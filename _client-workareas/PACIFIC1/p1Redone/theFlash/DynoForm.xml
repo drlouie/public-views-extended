@@ -1,0 +1,20 @@
+<dynaForm>
+<requestType>
+	<artist>
+		<name>Purchase Outright</name>
+		<email>purchase</email>
+	</artist>
+	<artist>
+		<name>Leased / Hosted</name>
+		<email>hosted</email>
+	</artist>
+</requestType>
+<requestSubject>
+	<subject>
+		<name>Showcase As-Is</name>
+	</subject>
+	<subject>
+		<name>Showcase Customized</name>
+	</subject>
+</requestSubject>
+</dynaForm>

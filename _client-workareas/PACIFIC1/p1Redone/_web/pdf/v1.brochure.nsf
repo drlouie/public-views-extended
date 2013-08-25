@@ -1,0 +1,183 @@
+<html>
+<body bgcolor="#FFFFFF" LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+<center>
+<table border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#FFFFFF">
+	<tr>
+		<td valign="top">
+			<table width="622" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#FFFFFF">
+				<tr>
+					<td bgcolor="#FFFFFF" valign="top">
+						<table border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#FFFFFF">
+							<tr>
+								<td valign="top" colspan="3"><img src="http://louierd.dynalias.com/website_design_imagery/brochure/lineardosTop.jpg" width="622" height="4" border="0"></td>
+							</tr>
+							<tr>
+								<td valign="top" colspan="3">
+
+									<table border="0" cellspacing="0" cellpadding="0" align="center">
+										<tr>
+											<td valign="top" height="25"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="450" height="25"></td>
+											<td valign="top" height="25"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="150" height="25"></td>
+										</tr>
+										<tr>
+											<td valign="middle" height="23"><font size="3" color="#000000" face="Verdana">%%LE_ADDRESS%%</font></td>
+											<td valign="top" height="23"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="150" height="23"></td>
+										</tr>
+										<tr>
+											<td valign="top" height="25"><font size="1" color="#997543" face="Verdana"><b>%%LE_CITST%%</b></font></td>
+											<td valign="top" height="25"><font size="3" color="#997543" face="Verdana"><b>%%LE_PRICE%%</b></font></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+							<tr>
+								<td valign="top" colspan="3" bgcolor="#E0DBCC"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="622" height="1"></td>
+							</tr>
+							<tr>
+								<td valign="top" width="1" bgcolor="#E0DBCC"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="1" height="1"></td>
+								<td valign="top">
+									<!-- <img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="620" height="489"> -->
+									<table border="0" cellspacing="0" cellpadding="0" align="center">
+										<tr>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+											<td valign="top" width="177" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="410" height="7"></td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="187" height="7"></td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+										</tr>
+										<tr>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+											<td valign="top" width="177" height="7"><img src="http://louierd.dynalias.com/Showcases/%%LE_SID%%/brochureI/%%LE_PID%%.jpg" width="410" height="474"></td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+											<td valign="top" width="7" height="7">
+
+												<table border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#E0DBCC">
+													<tr>
+														<td valign="top" width="7" height="20"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="10" height="20"></td>
+														<td valign="top" width="177"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="177" height="1"></td>
+														<td valign="top" width="7" height="20"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="10" height="20"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#997543" face="Verdana"><b>PROPERTY INFORMATION</b></font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Property ID: </b>%%LE_PID2%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>City: </b>%%LE_CITY%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Zone: </b>%%LE_STATE%% [ %%LE_ZIP%% ]</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Bedrooms: </b>%%LE_BED%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Bathrooms: </b>%%LE_BATH%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Garage: </b>%%LE_GARAGE%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Floorplan: </b>%%LE_FLOOR%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Lotsize: </b>%%LE_LOT%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+														<td valign="top" width="177"><font size="1" color="#000000" face="Verdana"><b>Year Built: </b>%%LE_BUILT%%</font></td>
+														<td valign="top" width="5"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="30"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="5" height="134"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="130"></td>
+														<td valign="bottom" width="177" height="134">
+
+															<table border="0" cellspacing="0" cellpadding="0" align="center" height="116">
+																<tr><td valign="top"><font size="1" color="#000000" face="Verdana"><b>CONTACT: Ruben</b></font></td></tr>
+																<tr><td valign="top"><font size="1" color="#000000" face="Verdana">Project Manager</font></td></tr>
+																<tr><td valign="top"><font size="1" color="#000000" face="Verdana">555 Technology Ave</font></td></tr>
+																<tr><td valign="top"><font size="1" color="#000000" face="Verdana">Irvine, CA 92121</font></td></tr>
+																<tr><td valign="top"><font size="1" color="#000000" face="Verdana">Office: (909) 489-2484</font></td></tr>
+																<tr><td valign="top"><font size="1" color="#000000" face="Verdana">Email: <a href="mailto:nms.ruben@gmail.com?subject=Requesing Technology Development Information [via Brochure]">Click Here</a></font></td></tr>
+																<!--<tr><td valign="top"><font size="1" color="#000000" face="Verdana">Fax: (800) 836-1301</font></td></tr>-->
+															</table>														
+														
+														</td>
+														<td valign="top" width="5" height="130"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="5" height="130"></td>
+													</tr>
+													<tr>
+														<td valign="top" width="7" height="20"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="10" height="20"></td>
+														<td valign="top" width="177"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="177" height="1"></td>
+														<td valign="top" width="7" height="20"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="10" height="20"></td>
+													</tr>
+												</table>
+											
+											</td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+										</tr>
+										<tr>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+											<td valign="top" width="177" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="410" height="7"></td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="187" height="7"></td>
+											<td valign="top" width="7" height="7"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="7" height="7"></td>
+										</tr>
+
+
+
+
+
+								</table></td>
+								<td valign="top" width="1" bgcolor="#E0DBCC"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="1" height="1"></td>
+							</tr>
+							<tr>
+								<td valign="top" colspan="3" bgcolor="#E0DBCC"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="622" height="1"></td>
+							</tr>
+							<tr>
+								<td valign="top" colspan="3"><img src="http://louierd.dynalias.com/website_design_imagery/brochure/bottomer.jpg" width="622" height="216" border="0"></td>
+							</tr>
+							<tr>
+								<td valign="top" colspan="3" bgcolor="#E0DBCC"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="622" height="1"></td>
+							</tr>
+							<tr>
+								<td valign="middle" colspan="3" height="19" align="center"><font size="1" color="#000000" face="Verdana">www.LouieRd.com &nbsp;  &nbsp;  P: (909) 489-2484 &nbsp;  &nbsp;  nms.ruben@gmail.com</font></td>
+							</tr>
+							<tr>
+								<td valign="top" colspan="3" bgcolor="#E0DBCC"><img src="http://louierd.dynalias.com/website_design_imagery/technology-spacer.gif" width="622" height="1"></td>
+							</tr>
+							<tr>
+								<td valign="middle" colspan="3" height="15" align="center"><font size="1" color="#000000" face="Verdana">555 Technology Ave, Irvine, CA 92121</font></td>
+							</tr>
+							<tr>
+								<td valign="top" colspan="3"><img src="http://louierd.dynalias.com/website_design_imagery/brochure/lineardosBot.jpg" width="622" height="1" border="0"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</center>
+</body>
+</html>

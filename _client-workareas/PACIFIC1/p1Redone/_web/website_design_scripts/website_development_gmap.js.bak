@@ -1,0 +1,32 @@
+    if (GBrowserIsCompatible()) { 
+		document.getElementById("map").innerHTML = '';		
+      function createMarker(point,html) {
+        var marker = new GMarker(point);
+        GEvent.addListener(marker, "click", function() {
+          marker.openInfoWindowHtml(html);
+        });
+        return marker;
+      }
+
+      var map = new GMap2(document.getElementById("map"));
+      map.addControl(new GLargeMapControl());
+      map.addControl(new GMapTypeControl());
+      map.setCenter(new GLatLng(lat,lon),15);
+
+      var point = new GLatLng(lat,lon);
+      var marker = createMarker(point,'<div style="width:240px"></div>');
+      map.addOverlay(marker);
+/*    
+      var point = new GLatLng(43.91892,-78.89231);
+      var marker = createMarker(point,'Some stuff to display in the<br>Second Info Window')
+      map.addOverlay(marker);
+
+      var point = new GLatLng(43.82589,-79.10040);
+      var marker = createMarker(point,'Some stuff to display in the<br>Third Info Window')
+      map.addOverlay(marker);
+*/
+    }
+    
+    else {
+      alert("Sorry, the Google Maps API is not compatible with this browser");
+    }

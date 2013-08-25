@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+
+## BINARY FILENAME FOR OUTGOING PDF NAMING
+$BIN = $ItemName;
+$SID = $FORM{'SID'};
+$PID = $FORM{'PID'};
+
+$leTemplateN = `cat pdf/v1.brochure.nsf`;
+
+$p1 = '<?xml version="1.0" encoding="UTF-8"?>';
+$page = `cat Showcases/$SID.xml`;
+$page =~ s/$p1//gi;
+
+$lePieces1 = "\t</proj>";
+$lePieces2 = "\t<proj>";
+@splitXML = split(/$lePieces1/,$page);
+##print int(@splitXML);
+
+$miPIDx = "$PID.xml";
+foreach $SXML (@splitXML) {
+	@splitSXML = split(/$lePieces2/,$SXML);
+
+ 	use HTML::Strip;
+  	my $hs = HTML::Strip->new();
+  	my $clean_text = $hs->parse( $splitSXML[1] );
+  	$hs->eof;
+
+
+	$clean_text =~ s/\t//gi;
+	if ($clean_text =~ $miPIDx) {
+		@ssxmlLines = split(/\n/,$clean_text);
+		##-- 0 = blank line space
+		$miAddress = $ssxmlLines[1];
+		$miCity = $ssxmlLines[2];
+		$miZip = $ssxmlLines[3];
+		$miState = $ssxmlLines[4];
+		$miPrice = $ssxmlLines[5];
+		$miTitle = $ssxmlLines[6];
+		$miFourFeatures = $ssxmlLines[7];
+		$miThumb = $ssxmlLines[8];
+		$miAllPhotos = $ssxmlLines[9];
+		$miDesc = $ssxmlLines[11];
+		$miBed = $ssxmlLines[12];
+		$miBath = $ssxmlLines[13];
+		$miFloor = $ssxmlLines[14];
+		$miLot = $ssxmlLines[15];
+		$miBuilt = $ssxmlLines[16];
+		$miGarage = $ssxmlLines[17];
+		$miLat = $ssxmlLines[18];
+		$miLon = $ssxmlLines[19];
+
+		$miCitSt = $miCity . ", ". $miState;
+		@elp = split(//,$miPrice);
+		$elPrecio = join(' ', @elp);
+		$leTemplateN =~ s/%%LE_ADDRESS%%/$miAddress/g;
+		$leTemplateN =~ s/%%LE_CITST%%/$miCitSt/g;
+		$leTemplateN =~ s/%%LE_PRICE%%/$elPrecio/g;
+		$leTemplateN =~ s/%%LE_PID%%/$PID/g;
+		$leTemplateN =~ s/%%LE_SID%%/$SID/g;
+		$leTemplateN =~ s/%%LE_PID2%%/$PID/g;
+		$leTemplateN =~ s/%%LE_CITY%%/$miCity/g;
+		$leTemplateN =~ s/%%LE_STATE%%/$miState/g;
+		$leTemplateN =~ s/%%LE_ZIP%%/$miZip/g;
+		$leTemplateN =~ s/%%LE_BED%%/$miBed/g;
+		$leTemplateN =~ s/%%LE_BATH%%/$miBath/g;
+		$leTemplateN =~ s/%%LE_GARAGE%%/$miGarage/g;
+		$leTemplateN =~ s/%%LE_FLOOR%%/$miFloor/g;
+		$leTemplateN =~ s/%%LE_LOT%%/$miLot/g;
+		$leTemplateN =~ s/%%LE_BUILT%%/$miBuilt/g;
+		$leTemplateN =~ s/%%LE_PID3%%/$PID/g;
+		
+	}
+}
+
+
+
+
+
+
+
+## temp invoice file
+
+
+
+
+$Rhtml = "pdf/brochures/$PID.html";
+$Rpdf = "pdf/brochures/$PID.pdf"; 
+
+
+
+## new PDF as per O-Num
+## write out invoice on temporary file
+open(RHTML,">$Rhtml") || &error('can not write to $Rhtml');
+flock(RHTML, 2);
+print RHTML "$leTemplateN";
+## unlock HTML
+flock(RHTML, 8);
+close(RHTML);
+## create PDF
+
+$commandline="htmldoc -t pdf15 --nup 1 --pagelayout document --header ... --footer ... --bottom 1px --left 36px --top 1px --webpage -f $Rpdf pdf/brochures/$PID.html";
+
+select(STDOUT); $| = 1;
+system($commandline);
+
+#print "k";
+
+if ($FORM{'pdf'}) {
+	print "Location: http://louierd.dynalias.com/$Rpdf\n\n";
+}
+else {
+	print "Content-type:  text/html\n\n";
+	$miHTML = `cat $Rhtml`;
+	print "$miHTML";
+}
+
+1;

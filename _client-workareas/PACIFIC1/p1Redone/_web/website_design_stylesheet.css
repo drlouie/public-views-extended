@@ -1,0 +1,20 @@
+	body { overflow:hidden; }
+	#musplLay { visibility:visible; }
+	#tree { filter:alpha(opacity=90);-moz-opacity:.90; }
+	#samplersBack  { filter:alpha(opacity=80);-moz-opacity:.80; }
+	#t1 { filter:alpha(opacity=70);-moz-opacity:0.70; }
+	#t2 { filter:alpha(opacity=60);-moz-opacity:0.60; }
+	#t3 { filter:alpha(opacity=50);-moz-opacity:0.50; }
+	#t4 { filter:alpha(opacity=40);-moz-opacity:0.40; }
+	#t5 { filter:alpha(opacity=30);-moz-opacity:0.30; }
+	#t6 { filter:alpha(opacity=20);-moz-opacity:0.20; }
+	#t7 { filter:alpha(opacity=10);-moz-opacity:0.10; }
+	#divLoad { visibility: hidden; border-top:#B8A27F 1px solid; border-left:#B8A27F 1px solid;  border-right:#B8A27F 1px solid; position:relative; z-index:103; top:-1171px; left:-86px; width:600px; height:328px; clip:rect(0px 600px 328px 0px); }
+	#overDiv, #divLinks,#divArrows, #bground, #divCont, #divIEText, #addCommentForm { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; }
+
+	.topIndex { text-decoration:none; font-size:11px; font-family:arial,verdana,helvetica; line-height:16px; color:#FFFFFF; }
+
+	.website_design_papier { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, src='website_design_imagery/website_development_papier.png'); BACKGROUND-REPEAT: no-repeat; BACKGROUND-ALIGN: top right; }
+	.website_design_papier[class] { background-image:url(website_design_imagery/website_development_papier.png); BACKGROUND-REPEAT: no-repeat; BACKGROUND-ALIGN: top right;  }
+	#website_design_information { visibility: hidden; position:relative; padding:32px; padding-top:40px; z-index:129; top:-700px; left:-220px; width:273px; height:332px; clip:rect(0px 273px 332px 0px); font-size:11px; font-family:arial,verdana,helvetica; text-align:left; line-height:15px; }
+	

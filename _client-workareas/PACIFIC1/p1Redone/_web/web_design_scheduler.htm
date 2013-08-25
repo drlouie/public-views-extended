@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+
+require("pq.nsp");
+
+if ($FORM{'sid'} && $FORM{'pid'}) {
+	$FORM{'SID'} = $FORM{'sid'};
+	$FORM{'PID'} = $FORM{'pid'};
+}
+else {
+	$FORM{'SID'} = 'OC1';
+	$FORM{'PID'} = 'S491574';
+}
+
+
+print "k";
+
+exit;
+
+
