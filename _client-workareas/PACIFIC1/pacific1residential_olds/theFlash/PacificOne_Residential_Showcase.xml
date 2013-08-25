@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<featuredProjects>
+	<proj>
+		<label>1118 Berkshire Lane</label>
+		<city>Newport Beach</city>
+		<price>$2,599,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_01.jpg</pic>
+	</proj>
+	<proj>
+		<label>21 Sandy Apple Lane</label>
+		<city>Laguna Beach</city>
+		<price>$3,109,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_02.jpg</pic>
+	</proj>
+	<proj>
+		<label>59 Veil by the Sea</label>
+		<city>Dana Point</city>
+		<price>$6,239,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_03.jpg</pic>
+	</proj>
+	<proj>
+		<label>546 Masterbuilt Road</label>
+		<city>Laguna Niguel</city>
+		<price>$1,029,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_04.jpg</pic>
+	</proj>
+	<proj>
+		<label>5 31st Street (Beachfront)</label>
+		<city>Newport Bay</city>
+		<price>$8,359,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_05.jpg</pic>
+	</proj>
+	<proj>
+		<label>Calle De Los Alamos</label>
+		<city>San Celemente</city>
+		<price>$10,409,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_06.jpg</pic>
+	</proj>
+	<proj>
+		<label>509 Palm Avenue (Oceanview)</label>
+		<city>Huntington Beach</city>
+		<price>$1,409,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_07.jpg</pic>
+	</proj>
+	<proj>
+		<label>79 Capistrano by the Sea</label>
+		<city>San Juan Capistrano</city>
+		<price>$2,523,000</price>
+		<link>/marioz.htm</link>
+		<width>600</width>
+		<height>400</height>
+		<pic>crabs_08.jpg</pic>
+	</proj>
+</featuredProjects>
