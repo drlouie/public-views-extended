@@ -1,0 +1,43 @@
+.submenu2 {
+	BORDER-RIGHT: #C9CDDF 1px solid; BORDER-TOP: #C9CDDF 1px solid; BACKGROUND-IMAGE: url(/NightVisionImages/NightVisionMenus/minimenuBG.gif); BORDER-LEFT: #C9CDDF 1px solid; BORDER-BOTTOM: #C9CDDF 1px solid; BACKGROUND-REPEAT: repeat-y; HEIGHT: auto; BACKGROUND-COLOR: #ffffff;
+	cursor:pointer;
+}
+.item12 {
+	BORDER-RIGHT: #316ac5 0px solid; BORDER-TOP: #316ac5 0px solid; MARGIN: 1px; BORDER-LEFT: #316ac5 0px solid; WIDTH: 100%; CURSOR: default; BORDER-BOTTOM: #316ac5 0px solid; BACKGROUND-COLOR: transparent;
+	cursor:pointer;
+}
+.item22 {
+	BORDER-RIGHT: #E1E3EC 1px solid; BORDER-TOP: #E1E3EC 1px solid; MARGIN: 0px; BORDER-LEFT: #E1E3EC 1px solid; WIDTH: 100%; CURSOR: default; BORDER-BOTTOM: #E1E3EC 1px solid; BACKGROUND-COLOR: #F8F9FA;
+	cursor:pointer;
+}
+.text12 {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 0px; PADDING-BOTTOM: 3px; FONT: 11px Arial, Tahoma; WIDTH: 100%; COLOR: #000000; TEXT-INDENT: 10px; PADDING-TOP: 3px;
+	cursor:pointer;
+}
+.text22 {
+	PADDING-RIGHT: 10px; PADDING-LEFT: 0px; PADDING-BOTTOM: 3px; FONT: 11px Arial, Tahoma; WIDTH: 100%; COLOR: #000000; TEXT-INDENT: 10px; PADDING-TOP: 3px;
+	cursor:pointer;
+}
+.topsubmenu2 {
+	padding:0px; 
+	cursor:pointer;
+}
+.topitem12 {
+	WIDTH: 10px; HEIGTH: 10px; CURSOR: default; 
+	padding:0px;
+	border:0px;
+	margin:0px;
+	cursor:pointer;
+}
+.toptext12 {
+	padding:0px;
+	border:0px;
+	margin:0px;
+	cursor:pointer;
+}
+.toptext22 {
+	padding:0px;
+	border:0px;
+	margin:0px;
+	cursor:pointer;
+}

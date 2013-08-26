@@ -1,0 +1,106 @@
+#!/usr/bin/perl5 -s
+
+print "Content-type: text/html\n\n";
+
+## --> Parse Request Query
+require ("parse_query.nsp");
+
+if ($FORM{"iIdee"} || $FORM{'catalog2006'}) {
+
+if ($FORM{"iIdee"}) {
+	#-- CONNECT TO DB (GET PAGE CONTENT)
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:unvWeb","root","19nv8n6uilPoA") or die "Unable to connect to database: <b>unvWeb</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+		$mid=$FORM{"iIdee"};
+		my $sth = $dbh->prepare("SELECT * FROM newImages where ImageID = '$mid'");
+		$sth->execute or die "Unable to execute query\n"; 
+		my @row;
+			while(@row = $sth->fetchrow_array) { 
+				$FileName = $row[2];
+			}
+		$sth->execute or die "Unable to execute query\n"; 
+		$sth->finish;
+		$dbh->disconnect;
+		$cualTrueFile = "/usr/local/www/vhosts/usnightvision.com/htdocs/Night_Vision_Images/Night_Vision_Products/" . $FileName . "";
+		$localFileName = "Night_Vision_Images/Night_Vision_Products/" . $FileName . "";
+}
+### catalog2006
+else {
+	$FileName = "Night_Vision_Images/catalog2006/" . $FORM{'catalog2006'} . ".jpg";
+	$cualTrueFile = "/usr/local/www/vhosts/usnightvision.com/htdocs/" . $FileName . "";
+	$localFileName = "Night_Vision_Images/catalog2006/" . $FORM{'catalog2006'} . ".jpg";
+}
+
+
+if ((-e "$cualTrueFile") && $FileName) { $loadScript = "tiralo()"; }
+else { $loadScript = "filenotfound()"; }
+
+
+if ($FORM{'largeOne'} eq "1") { $cualBacker = "viewImage_backerlarge.gif"; $cualWidth = "594"; $cualWidth2 = $cualWidth - 2; }
+else { $cualBacker = "viewImage_backer.gif"; $cualWidth = "323"; $cualWidth2 = $cualWidth - 2; }
+
+print qq~
+<html>
+<head></head>
+<title>Night Vision - Photo Viewer - US Night Vision Corporation</title>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<center>
+<table width="$cualWidth" cellpadding="0" cellspacing="0" border="0" style="margin-left:1px;margin-top:2px;">
+<tr valign="top">
+	<td width="100%" align="center">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td align="center" style="padding-left:70px;"><a href="javascript:void(0);parent.window.close();"><img src="Night_Vision_Images/viewImage_us_night_vision_logo.gif" width="198" height="117" border="0"></a></td>
+			<td width="65" align="right" valign="top"><a href="javascript:void(0);parent.window.close();" style="font-size:9px;color:#000000;font-family:verdana,arial">close [<font style="color:#eb0000;">X</font>]</a><br><img src="Night_Vision_Images/spacer.gif" width="50" height="1" border="0"></td>
+		</tr>
+		</table>
+
+	
+	</td>
+</tr>
+<tr>
+	<td>
+
+		<table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(Night_Vision_Images/$cualBacker); background-repeat: no-repeat; ">
+			<tr>
+				<td align="center" style="padding-top:36px; padding-bottom:55px;height:443px;"><img src="Night_Vision_Images/viewImage_loading.gif" border="0" name="theFeds"></td>
+			</tr>
+		</table>
+
+	</td>
+</tr>
+</table>
+</center>
+<div id="loadImage" style="position:absolute;z-index:10;left:1px;top:142px;width:$cualWidth2 px;height:250px;visibility:hidden;"><img src="Night_Vision_Images/viewImage_watermark.jpg" width="$cualWidth2"></div>
+
+<script language="javascript">
+	function tiralo() { 
+		if (document.getElementById) {
+			document.images.theFeds.src = '$localFileName'; 
+			changeOpac('5','loadImage');
+		}
+	}
+	function filenotfound() { document.images.theFeds.src = 'Night_Vision_Images/viewImage_filenotfound.gif'; }
+	setTimeout('$loadScript',1000);
+
+//change the opacity for different browsers 
+function changeOpac(opacity, id) {
+    var object = document.getElementById(id).style; 
+
+    object.opacity = (opacity / 100); 
+    object.MozOpacity = (opacity / 100); 
+    object.KhtmlOpacity = (opacity / 100); 
+    object.filter = "alpha(opacity=" + opacity + ")"; 
+    object.visibility = 'visible';
+} 
+
+</script>
+</body>
+</html>
+
+~;
+}
+
+exit;

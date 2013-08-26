@@ -1,0 +1,161 @@
+BODY { 
+	overflow-y:auto; 
+	overflow-x:hidden;
+}
+
+
+.elComment { font-size:12px; font-family:verdana,arial,helevtica; color:#001E5B; }
+.welcomeText { font-size:12px;font-family:verdana,arial,helvetica;color:ffffff;line-height:16px; }
+.label { font-size:11px; font-family:verdana,arial,helvetica; color: #001E5B;  }
+.mainLabel { font-size:12px; font-weight:bold; font-family:verdana,arial,helvetica; color: #001E5B; }	
+.commonText { font-size:11px; font-family:verdana,arial,helvetica; color: #001E5B; }
+.commonInput { font-size: 12px; font-family:verdana,arial,helvetica; height:20px; color:#001E5B; padding: 3px; font-weight:normal; }
+.commonArea { font-size: 12px; font-family:verdana,arial,helvetica; height:60px; color:#001E5B; padding: 3px; font-weight:normal; }
+.vFormTitle { font-size:10px; font-family:verdana,arial,helevtica; color:#001E5B; }
+
+.babyText { font-size:9px; font-family:verdana,arial,helvetica; color:#000000; }
+.thawteText { font-size:9px; font-family:verdana,arial,helvetica; color:#382478; }
+
+.cartTitles { font-size: 12px; font-family:arial,verdana,helvetica; color:#000000; padding-right: 10px; }
+.cartInput { font-size: 12px; font-family:arial,verdana,helvetica; height:20px; color:#000000; }
+.cartHelpers { font-size: 10px; font-family:arial,verdana,helvetica; color:#000000; }
+.helperText { cursor:pointer; }
+.cartRadioTitles { font-size: 12px; font-family:arial,verdana,helvetica; color:#000000; padding-top: 2px; }
+.cartRadios { padding-right: 10px; }
+
+.inputHelpers { font-size: 9px; font-family:arial,verdana,helvetica; color:#000000; padding-top: 2px; padding-left: 2px; }
+
+
+
+.ptabs { padding-bottom:3px; font-family:verdana,arial,helvetica; font-size:10px; }
+.addToCartBut { cursor:pointer; border:0px; width:206px; height:25px; background-image:url(NightVisionImages/addCheckedToCart_off.gif); background-repeat:no-repeat; }
+.productTabs { background-image:url(NightVisionImages/tableback.gif); background-repeat:repeat-x; }
+
+#Contento { background-position:top center; background-repeat:no-repeat; }
+#Producto { margin-top:150px; }
+
+.tabies { background-image:url(NightVisionImages/prodTabiesBacker.gif); background-position:top left; background-repeat:no-repeat; margin-top:15px; }
+.tabieTexts { color:#718255; font-size:10px; font-family: verdana,arial,helvetica; }
+.expansionPack { padding:10px; padding-top:15px; padding-left:20px; color:#000000; font-size:12px; font-family: arial,verdana,helvetica; }
+.expansionBold { color:#718255; font-weight:bold; }
+
+.accessoryPreviewTitle { color:#000000; font-size:11px; font-family: verdana,arial,helvetica; }
+.accessoryPreviewSubTitle { color:#2D4492; font-size:9px; font-family: verdana,arial,helvetica; line-height:10px; padding-top:5px; padding-bottom:5px; }
+.accessoryPreviewCost { color:#000000; font-size:10px; font-family: verdana,arial,helvetica; }
+
+.similarPreviewTitle { color:#2D4492; font-size:11px; font-family: verdana,arial,helvetica; }
+.similarPreviewCost { color:#000000; font-size:10px; font-family: verdana,arial,helvetica; padding-top:5px; }
+
+.BulletPoints { font-family:verdana,arial,helvetica; font-size:11px; color:#000000; }
+#BulletPointTable { padding-left:25px; }
+.BulletPointStar { color:#718255; font-size:24px; font-family: arial,verdana,helvetica; padding-left:5px; padding-right:5px; }
+
+
+
+.footerInfo { font-size:9px; font-family:arial,verdana,helvetica; color: #000000; }
+
+.cartReadTitle { padding-bottom:3px; }
+
+
+li { color:#fff;background:url(NightVisionImages/NightVisionMenus/bullet.gif) no-repeat 6px 6px; }
+	
+/* template master */
+.tmenu { font-family: verdana,arial,helvetica; font-size:9px; font-weight:bold; color:#000000; text-decoration:underline; padding-right:1px; padding-left:1px; }
+.menuIcon { padding-left:4px; padding-right:4px; }
+.quickStat {  padding-right:10px; }
+.qsFont { font-family: arial,verdana,helvetica; font-size:11px; font-weight:bold; color:#000000; }
+.secMenuSpacer { font-family: verdana,arial,helvetica; font-size:10px; color:#999999; }
+.secMenuLink { font-family: arial,verdana,helvetica; font-size:11px; color:#000000; padding-right:1px; padding-left:1px; }
+.bodyText { font-family: verdana,arial,helvetica; font-size:11px; color:#000000; padding:20px;}
+.footerText { font-family: verdana,arial,helvetica; font-size:9px; color:#000000; }
+
+.crumbs { padding-top:8px; padding-left:12px; font-size:12px; font-family:verdana,arial,helvetica; color:#000000; }
+.crumb1 { font-size:12px; font-family:verdana,arial,helvetica; font-weight:bold; color:#718255; }
+.welcomeMessage { font-family: verdana,arial,helvetica; font-size:10px; color:#666666; padding-right:5px; padding-left:5px; }
+.welcomeLink { font-family: verdana,arial,helvetica; font-size:10px; color:#000000; text-decoration:underline; }
+.welcomeMessage2k8 { font-family: verdana,arial,helvetica; font-size:12px; color:#000000; padding-top:6px; padding-right:4px; }
+.welcomeLink2k8 { font-family: verdana,arial,helvetica; font-size:12px; color:#000000; text-decoration:underline; }
+
+
+/* Featured Product */
+.italix { color:#000000; font-size: 10px; font-family:verdana,arial,helvetica; margin-left:5px; }
+.featureText { color:#000000; font-size: 9px; font-family:arial,verdana,helvetica; padding-top:10px; padding-left:10px; padding-right:10px;padding-bottom:10px; }
+.featurePrice { color:#ffffff; font-size: 11px; font-weight:bold; font-family:verdana,arial,helvetica; padding-right:15px; }
+.featureLink { color:#000000; font-size: 9px; font-family:verdana,arial,helvetica; padding-top:10px; }
+.featureBullets { padding-left:15px; line-height:16px; font-size:9px; font-family:arial,verdana,helvetica; }
+.featureButtons { font-size:10px; font-family:verdana,arial,helevtica; }
+
+/* ask expert */
+.aaeSmallInput { height:17px; width:79; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+.aaeLargeInput { height:17px; width:120; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+.aaeTArea { width:250; height:54px; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+.aaeButtons { font-size:10px; font-family:verdana,arial,helevtica; }
+
+/* left menu */
+#cartTable { margin-top:30px; visibility: visible; position:relative; left:0px; top:0px; background-color:#FFFFFF; border:#CCCCCC 1px dashed; height:91px; width:165px; }
+#cartTable2 { visibility: visible; position:relative; left:0px; top:0px; background-color:#FFFFFF; border:#CCCCCC 1px dashed; height:91px; width:165px; }
+.counterCart { font-size:9px; font-family:arial,verdana,helevtica; color:#A41110; line-height:16px; }
+.counterCartNums { font-size:9px; font-family:verdana,arial,helevtica; color:#000000; line-height:16px; }
+
+.tableTitles { background-repeat:no-repeat; background-position:top left; margin-top:35px; }
+/*defaults, overwrite in doc*/
+#tableTitleDescription { margin-top:35px; background-image:url(NightVisionImages/tableTitles_productDescription.gif); }
+#tableTitleAccessories { margin-top:35px; background-image:url(NightVisionImages/tableTitles_accessories.gif); }
+#tableTitleUpgrades { margin-top:35px; background-image:url(NightVisionImages/tableTitles_upgradesOptions.gif); }
+#tableTitleWarranty { margin-top:35px; background-image:url(NightVisionImages/tableTitles_warranty.gif); }
+#tableTitleSimilar { margin-top:35px; background-image:url(NightVisionImages/tableTitles_similar.gif); }
+
+#leftieTableShell { border:#596743 1px dashed; }
+#leftieTable { visibility: visible; position:relative; left:0px; top:0px; background-color:#FFFFFF; }
+.leftieTitulo { background-color:#D6DCD6; height:30px; padding-left:5px; font-size:12px; font-family:arial,verdana,helevtica; color:#313825; line-height:16px; font-weight:bold; }
+.leftieItem { text-decoration:none; padding-left:2px; padding-right:2px; padding-top:1px; padding-bottom:1px; font-size:11px; font-family:arial,verdana,helevtica; color:#313825; }
+.leftieItemLayer { text-align:left; cursor:pointer; width:204px; text-decoration:none; padding-left:8px; padding-right:8px; padding-top:4px; padding-bottom:4px; font-size:11px; font-family:arial,verdana,helevtica; color:#313825; line-height:14px; background-color:#FFFFFF; border:#FFFFFF 1px solid; text-decoration:none; }
+.leftieItemLayerSelected { text-align:left; width:204px; text-decoration:none; padding-left:8px; padding-right:8px; padding-top:4px; padding-bottom:4px; font-size:11px; font-family:arial,verdana,helevtica; color:#313825; line-height:14px; background-color:#F4F7F2; border:#C3CCC3 1px solid; }
+
+#leftieTableTopBot { background-image: url(NightVisionImages/leftieBorder_topbot.gif); background-align: top left; background-repeat: repeat x; }
+#leftieTableSides { background-image: url(NightVisionImages/leftieBorder_sides.gif); background-align: top left; background-repeat: repeat y; }
+
+#customercareTable { visibility: visible; position:relative; left:0px; top:0px; background-color:#FFFFFF; border:#363E2A 1px dashed; height:91px; width:165px; }
+
+.panelTop { margin-top:25px; }
+.panelTopText { font-size:11px;font-family:arial,verdana,helvetica;color:#313825; padding-bottom:2px; }
+.panelLinearGreen { background-image:url(/NightVisionImages/leftieGreenDottie.gif); background-repeat:repeat-x; }
+.panelLinearWhite { background-image:url(/NightVisionImages/leftieWhiteDottie.gif); background-repeat:repeat-x; }
+
+
+
+#saleitemsTable { visibility: visible; position:relative; left:0px; top:0px; background-color:#FFFFFF; border:#A33A39 1px dashed; }
+.saleRed { color:#A41110; }
+.sale {	color:#313825; }
+.prompt { line-height:14px; font-size:9px; letter-spacing:1px; font-family:verdana,arial,helvetica; color: #A41110; }
+#sale {	line-height:12px; font-family:verdana,arial,helvetica; font-size:11px; color:#313825; padding-bottom:5px; padding-top:2px; }	
+
+#wikiTable { visibility: visible; position:relative; left:0px; top:0px; background-color:#FFFFFF; border:#596743 1px dashed; }
+#wiki {	line-height:12px; width:140px; font-family:verdana,arial,helvetica; font-size:11px; color:#313825; padding-bottom:5px; padding-top:2px; }	
+
+#forumTable { visibility: visible; position:relative; left:0px; top:0px; background-color:#FFFFFF; border:#363E2A 1px dashed; }
+#forum { background-image:url(/NightVisionImages/NightVisionMenus/panelNVOF.gif); background-position:bottom right; background-repeat:no-repeat; line-height:12px; width:140px; font-family:verdana,arial,helvetica; font-size:11px; color:#313825; padding-bottom:5px; padding-top:2px; }	
+
+
+#thawteTable { background-image:url(/NightVisionImages/NightVisionMenus/panelThawte.gif); }
+.panelThawteText { font-family:verdana,arial,helvetica; font-size:10px; color:#FFFFFF; }
+
+.secureTitulo { font-size:14px; font-family:verdana,arial,helvetica; font-color:#000000; letter-spacing:5px; padding-top:52px; padding-right:70px; }
+
+/* secondary & prod pages pages (REDONE) */
+.title { font-family:arial,verdana,helvetica; font-size:13px; line-height:20px; color:#000000; margin-left:5px; font-weight:bold; }
+.description { font-family:verdana,arial,helvetica; font-size:12px; line-height:16px; color:#000000; }
+.descriptionProduct { padding-top:10px; font-family:verdana,arial,helvetica; font-size:11px; line-height:16px; color:#000000; }
+.inventoryButtons { text-decoration:none; font-size:10px; font-family:arial,verdana,helevtica; color:#000000; }
+.subTitle { font-family:arial,verdana,helvetica; font-size:12px; color:#000000; margin-left:20px; }
+.subDescription { font-family:arial,verdana,helvetica; font-size:12px; color:#000000; line-height:23px; margin-left:10px; font-weight:bold; }
+.PriceWarranty { font-family:arial,verdana,helvetica; font-size:11px; color:#000000; }
+.techSpecsCartSel { font-family:verdana,arial,helvetica; font-size:9px; letter-spacing:1px; color:#000000; line-height:20px; }
+.specs { font-size:9px; font-family:arial,verdana,helevtica; color:#000000; line-height:16px; }
+.shopSelectName { font-size:11px; font-family:arial,verdana,helevtica; color:#000000; }
+.shopSelectPrice { font-size:11px; font-family:arial,verdana,helevtica; color:#000000; }
+.shopSelectName2 { font-size:9px; font-family:arial,verdana,helevtica; color:#000000; line-height:20px; }
+.shopSelectPrice2 { font-size:9px; font-family:arial,verdana,helevtica; color:#000000; line-height:20px; }
+.submitButton {font-size:9px; font-weight:bold; font-family:verdana,arial,helevtica; width:185px;}
+
+

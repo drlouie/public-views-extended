@@ -1,0 +1,31 @@
+<table width="525" border="0" cellspacing="0" cellpadding="0" class="browseResultsBack">
+  	<tr>
+    	<td width="385">
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  				<tr valign="bottom">
+	    			<td height="28" class="productTitle"><b>!!Title_With_Link!!</b></td>
+    				<td height="28" align="right" class="productPrice"><b>Price</b> !!PRICE!!</td>
+		  		</tr>
+	  		</table>
+		</td>
+    	<td width="140" rowspan="2" align="center" valign="top">!!IMAGEN!!</td>
+  	</tr>
+  	<tr>
+    	<td width="325" height="75" valign="top" class="resultDescription"><font style="line-height:20px;"><i><b>!!ProdDescSmall!!</b></i></font><br>!!DESCRIPTION!!</td>
+  	</tr>
+  	<tr>
+    	<td colspan="2" height="30" align="right">
+      		<table width="70%" height="30"  border="0" cellpadding="0" cellspacing="0">
+        		<tr align="center" valign="bottom">
+          			<td style="padding-bottom:5px;">!!MPINFO!!</td>
+          			<td><img src="Night_Vision_Images/spacerBlack.gif" width="1" height="20" style="margin-top:3px;"></td>
+          			<td style="padding-bottom:5px;">!!PPDF!!</td>
+          			<td><img src="Night_Vision_Images/spacerBlack.gif" width="1" height="20" style="margin-top:3px;"></td>
+          			<td style="padding-bottom:5px;"><a href="#" class="resultLink">Large Photo</a></td>
+        		</tr>
+      		</table>
+	  	</td>
+  	</tr>
+</table>
+<br>
+!!Splitter!!

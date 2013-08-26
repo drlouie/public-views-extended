@@ -1,0 +1,31 @@
+<table align=center border=0 cellpadding=0 cellspacing=0 width=100%><tr><td>
+<table align=center border=0 cellpadding=2 cellspacing=1 width=100% bgcolor=#EEEEEE>
+	<tr class=title align=center>
+		<td>&nbsp;DELETE</td>
+		<td>&nbsp;ZONE ID</td>
+		<td>&nbsp;ZONE NAME</td>
+		<td>&nbsp;DATE ADDED</td>
+		<td>&nbsp;ACTIONS</td>
+	</tr>
+	<TMPL_LOOP ZONE_LIST>
+		<tr class=list>
+			<td align=center><img src="ad_images/delete.gif" align="absmiddle">&nbsp;<input type=checkbox name="zone_del_<TMPL_VAR ID>" value=1></td>
+			<td align=center><TMPL_VAR ID></td>
+			<td align=center><input class=myinput type=text name=name_<TMPL_VAR ID> size=35 value="<TMPL_VAR NAME>"></td>
+			<td align=center><TMPL_VAR DATE_ADDED></td>
+			<td align=center><img src="ad_images/edit.gif" align="absmiddle">&nbsp;<a href="<TMPL_VAR SNAME>?act=list_banners&zone_id=<TMPL_VAR ID>">Manage</a></td>
+		</tr>
+	</TMPL_LOOP>
+		<tr><td colspan=5 align=right><input type=image src="ad_images/del_check.gif" alt="Delete All Checked" onClick="javascript:presubmit('delete_zone')" value="Delete All Checked">&nbsp;&nbsp;<input type=image src="ad_images/update_ch.gif" onClick="javascript:presubmit('update_zone')" alt="Update Changes" value="Update Changes"></td></tr>
+		<tr><td colspan=5><hr noshade></td></tr>
+		<tr class=list>
+			<td align=center>&nbsp;</td>
+			<td align=center>&nbsp;</td>
+			<td align=center><input class=myinput type=text name=name_new size=35 value=""></td>
+			<td align=center>&nbsp;</td>
+			<td align=center>&nbsp;</td>
+		</tr>
+		<tr><td colspan=5 align=right><input type=image src="ad_images/new_zone.gif" alt="Add new advert zone" onClick="javascript:presubmit('add_zone')" value="Add New Advert Zone"></td></tr>
+</table>
+</td></tr>
+</table>

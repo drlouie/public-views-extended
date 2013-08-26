@@ -1,0 +1,27 @@
+<table width=100% align=center border=0 cellpadding=0 cellspacing=0 width=100%><tr><td>
+<table width=100% align=center border=0 cellpadding=2 cellspacing=1 bgcolor=#EEEEEE width=100%>
+	<tr class=title><td colspan=2>&nbsp;GLOBAL SETTINGS</td></tr>
+	<tr class=list>
+		<td>&nbsp;Administrator Login:</td>
+		<td><input class=myinput type=text style="width:200" name=adm_login value="<TMPL_VAR ESCAPE=HTML NAME=ADM_LOGIN>"></td>
+	</tr>
+	<tr class=list bgcolor="#f7f7f7">
+		<td>&nbsp;Administrator Password:</td>
+		<td><input class=myinput type=password style="width:200" name=adm_password value="<TMPL_VAR ESCAPE=HTML NAME=ADM_PASSWORD>"></td>
+	</tr>
+	<tr><td colspan=2><hr noshade></td></tr>
+	<tr class=list>
+		<td>&nbsp;Site URL: (example "http://www.mysite.com")</td>
+		<td><input class=myinput type=text style="width:200" name=server_url value="<TMPL_VAR ESCAPE=HTML NAME=SERVER_URL>"></td>
+	</tr>
+	<tr class=list bgcolor="#f7f7f7">
+		<td>&nbsp;Banners Image URL: (example "/advert/")</td>
+		<td><input class=myinput type=text style="width:200" name=image_url value="<TMPL_VAR ESCAPE=HTML NAME=IMAGE_URL>"></td>
+	</tr>
+	<tr class=list>
+		<td>&nbsp;Banners Image Path: (example "/usr/home/mysite/htdocs/images/")</td>
+		<td><input class=myinput type=text style="width:200" name=image_path value="<TMPL_VAR ESCAPE=HTML NAME=IMAGE_PATH>"></td>
+	</tr>
+	<tr class=list><td colspan=2 align=right><br><input type=image src="ad_images/update.gif" onClick="javascript:presubmit('update_options')" value="Update Settings">&nbsp;</td></tr>
+</table>
+</td></tr></table>

@@ -1,0 +1,33 @@
+<table width=100% align=center border=0 cellpadding=0 cellspacing=0>
+<tr class=list><td><TMPL_VAR ZONE_LIST>&nbsp;<input type=image src="ad_images/select_zone.gif" align=absmiddle onClick="javascript:presubmit('list_banners')" alt="Select Advert Zone" value="Select Advert Zone"></td></tr>
+<tr><td>
+<table align=center border=0 cellpadding=2 cellspacing=1 width=100% bgcolor=#EEEEEE>
+	<tr class=title align=center>
+		<td>&nbsp;ID</td>
+		<td>&nbsp;ZONE NAME</td>
+		<td>&nbsp;TITLE</td>
+		<td>&nbsp;FORMAT</td>
+		<td>&nbsp;ACTIVE</td>
+		<td>&nbsp;DATE ADDED</td>
+		<td>&nbsp;MORE</td>
+	</tr>
+	<TMPL_LOOP BANNERS_LIST>
+		<tr class=list bgcolor="<TMPL_VAR BGCOLOR>">
+			<td align=center><TMPL_VAR ID></td>
+			<td align=left>&nbsp;<img src="ad_images/zone.gif" align="absmiddle" alt="[zone-<TMPL_VAR ZONE_NAME>]">&nbsp;<TMPL_VAR ZONE_NAME></td>
+			<td align=left><b><TMPL_VAR TITLE></b><br>Clc.: <TMPL_VAR CLICKS>, Imp.: <TMPL_VAR IMP>, CTR: <TMPL_VAR CTR><br><a href="<TMPL_VAR SNAME>?act=delete_stats&id=<TMPL_VAR ID>" onClick="return confirm('Clear?')">Clear stats</a></td>
+			<td align=left><TMPL_IF FORMAT><img src="ad_images/<TMPL_VAR FORMAT>.gif" alt="<TMPL_VAR FORMAT>" align="absmiddle">&nbsp;<TMPL_VAR FORMAT><TMPL_ELSE><img src="ad_images/html.gif" alt="Format HTML" align="absmiddle">&nbsp;html</TMPL_IF></td>
+			<td align=center>&nbsp;<img src="ad_images/<TMPL_UNLESS ACTIVE>in</TMPL_UNLESS>active.gif" align="absmiddle" alt="<TMPL_IF ACTIVE>Yes<TMPL_ELSE>No</TMPL_IF>"></td>
+			<td align=center><TMPL_VAR DATE_ADDED></td>
+			<td align=left>
+				<img src="ad_images/edit.gif" align="absmiddle">&nbsp;<a href="<TMPL_VAR SNAME>?act=edit_banners&id=<TMPL_VAR ID>">Edit</a><br>
+				<img src="ad_images/zoom.gif" align="absmiddle">&nbsp;<a href="<TMPL_VAR SNAME>?act=preview_banner&id=<TMPL_VAR ID>" target=_new onClick="return openWindow('<TMPL_VAR SNAME>?act=preview_banner&id=<TMPL_VAR ID>', '', 'status=no,scrollbars=no,resizable=no,width=<TMPL_VAR WIDTH>,height=<TMPL_VAR HEIGHT>');">Preview</a><br>
+				<img src="ad_images/delete.gif" align="absmiddle">&nbsp;<a href="<TMPL_VAR SNAME>?act=delete_banners&id=<TMPL_VAR ID>" onClick="return confirm('Delete?')">Delete</a><br><br>
+			</td>
+		</tr>
+	</TMPL_LOOP>
+		<tr><td colspan=7><hr noshade></td></tr>
+		<tr><td colspan=7 align=right><input type=image src="ad_images/add_banner.gif" onClick="javascript:presubmit('add_banners_form')" alt="Add New Banner" value="Add New Banner">&nbsp;</td></tr>
+</table>
+</td></tr>
+</table>

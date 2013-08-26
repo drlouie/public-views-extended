@@ -1,0 +1,10 @@
+
+//EMAILER CSS (DYNAMIC SINCE EMIAL CLIENTS ALWAYS REFRESH THIS)
+body { background-image: url(http://www.usnightvision.com/Mailbox/images/emailbacker1.jpg); background-repeat: no-repeat; background-align: top left; }
+.commonSmallB { font-size:10px;font-family:verdana,arial,helvetica;color:#000000;line-height:10px;font-weight:bold; }
+.commonSmall{ font-size:10px;font-family:verdana,arial,helvetica;color:#000000;line-height:16px; }
+.commonSmallest { font-size:9px;font-family:verdana,arial,helvetica;color:#000000;}
+.commonMediumB { font-size:11px;font-family:verdana,arial,helvetica;color:#000000;line-height:10px;font-weight:bold; }
+.commonInput { background-color: #ffffff; border: 1px solid #; height:20px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+.commonTArea { background-color: #FFFFFF; border: 1px solid #; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+.checkbox0 { font-size:10px;font-family:verdana,arial,helvetica;color:#000000;line-height:9px; line-height:12px; }

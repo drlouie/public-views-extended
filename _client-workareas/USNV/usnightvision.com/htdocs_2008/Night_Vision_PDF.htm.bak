@@ -1,0 +1,153 @@
+#!/usr/bin/perl5 -s
+
+print "Content-type: text/html\n\n";
+
+## --> Parse Request Query
+require ("parse_query.nsp");
+
+$noDateParse = 1;
+require ("dateNewest.nsp");
+
+@lasPaginas = ('','Night-Vision-2008-Catalog-Cover','Night-Vision-2008-Front-Inside-Cover','Night-Vision-2008-P2-PVS14','Night-Vision-2008-P3-PVS14-Accessories','Night-Vision-2008-P4-PVS7','Night-Vision-2008-P5-PVS7-Accessories','Night-Vision-2008-P6-US18','Night-Vision-2008-P7-US18-Accessories','Night-Vision-2008-P8-US14','Night-Vision-2008-P9-US14-Accessories','Night-Vision-2008-P10-Coyote-Image','Night-Vision-2008-P11-US441','Night-Vision-2008-P12-X200','Night-Vision-2008-P13-X50','Night-Vision-2008-P14-Thermal-Image','Night-Vision-2008-P15-250D','Night-Vision-2008-P16-5000xp','Night-Vision-2008-P17-Military-Sights','Night-Vision-2008-P18-Tactical-Kits','Night-Vision-2008-P19-US321','Night-Vision-2008-P20-HMMWV-Kits','Night-Vision-2008-P21-Filters','Night-Vision-2008-P22-Lasers','Night-Vision-2008-P23-Eotech','Night-Vision-2008-P24-Golight','Night-Vision-2008-P25-Gen1','Night-Vision-2008-P26-Helmets','Night-Vision-2008-P27-Accessories','Night-Vision-2008-P28-Export','Night-Vision-2008-TOC','Night-Vision-2008-Back-Inside-Cover','Night-Vision-2008-Back-Cover');
+$totalPages = 32;
+
+##--top(180) + bottom(50) + spacers(6)
+$removeFromHeight = 273;
+$removeFromWidth = 30;
+if ($FORM{'US_Night_Vision_Catalog_2008'}) {
+	$leDW = 840; $leDH = 650; if ($FORM{'w'}) { $leDW = int($FORM{'w'}); }if ($FORM{'h'}) { $leDH = int($FORM{'h'}); }
+	$leAvailHeight = int($leDH - $removeFromHeight);
+	$leAvailWidth = int($leDW - $removeFromWidth);
+
+	$FileName = "$FORM{'US_Night_Vision_Catalog_2008'}" . ".pdf";
+	$cualTrueFile = "/usr/local/www/vhosts/usnightvision.com/htdocs/Night_Vision_Catalog/US_Night_Vision_Catalog_2008/" . $FileName . "";
+	$localFileName = "/Night_Vision_Catalog/US_Night_Vision_Catalog_2008/$FileName";
+}
+
+
+if ((-e "$cualTrueFile") && $FileName) { 
+	$selectedPage = "$FORM{'US_Night_Vision_Catalog_2008'}"; $cup = 0; foreach $UP (@lasPaginas) { if ($UP eq "$selectedPage") { $elNumeroMiPagina = "$cup"; } $cup++; }
+
+	$pp = int($elNumeroMiPagina-1);
+	$pn = int($elNumeroMiPagina+1);
+	if ($elNumeroMiPagina eq "1") { $Previous = '&lt;&lt; PREV PAGE'; } 
+	else { 
+		$LApp = $lasPaginas[$pp];
+		$Previous = "<a href=\"Night_Vision_PDF.htm?US_Night_Vision_Catalog_2008=$LApp&w=$leDW&h=$leDH\" style=\"color:#ffffff;font-family:verdana,arial;font-weight:bold;\" title=\"Night Vision Catalog Page $pp\">&lt;&lt; PREV PAGE<img src=\"/night-vision-images/nightvision_spacer.gif\" height=\"1\" width=\"1\" border=\"0\" alt=\"Night Vision Catalog Page $pp\"></a>"; 
+	}
+	if ($elNumeroMiPagina eq $totalPages) { $Next = 'NEXT PAGE &gt;&gt;'; } 
+	else { 
+		$LApn = $lasPaginas[$pn];
+		$Next = "<a href=\"Night_Vision_PDF.htm?US_Night_Vision_Catalog_2008=$LApn&w=$leDW&h=$leDH\" style=\"color:#ffffff;font-family:verdana,arial;font-weight:bold;\" title=\"Night Vision Catalog Page $pn\"><img src=\"/night-vision-images/nightvision_spacer.gif\" height=\"1\" width=\"1\" border=\"0\" alt=\"Night Vision Catalog Page $pn\">NEXT PAGE &gt;&gt;</a>"; 
+	}
+
+	$loadScript = "pass()"; 
+}
+else { $loadScript = "filenotfound()"; }
+
+print qq~<link rel="top" href="./index.htm" title="Night Vision Catalog by US Night Vision Corporation" />
+<html>
+<head>
+<title>Night Vision - US Night Vision 2008 Product Catalog</title>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META NAME="Description" CONTENT="Night Vision Catalog by US Night Vision Corpoation contains only the highest of quality products available in the USA. US Night Vision sells and distributes only high quality Night Vision, Infrared and Thermal products and accessories including goggles and weapon sights.">
+<META NAME="Keywords" CONTENT="night vision catalog, NightVisionCatalog, night vision, NightVision, thermal, infrared, NVD, NVG, goggles, weapon sights">
+<META NAME="rights" CONTENT="Night Vision Catalog is Copyright $date (USNV)">
+<META NAME="Classification" CONTENT="Military:Optics and Shopping:Recreation:Hunting:Optics and Shopping:Recreation:Guns:Accessories:Optics">
+<META NAME="robots" CONTENT="index,follow">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="source" CONTENT="NMS-DRLv2 Website Developer, Hard-Code 7.16.03">
+<META NAME="author" CONTENT="DrLouie/LouieRd (NMS) for US Night Vision Corporation (USNV)">
+<META NAME="owner" CONTENT="US Night Vision Corporation">
+<META NAME="revisit-after" CONTENT="1 days">
+<META HTTP-EQUIV="PICS-Label" CONTENT='(PICS-1.1 "http://www.icra.org/ratingsv02.html" l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) "http://www.rsac.org/ratingsv01.html" l gen true r (n 0 s 0 v 0 l 0) "http://www.classify.org/safesurf/" l gen true r (SS\~\~000 1))' />
+<script type="text/javascript" src="night-vision-scripts/nightvision_beforeDOM.js"></script>
+<script>
+function Night_Vision_Close() {
+	parent.window.close();
+}
+var theCB = 0;
+var countT = 0;
+function trigger(myurl) {
+	var myurl = myurl;
+	if (myurl.indexOf("?") != -1) {
+		if (countT != 0) { theCB = '&CB=' + countT + ''; }
+		frame.loadpage(''+myurl+'&'+theCB+'');
+		countT++;
+	}
+	else {
+		frame.loadpage(''+myurl+'');
+	}
+}
+</script>
+<style>
+	#divLoad { border:#000000 1px dotted; visibility: hidden; height:1px;width:1px; }
+	#overDiv { visibility: visible; position:relative; left:0px; top:0px; background-color:#F5F5F5;border:#000000 1px dotted; height:20px;width:550px; font-family:verdana,arial,helvetica; font-size:10px; color:#000000; line-height:16px; letter-spacing:2px; }
+	#divLinks,#divArrows, #bground, #divCont, #divIEText, #addCommentForm { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; }
+</style>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<center>
+<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
+<tr valign="top" height="117">
+	<td width="100%" align="center">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0">
+			<tr>
+				<td align="center" style="padding-left:65px;"><a href="javascript:Night_Vision_Close();"><img src="night-vision-images/us_night_vision_logo.gif" width="198" height="117" border="0" alt="Night Vision Catalog $year Exit"></a></td>
+				<td width="65" align="right" valign="top" style="padding-right:10px;padding-top:5px;"><a href="javascript:Night_Vision_Close();" style="font-size:9px;color:#000000;font-family:verdana,arial;" title="Night Vision Catalog $year Exit">close <font style="text-decoration:none;">[<font style="color:#eb0000;">X</font>]</font></a><br><img src="night-vision-images/spacer.gif" width="50" height="1" border="0" alt="US Night Vision Catalog 2008"></td>
+			</tr>
+		</table>
+	</td>
+</tr>
+<tr><td height="1"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_horizontalDottie.gif); background-repeat: repeat-x;"><tr><td align="center" height="1"><div style="height:1px;width:1px;clip:rect(0px 1px 1px 0px);overflow:hidden;"></div></td></tr></table></td></tr>
+<tr valign="top">
+	<td width="100%" align="center" valign="bottom" height="22">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000">
+			<tr valign="bottom" height="22">
+				<td align="left" width="150" style="padding-bottom:5px;padding-left:10px;font-size:11px;color:#ffffff;font-family:verdana,arial;">$Previous</td>
+				<td align="center" style="padding-bottom:5px;letter-spacing:6px;font-size:11px;color:#ffffff;font-family:verdana,arial;font-weight:bold;">NIGHT VISION CATALOG PAGE $elNumeroMiPagina OF $totalPages</td>
+				<td align="right" width="150"  style="padding-bottom:5px;padding-right:10px;font-size:11px;color:#ffffff;font-family:verdana,arial;">$Next</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+
+<tr><td height="1"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_horizontalDottie.gif); background-repeat: repeat-x;"><tr><td align="center" height="1"><div style="height:1px;width:1px;clip:rect(0px 1px 1px 0px);overflow:hidden;"></div></td></tr></table></td></tr>
+<tr><td height="1"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_spacer.gif); background-repeat: repeat-x;"><tr><td align="center" height="1"><div style="height:1px;width:1px;clip:rect(0px 1px 1px 0px);overflow:hidden;"></div></td></tr></table></td></tr>
+<tr><td height="1"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_horizontalDottie.gif); background-repeat: repeat-x;"><tr><td align="center" height="1"><div style="height:1px;width:1px;clip:rect(0px 1px 1px 0px);overflow:hidden;"></div></td></tr></table></td></tr>
+<tr><td>
+		<table width="100%" align="center" cellpadding="10" cellspacing="0" border="0">
+			<tr>
+				<td align="center" valign="middle" style="padding:0px;"><div id="overDiv">night vision catalog page is loading . . .</div><div id="divLinks"></div><div id="divArrows"></div>
+<script language="JavaScript" src="night-vision-scripts/nightvision_pageload1.js"></script>
+<!-- Copyright NetMedia Solutions (NMS) DrLouie\@LouieRd.com & US Night Vision Corporation -->
+<script language="Javascript" src="night-vision-scripts/nightvision_pageload2.js"></script></td>
+			</tr>
+		</table>
+</td></tr>
+<tr><td height="1"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_horizontalDottie.gif); background-repeat: repeat-x;"><tr><td align="center" height="1"><div style="height:1px;width:1px;clip:rect(0px 1px 1px 0px);overflow:hidden;"></div></td></tr></table></td></tr>
+<tr><td height="1"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_spacer.gif); background-repeat: repeat-x;"><tr><td align="center" height="1"><div style="height:1px;width:1px;clip:rect(0px 1px 1px 0px);overflow:hidden;"></div></td></tr></table></td></tr>
+<tr><td height="1"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_horizontalDottie.gif); background-repeat: repeat-x;"><tr><td align="center" height="1"><div style="height:1px;width:1px;clip:rect(0px 1px 1px 0px);overflow:hidden;"></div></td></tr></table></td></tr>
+<tr><td height="20"><table width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="background-image:url(night-vision-images/nightvision_spacer.gif); background-repeat: repeat-x;"><tr><td align="center" height="20"><div style="height:20px;width:550px;clip:rect(0px 550px 20px 0px);overflow:hidden;font-family:verdana,arial,helvetica;font-size:10px;color:#000000;line-height:16px;letter-spacing:2px;">&copy; $year US Night Vision Corporation</div></td></tr></table></td></tr>
+</table>
+</center>
+<script language="javascript">
+	function pass() {
+		document.getElementById("overDiv").style.visibility = "hidden";
+		document.getElementById("overDiv").style.position = "absolute";
+		document.getElementById("overDiv").style.top = "0px";
+		document.getElementById("overDiv").style.left = "0px";
+		
+		document.getElementById("divLoad").style.visibility = "visible";
+		document.getElementById("divLoad").style.height = '$leAvailHeight' + 'px'; 
+		document.getElementById("divLoad").style.width = '$leAvailWidth' + 'px'; 
+		trigger('$localFileName');
+	} function filenotfound() { alert('FILE: $FileName not found...'); } setTimeout('$loadScript',1000);
+	ifrinit();
+</script>
+</body>
+</html>
+
+~;
+
+exit;
