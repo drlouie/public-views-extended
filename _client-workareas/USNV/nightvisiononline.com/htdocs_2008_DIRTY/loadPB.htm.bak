@@ -1,0 +1,106 @@
+#!/usr/bin/perl5 -s
+
+print "Content-type: text/html\n\n";
+
+require("parse_query.nsp");
+
+use DBI;
+use locale;
+use Text::Autoformat;
+autoformat;
+
+##-clima
+require("clim.nsp");
+##-pod
+use LWP::Simple;
+$muaGRAP = get("http://www.nightvisiononline.com/getRandomAP.htm?h=1");
+
+
+print qq~
+<div id="loadFB">$muaGRAP</div>
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript">
+	parent.document.getElementById("NVOFfotoblog").style.visibility = 'visible';
+	parent.document.getElementById("fbpreview").innerHTML = document.getElementById("loadFB").innerHTML;
+</script>
+~;
+
+
+print qq~ 
+<script language="Javascript"> 
+~;
+#-- NEWS PERL START
+	$countNews = 1;
+
+
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+	my $sth = $dbh->prepare("SELECT * FROM NVNewsAltaVista WHERE Blocked = 'N' ORDER BY PubDate DESC LIMIT 0, 10");
+	$sth->execute or die "Sorry, no DB, please try again.\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$A = $row[0]; $T = $row[1]; $L = $row[2]; $PD = $row[3]; $D = $row[4]; 
+		$T =~ s/"//gi;
+		$T =~ s/'//gi; 
+		$D =~ s/"//gi; 
+		$D =~ s/'//gi; $TIT = $T; $TIT = autoformat $TIT, { case => 'title' }; chomp($TIT); $TIT =~ s/\n//gi;
+		##-- loadparse 4
+		if ($countNews < 5) { push(@losDefaultNews,"<div style=\"width:140px;padding:5px;\"><a href=\"$L\" style=\"color:#000000;\" target=\"NEWS\" onmouseover=\"this.style.color='#326728';return overlib('<span class=news>$D<br><br><i>click for full article</i>...</span>', LEFT, CELLPAD, 10, FGCOLOR, '#D6D6D6');\" onmouseout=\"this.style.color='#000000';return nd();\">$TIT</a></div>"); }
+		##-- script parse 10
+		print qq~ parent.lasNuevas[$countNews] = '<div style="width:140px;padding:5px;"><a href="$L" style="color:#000000;" target="NEWS" onmouseover="this.style.color=\\'#326728\\';return overlib(\\'<span class=news>$D<br><br><i>click for full article</i>...</span>\\', LEFT, CELLPAD, 10, FGCOLOR, \\'#D6D6D6\\');" onmouseout="this.style.color=\\'#000000\\';return nd();">$TIT</a></div>';\n ~;
+		$countNews++;
+	}
+	$sth->finish;
+
+print qq~
+parent.todosNews = '$countNews'; 
+~;
+
+	$dbh->disconnect;
+
+#-- NEWS PERL END
+	
+
+#-- WIKI PERL START
+push(@wt,"Night Vision-----http://en.wikipedia.org/wiki/Night_vision-----Night vision is the ability to see in a dark environment. Whether by biological or technological means, night vision is made possible by a combination of two approaches: sufficient spectral range, and sufficient intensity range.");
+push(@wt,"NV Device (NVD)-----http://en.wikipedia.org/wiki/Night_vision_device-----A night vision device (NVD) is an optical instrument that allows images to be produced in levels of light approaching total darkness. They are most often used by the military and law enforcement agencies, but are available to civilian users. The term usually refers to a complete unit, including an image intensifier tube, a protective and generally water-resistant housing, and some type of mounting system. Many NVDs also include sacrificial lenses, IR illuminators, and telescopic lenses.");
+push(@wt,"Generation [I II III]-----http://en.wikipedia.org/wiki/Image_intensifier#Generation_1__.28GEN_I.29-----[GEN I] 1st generation passive NVDs, introduced during the Vietnam War rely on ambient light instead of an infrared light source.<br><br>[GEN II] 2nd generation NVDs featured an improved image-intensifier tube utilizing microchannel plate (MCP)[13] with an S-25 photocathode[14], resulting in a much brighter image.<br><br>[GEN III] 3rd generation NVDs maintain the MCP from Gen II, but now use a photocathode made with gallium arsenide, which improves image resolution.");
+push(@wt,"Infrared (IR)-----http://en.wikipedia.org/wiki/Infrared-----Infrared (IR) radiation is electromagnetic radiation of a wavelength longer than that of visible light, but shorter than that of microwaves. The name means &lsquo;below red&rsquo; (from the Latin infra, &lsquo;below&rsquo;), red being the color of visible light with the longest wavelength.<br><br>Infrared imaging is used extensively for both military and civilian purposes. Military applications include target acquisition, surveillance, homing and tracking.");
+push(@wt,"Thermal Imaging-----http://en.wikipedia.org/wiki/Thermal_Imaging-----Thermography, thermal imaging, or thermal video, is a type of infrared imaging. Since infrared radiation is emitted by all objects based on their temperatures, according to the black body radiation law, thermography makes it possible to &quot;see&quot; one&rsquo;s environment with or without visible illumination. The amount of radiation emitted by an object increases with temperature, therefore thermography allows one to see variations in temperature (hence the name).");
+push(@wt,"Laser Designator-----http://en.wikipedia.org/wiki/Laser_designator-----A laser designator is a laser light source which is used to illuminate a target. Laser designators provide targeting for laser guided bombs, missiles, or precision artillery munitions. Laser designators may be mounted on aircraft, ground vehicles, or handheld.");
+push(@wt,"Monocular-----http://en.wikipedia.org/wiki/Monocular-----A monocular is a modified refracting telescope used to magnify the images of distant objects by passing light through a series of lenses and prisms; the use of prisms results in a lightweight telescope. Volume and weight are less than half those of binoculars, making it easy to carry.<br><br>Monoculars, sometimes called telescopes when used in this capacity, are often used by visually impaired people to see distant objects that would normally be undiscernable.");
+push(@wt,"AN/PVS-14-----http://en.wikipedia.org/wiki/AN/PVS-14-----The AN/PVS-14 Monocular Night Vision Device (MNVD) is in widespread use by US Armed Forces as well as NATO allies around the world. It uses a GEN III image intensifier tube, and is manufactured by US Night Vision Corporation. It is often used &lsquo;hands free&lsquo; using a head harness or attached to a combat helmet such as the PASGT, Advanced Combat Helmet, or Marine Lightweight Helmet. It can also be used as a weapons night sight, such as on the M110 SASS. Also, it was part of the equipment fielded in the US Army&rsquo;s Land Warrior program.");
+push(@wt,"Photonics-----http://en.wikipedia.org/wiki/Photonics-----Photonics is the science of generating, controlling, and detecting photons, particularly in the visible and near infra-red spectrum, but also extending to the ultraviolet (0.2 - 0.35 µm wavelength), long-wave infrared (8 - 12 µm wavelength), and far-infrared/THz portion of the spectrum (e.g., 2-4 THz corresponding to 75-150 µm wavelength).<br><br>Photonics is closely related to optics.");
+push(@wt,"Optoelectronics-----http://en.wikipedia.org/wiki/Optoelectronics-----Optoelectronics is the study and application of electronic devices that interact with light, and thus is usually considered a sub-field of photonics. In this context, light often includes invisible forms of radiation such as gamma rays, X-rays, ultraviolet and infrared. Optoelectronic devices are electrical-to-optical or optical-to-electrical transducers, or instruments that use such devices in their operation.");
+$countWiki = 1;
+foreach $unWT (@wt) {
+	($T, $L, $D) = split(/-----/,$unWT);
+	##-- loadparse 5
+	if ($countWiki < 6) { push(@losDefaultWIKI,"<div style=\"width:140px;padding:5px;color:#ADADAE;\">- <a href=\"$L\" style=\"color:#ADADAE;\" target=\"WIKI\" onmouseover=\"this.style.color='#326728';return overlib('<span class=news><i>term:</i><b>$T</b><br><br>$D<br><br><i>click to read more</i>...</span>', LEFT, CELLPAD, 10, FGCOLOR, '#D6D6D6');\" onmouseout=\"this.style.color='#ADADAE';return nd();\">$T</a></div>"); }
+	print qq~ parent.lasWiki[$countWiki] = '<div style="width:140px;padding:5px;color:#ADADAE;">- <a href="$L" style="color:#ADADAE;" target="WIKI" onmouseover="this.style.color=\\'#326728\\';return overlib(\\'<span class=news><i>term:</i><b>$T</b><br><br>$D<br><br><i>click to read more</i>...</span>\\', LEFT, CELLPAD, 10, FGCOLOR, \\'#D6D6D6\\');" onmouseout="this.style.color=\\'#ADADAE\\';return nd();">$T</a></div>';\n ~;
+	$countWiki++;
+}
+
+print qq~ 
+parent.todosWiki = '$countWiki'; 
+~;
+
+#-- WIKI PERL END
+
+print qq~
+</script> 
+
+
+
+<div id="loadWIKI">@losDefaultWIKI</div>
+<script language="Javascript">
+	parent.document.getElementById("NVOFwiki").style.visibility = 'visible';
+	parent.document.getElementById("wiki").innerHTML = document.getElementById("loadWIKI").innerHTML;
+</script>
+<div id="loadNEWS">@losDefaultNews</div>
+<script language="Javascript">
+	parent.document.getElementById("NVOFnews").style.visibility = 'visible';
+	parent.document.getElementById("news").innerHTML = document.getElementById("loadNEWS").innerHTML;
+</script>
+~;

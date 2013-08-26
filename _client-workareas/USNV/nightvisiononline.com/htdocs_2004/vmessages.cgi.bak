@@ -1,0 +1,376 @@
+#!/usr/bin/perl5 -w
+
+#	GNU GPL Copyright 2002 - Gavin Laking
+#
+#	This file is part of Daisy.
+#
+#	Daisy is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; either version 2 of the License, or
+#	(at your option) any later version.
+#
+#	Daisy is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with Daisy; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+$| = 1;
+
+print "Content-type: text/html\n\n";
+
+require("parse_query.nsp");
+
+require 'common.cgi';
+
+require("bcookiesnif.nsp");
+
+#require 'getBanner.nsp';
+
+&openDatabase;
+
+$messagecount = 0;
+$threadcount = 0;
+
+if ($FORM{'numPages'}) { $maxdisplay = $FORM{'numPages'}; }
+else { $maxdisplay = $maxdisplay; }
+
+if ($FORM{'nextOne'}) { $parseCount = ($FORM{'nextOne'} * $maxdisplay) - 1; $nextInline = $FORM{'nextOne'} + 1; }
+else { $parseCount = ($maxdisplay - 1); $nextInline = 2; }
+
+if ($FORM{'showAll'}) { $showAll = "&showAll=YES"; }
+else { $showAll = ""; }
+
+
+for ($a = 0; $a < @messages; $a++) {
+	($mnum[$a],$msub[$a],$mfollow[$a],$mname[$a],$memail[$a],$mdate[$a],$mip[$a],$magent[$a],$mresource[$a],$murl[$a],$chop) = split(/``/,$messages[$a]);
+	$messagecount++;
+
+	if ($mfollow[$a] == 1) {
+		$threadcount++;
+	}
+}
+
+$AppTitle = "Night Vision Online Forum";
+
+	if ($parseCount == $maxdisplay - 1) { $myPager = "Live Forum - Active Thread"}
+	else { $myPage = $nextInline - 1; $myPager = "Archived Forum - Page $myPage" }
+
+print qq~
+<html>
+<head>
+<title>$AppTitle</title>
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript" src="js/mousetable.js"></script>
+<script language="Javascript" src="js/illusFlipper.js"></script>
+<script language="Javascript" src="js/myOverlib.js"></script>
+<style type="text/css">
+#myOverDiv {	padding-top:1px; padding-bottom:1px; padding-left:1px; padding-right:1px; position:absolute; top:0px; left:0px; visibility:hidden; z-index:5000; border-top:1px solid #D7A368; border-bottom:1px solid #D7A368; border-left:1px solid #D7A368; border-right:1px solid #D7A368; }
+.myOverDiv { padding:10px;font-weight:bold; color:#eb0000; padding-top:3px; padding-bottom:3px; padding-left:3px; padding-right:3px; z-index:5000; }
+.myOverlib { margin-top:10px;margin-left:10px;margin-bottom:10px;margin-right:10px; }
+</style>
+<LINK REL="STYLESHEET" HREF="common_css.css" Type="text/css">
+</head>
+<BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0" onLoad="timeFlip();">
+<table width="100%" height="100" align="center" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td width="325" align="center" valign="top"><img src="images/spacer.gif" width="325" height="100" border="0" name="leImagen"></td>
+		<td width="100%" align="left" valign="top">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0" class="botFrameTopper">
+				<tr height="20">
+					<td align="right"><font class="slogan"><!--NightVision Online Forum is America’s #1 night vision forum...--></font></td>
+				</tr>		
+			</table>
+			<table border="0" cellpadding="0" cellspacing="0" width="100%">
+				<tr height="75">
+					<td align="center" valign="middle"><font class="pageCount" style="font-size:13px;"><b>Home ( $myPager )<b></font><!--<img src="images/nowviewing.gif" border="0">--></td>
+				</tr>		
+			</table>
+		</td>
+	</tr>
+</table>
+<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
+	<tr valign="top">
+		<td width="15"><img src="images/spacer.gif" width="15" height="10" border="0"></td>
+		<td height="20">
+<script type="Javascript">
+function goToPage(cual) {
+	var formindex = document.pager.GoToPages.selectedIndex;
+	var thisone = document.pager.GoToPages.options[formindex].value;
+	document.location.href = thisone;
+}
+</script>
+~;
+
+$pagecount=1;
+print qq~
+<TABLE width="100%" border="0" cellpadding="5" cellspacing="0">
+<tr>
+<td width="33%">
+<font class="pageCount">
+<!--<input type="text" name="thyQuery" value="Quick Search" onFocus="this.blur" class="search"> &nbsp; | &nbsp; Advanced Search
+--></font>
+</td>
+<form name="numberMessages">
+<td width="33%" align="center">
+<nobr>
+<font class="pageCount">
+<select name="numPages" class="numPages" onChange="document.numberMessages.submit();">
+~;
+
+if ($FORM{'numPages'} eq "500") { $selected500 = "selected"; }
+elsif ($FORM{'numPages'} eq "400") { $selected400 = "selected"; }
+elsif ($FORM{'numPages'} eq "300") { $selected300 = "selected"; }
+elsif ($FORM{'numPages'} eq "200") { $selected200 = "selected"; }
+elsif ($FORM{'numPages'} eq "100") { $selected100 = "selected"; }
+else { $selected50 = "selected"; }
+
+print qq~
+	<option value="50" $selected50>50 Messages Per Page</option>
+	<option value="100" $selected100>100 Messages Per Page</option>
+	<option value="200" $selected200>200 Messages Per Page</option>
+	<option value="300" $selected300>300 Messages Per Page</option>
+	<option value="400" $selected400>400 Messages Per Page</option>
+	<option value="500" $selected500>500 Messages Per Page</option>
+</select> &nbsp; | &nbsp; <a href="vmessages.cgi?showAll=YES$leNumPages" class="pageCount">Show All Messages</a></font>
+</nobr>
+</td>
+</form>
+~;
+
+if ($FORM{'numPages'}) { $leNumPages = "&numPages=$FORM{'numPages'}"; }
+	for ($b = 0; $b < @messages;) {
+		$b = $b+$maxdisplay;
+		if ($b ne $parseCount) { push(@allOthers,"<option value=\"vmessages.cgi?nextOne=$pagecount$leNumPages$showAll\">$pagecount</option>"); }
+		$pagecount++;
+	}
+	$prevPage = $nextInline - 2;
+	print "";
+	print "<form name=\"pager\"><td width='33%' align='right'><nobr><font class=\"pageCount\">";
+	if ($parseCount != $maxdisplay - 1) { print "<a href=\"vmessages.cgi?nextOne=$prevPage$leNumPages$showAll$showAll\" class=\"pageCount\"><<< Prev Page</a>&nbsp;&nbsp;|&nbsp;&nbsp;"; }
+	print "Go to Page <select name=\"GoToPages\" onChange=\"location.href=this.options[this.selectedIndex].value;\" class=\"numPages\"><option value=\" \"> </option>@allOthers</select>";
+	if ($parseCount < @messages) { print "&nbsp;&nbsp;|&nbsp;&nbsp;<a href=\"vmessages.cgi?nextOne=$nextInline$leNumPages$showAll\" class=\"pageCount\">Next Page >>></a>"; }
+	print "</font></nobr></td></form>";
+print "</tr></table>";
+
+
+
+print qq~
+		
+		</td>
+		<td width="15"><img src="images/spacer.gif" width="15" height="10" border="0"></td>
+	</tr>
+	<tr>
+		<td width="15"><img src="images/spacer.gif" width="15" height="10" border="0"></td>
+		<td width="100%" align="center" valign="top">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  				<tr align="center">
+    				
+~;
+
+if (!$Cookies{'Entrado'}) {
+	print "<td width=\"12\" height=\"12\" valign=\"top\"><img src=\"images/topleftcorner_forum.gif\"></td>";
+	print "<td valign=\"bottom\" height=\"12\" width=\"223\" class=\"leForumTop\" bgcolor=\"#045E3B\"><img src=\"images/spacer.gif\" border=\"0\" height=\"1\" width=\"223\"></td>";
+	print "<td valign=\"bottom\" height=\"12\" width=\"100%\" class=\"leForumTop\"><img src=\"images/spacer.gif\" border=\"0\" height=\"1\" width=\"1\"></td>";
+}
+else {
+	print "<td width=\"12\" height=\"12\" valign=\"top\"><img src=\"images/topleftcorner2_forum.gif\"></td>";
+	print "<td valign=\"bottom\" height=\"12\" width=\"100%\" class=\"leForumTop\"><img src=\"images/spacer.gif\" border=\"0\" height=\"1\" width=\"1\"></td>";
+}
+
+
+print qq~
+					<td width="12" height="12" valign="top"><img src="images/toprightcorner_forum.gif"></td>
+
+  				</tr>
+				<tr valign="top">
+					<td width="100%" align="center" colspan="4" class="leForumLeftRight" valign="top">
+
+<TABLE width="100%" cellpadding="10" align="center" cellspacing="0" border="0">
+	<tr valign="top">
+~;
+
+if (!$Cookies{'Entrado'}) {
+
+print qq~
+		<td width="200" align="left" bgcolor="#045E3B"><img src="images/spacer.gif" height="1" width="200" border="0">
+			<table width="100%" align="center" border="0" cellpadding="3" cellspacing="0" bgcolor="#000000">
+				<tr>
+					<td width="100%" valign="top" align="center">
+						<table align="center" border="0" width="100%" cellpadding="3" cellspacing="0" class="masterBacker">
+							<tr>
+								<td align="center" width="100%">
+									<div id="adverSpecial2"><center><nobr><img src="images/adverarrow.gif" border="0" width="20" height="5"> ADVERTISEMENT<img src="images/adverarrow.gif" border="0" width="20" height="5"></nobr><br></center></div>
+									<script language=JavaScript src='http://www.nightvisiononline.com/adVenture/advert.cgi?zone_id=1'></script>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+			<br><br>
+~;
+
+## GET Poll
+$NOCORNER = "1";
+require 'getPoll.nsp';
+
+print "</td>";
+
+}
+
+else { $MuaColspan=" colspan='2'"; }
+
+
+print "<td width=\"100%\" align=\"left\" $MuaColspan><font class=\"commonText\" style='font-size:13px;'>";
+
+if ($FORM{'showAll'}) {
+	print "<table width=\"100%\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\">";
+}
+
+@template = "<!--messages-->";
+
+### QUERY DB
+use DBI;
+my $dbh = DBI->connect("DBI:mysql:NVF","root","chinga2") or die "Unable to connect to database\n"; 
+$dbh->{RaiseError} = 1; 
+
+for ($a = 0; $a < @template; $a++) {
+	$_ = $template[$a];
+		$last = 1;
+	if (!$FORM{'showAll'}) { print "<ul class='UL1'>\n"; }
+	    for ($b = 0; $b < @messages; $b++) {
+			if ($parseCount == $maxdisplay - 1) { $lastSet = ($parseCount - $maxdisplay); }
+			else { $lastSet = ($parseCount - $maxdisplay); }
+			if ($b <= $parseCount && $b > $lastSet) {
+				if ($mfollow[$b] > $last) {
+			        if (!$FORM{'showAll'}) { print "<ul class='UL2'>\n"; }
+				}
+		        else {
+			        if ($mfollow[$b] <= $last) {
+				        for ($c = 0; $c < $last - $mfollow[$b]; $c++) {
+					        if (!$FORM{'showAll'}) { print "</ul>\n"; }
+						}
+				    }
+			    }
+				$last = $mfollow[$b];
+
+if ($mname[$b] eq "" || $mname[$b] eq " ") { $muaUsername = "AnonymousUser"; }
+else { $muaUsername = $mname[$b]; }
+
+@dateTime = split(/ - /, $mdate[$b]);
+@datePieces = split (/\//, $dateTime[0]);
+@timePieces = split(/:/, $dateTime[1]);
+
+@months = ('','January','February','March','April','May','June','July','August','September','October','November','December');
+
+
+if ($datePieces[2] > 50) { $myYear = "19" . $datePieces[2]; }
+else { $myYear = "20" . $datePieces[2]; }
+
+if ($timePieces[0] > 12) { $timeSet = "pm"; $theHour = $timePieces[0] - 12; }
+elsif ($timePieces[0] == 12) { $timeSet = "pm"; $theHour = $timePieces[0]; }
+elsif ($timePieces[0] < 12) { $timeSet = "am"; $theHour = $timePieces[0]; }
+$theMinute = $timePieces[1];
+
+$theHour = sprintf("%02d", $theHour);
+$leCuenta = $b + 1;
+
+if (!$FORM{'showAll'}) { print "<li style='line-height:20px;'><a href='fdisplay.cgi?action=display\&num=$mnum[$b]' class='instruct' style='font-size:13px;' onMouseOver=\"myOverlib('<div class=\\'myOverlib\\'><b>Subject</b><br>$msub[$b]<br><br><b>Message Posted By</b><br>$muaUsername ( $mip[$b] )<br><br><b>Message Posted On</b><br>$months[$datePieces[0]] $datePieces[1] $myYear ( $theHour:$theMinute $timeSet PST )</b><br></div>')\" onMouseOut=\"return nd();\">$msub[$b]</a> ( <b>$muaUsername</b> )</li>\n"; }
+
+
+else { 
+
+my $sth = $dbh->prepare("SELECT * FROM leForu WHERE PostadoID='$mnum[$b]'");
+$sth->execute or die "Unable to execute query\n"; 
+my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$Body = $row[3];
+		$count++;
+}
+$sth->execute or die "Unable to execute query\n"; 
+$sth->finish;
+
+$cualA = $a / 2;
+if ($cualA =~ ".") { $bgC = ""; }
+else { $bgC = "bgcolor=\"#353535\""; }
+print "<tr><td width=\"100%\" $bgC><font class=\"commonText\" style=\"font-size:14px;\"><center><a href=\"fdisplay.cgi?action=display\&num=$mnum[$b]\" class=\"instruct\" style=\"font-size:14px;\"><b>$msub[$b]</b></a><br>Posted by <b>$muaUsername</b></center><br>$Body<br><br><center>Posted on $days[$datePieces[1]], $months[$datePieces[0]] $datePieces[1] $myYear at $theHour:$theMinute $timeSet PST<br>from IP $mip[$b]</center></font></td></tr>\n"; 
+
+}
+
+
+#  Posted on $datePieces[0].$datePieces[1].$datePieces[2] \@ $theHour:$theMinute $timeSet - $mip[$b]
+
+				#if ($b >= $maxdisplay && $maximum == 1 && $action ne 'showall') {
+				#	$b = @messages;
+				#}
+			}
+		}
+		for ($b = 0; $b < $last; $b++) {
+			$lastSet = $parseCount - $maxdisplay;
+			if ($b <= $parseCount && $b >= $lastSet) {
+				if (!$FORM{'showAll'}) { print "</ul>\n"; }
+			}
+		}
+}
+
+$dbh->disconnect;
+
+
+if ($FORM{'showAll'}) {
+	print "</table>";
+}
+
+print "</td></tr></table>";
+
+print qq~
+
+
+					</td>
+				</tr>
+  <tr align="center">
+    
+
+
+~;
+
+if (!$Cookies{'Entrado'}) {
+	print "<td width=\"12\" height=\"12\" valign=\"bottom\"><img src=\"images/botleftcorner_forum.gif\" width=\"12\" height=\"12\"></td>";
+	print "<td valign=\"bottom\" height=\"12\" width=\"223\" class=\"leForumBot\" bgcolor=\"#045E3B\"><img src=\"images/spacer.gif\" border=\"0\" height=\"1\" width=\"223\"></td>";
+	print "<td valign=\"top\" height=\"12\" width=\"100%\" class=\"leForumBot\"><img src=\"images/spacer.gif\" height=\"12\" width=\"12\" border=\"0\"></td>";
+}
+else {
+	print "<td width=\"12\" height=\"12\" valign=\"bottom\"><img src=\"images/botleftcorner2_forum.gif\" width=\"12\" height=\"12\"></td>";
+	print "<td valign=\"top\" height=\"12\" width=\"100%\" class=\"leForumBot\"><img src=\"images/spacer.gif\" height=\"12\" width=\"12\" border=\"0\"></td>";
+}
+
+
+print qq~
+
+
+	<td width="12" height="12" valign="bottom"><img src="images/botrightcorner_forum.gif"></td>
+  </tr>
+
+			</table>
+&nbsp;
+		</td>
+		<td width="15"><img src="images/spacer.gif" width="15" height="10" border="0"></td>
+	</tr>
+</table>
+<br>
+<div id="myOverDiv"></div>
+</body>
+</html>
+
+~;
+
+sub dropBanner ($incoming) {
+## request and then parse banner as needed
+	my ($incoming) = @_;
+	$leAdType = $incoming;
+	require 'require_ad.nsp';
+	$leAdType = "";
+}

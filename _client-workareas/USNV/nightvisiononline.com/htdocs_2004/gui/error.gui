@@ -1,0 +1,13 @@
+<html>
+<head>
+<title> </title>
+<script src="forum.js" type="text/javascript"></script> 
+<link rel="stylesheet" href="forum_css.css" title="default" type="text/css" /> 
+</head>
+<BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+<div id="error">
+<h3>Forum Administration : Error</h3>
+<!--error-->
+</div>
+</body>
+</html>

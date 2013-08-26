@@ -1,0 +1,486 @@
+#!/usr/bin/perl5 -s
+
+require ("referer.nsp");
+require ("parse_query.nsp");
+
+$noDateParse = 1;
+require ("dateNewest.nsp"); 
+
+require ("cookie.lib");
+
+use Crypt::Tea;
+
+$loadscript = "onLoad=\"document.login.uNaim.select();document.login.uNaim.focus();\"";
+
+##if already logged in
+if (&GetCookies('IN') && &GetCookies('EN')) {
+	$ISIN = int($Cookies{'IN'});
+}
+
+
+if ($ISIN > 0) {
+
+	&GetCookies('IN'); &GetCookies('EN'); $resulta = &decrypt ($Cookies{'EN'}, $Cookies{'IN'});
+
+	print "Content-type: text/html\n\n";
+
+	if ($resulta eq "SI") {
+		#-	$key = 'CRAP';
+		#-	$ascii_cyphertext = &encrypt ($plaintext, $key);
+		#-	$dec = &decrypt ($ascii_cyphertext, $key);
+
+		print qq~
+			<script language="javascript">
+				alert('You are already logged in, you will now be forwarded to your previous location.');
+			</script>
+		~;
+
+
+
+		if ($FORM{'LL'} ne "") {
+
+			if ($FORM{'LL'} eq "fbm") { $FORM{'LL'} = "FotoBlogManage.htm"; }
+			if ($FORM{'LL'} eq "fb") { $FORM{'LL'} = "FotoBlog.htm"; }
+			if ($FORM{'LL'} eq "pn") { $FORM{'LL'} = "postnew2008.htm"; }
+			if ($FORM{'LL'} eq "fdisp") { 
+				if ($FORM{'v'}) { $laV = int($FORM{'v'}); $addQuery = "action=display&num=$laV"; }
+				$FORM{'LL'} = "fdisplay2008.htm";
+			}
+			if ($FORM{'LL'} eq "fmsgr") { 
+				if ($FORM{'v'}) { $laV = int($FORM{'v'}); $addQuery = "posterid=$laV"; }
+				$FORM{'LL'} = "fmsgr2008.htm";
+			}
+			if ($FORM{'LL'} eq "fg") { print qq~ <script>window.opener.addComment();window.close();</script>~; }
+			else {	
+				print qq~
+					<script language="javascript">
+						parent.location.href = 'http://www.nightvisiononline.com/$FORM{'LL'}?$addQuery';
+					</script>
+				~;
+			}
+			
+		}
+		else { 
+			##--> push to startsrceen
+			print qq~
+				<script language="javascript">
+					parent.location.href = '/';
+				</script>
+			~;
+		}
+
+
+
+	}
+	else {
+		print qq~
+			<script language="javascript">
+				alert('Your attempt has been logged to our system.');
+				parent.location.href = '/';
+			</script>
+		~;
+	}
+}
+## If attemping to login
+elsif ($FORM{'uNaim'} && $FORM{'pDub'}) {
+	
+	## Define Variables
+	my $Username = "$FORM{'uNaim'}";
+	my $Password = "$FORM{'pDub'}";
+	## Start DB connection
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+	my $sth = $dbh->prepare("SELECT * FROM vAcctsNew WHERE Username = '$Username'");
+	$sth->execute or die "Sorry, that User Name/Password combination are incorrect, try again at your own risk.\n"; 
+		my $row = $sth->fetchrow_arrayref;
+		my $UserID = $row->[0];
+		my $UserN = $row->[1];
+		my $First = $row->[2];
+		my $Last = $row->[3];
+		my $Email = $row->[4];
+		my $AS = $row->[7];
+		my $Pass = $row->[11];
+		my $Zip = $row->[16];
+		my $LastLog = $row->[19];
+		my $HistCook = $row->[26];
+	$sth->finish;
+
+	my $sth = $dbh->prepare("SELECT ENCRYPT('$Password','nV')");
+	$sth->execute or die "Sorry, that User Name/Password combination are incorrect, try again at your own risk.\n"; 
+	my $row = $sth->fetchrow_arrayref;
+	my $elCrypto = $row->[0];	
+	$sth->finish;
+
+	if ($Pass eq $elCrypto) {
+	
+		##days since last login if available
+		$diff = "?";
+		if ($LastLog =~ "-" && $LastLog =~ ":") {
+			($lld, $llt) = split(/ /,$LastLog);
+			$diff = date($today) - date($lld);
+		}
+
+		$Zip = int($Zip);
+		$llave = $UserID;
+		$ascii_EN = &encrypt ("SI", $llave);
+		$ascii_UN = &encrypt ($UserN, $llave);
+		$ascii_IM = &encrypt ($Email, $llave);
+		$ascii_FN = &encrypt ($First, $llave);
+		$ascii_LN = &encrypt ($Last, $llave);
+		$ascii_ZP = &encrypt ($Zip, $llave);		
+		
+		# Print headers with only one \n 
+		print "Content-type: text/html\n";
+			&SetCookies('IN',$llave);
+			&SetCookies('EN',$ascii_EN);
+			&SetCookies('UN',$ascii_UN);
+			&SetCookies('IM',$ascii_IM);
+			&SetCookies('FN',$ascii_FN);
+			&SetCookies('LN',$ascii_LN);
+			&SetCookies('ZP',$ascii_ZP);
+			&SetCookies('DSLL',$diff);
+		print "\n";
+		
+		## UPDATE LAST LOG INFO FOR USER ACCOUNT
+		my $sth = $dbh->prepare("UPDATE LOW_PRIORITY vAcctsNew 
+								 SET LastLogin='$datetime'
+								 WHERE Username='$Username'");
+		$sth->execute or die "Unable to execute query\n";
+		$sth->finish; 
+		
+		if ($FORM{'LL'} ne "") {
+
+			if ($FORM{'LL'} eq "fbm") { $FORM{'LL'} = "FotoBlogManage.htm"; }
+			if ($FORM{'LL'} eq "fb") { $FORM{'LL'} = "FotoBlog.htm"; }
+			if ($FORM{'LL'} eq "pn") { $FORM{'LL'} = "postnew2008.htm"; }
+			if ($FORM{'LL'} eq "fdisp") { 
+				if ($FORM{'v'}) { $laV = int($FORM{'v'}); $addQuery = "action=display&num=$laV"; }
+				$FORM{'LL'} = "fdisplay2008.htm";
+			}
+			if ($FORM{'LL'} eq "fmsgr") { 
+				if ($FORM{'v'}) { $laV = int($FORM{'v'}); $addQuery = "posterid=$laV"; }
+				$FORM{'LL'} = "fmsgr2008.htm";
+			}
+			if ($FORM{'LL'} eq "fg") { print qq~ <script>window.opener.addComment();window.close();</script>~; }
+			else {	
+				print qq~
+					<script language="javascript">
+						parent.location.href = 'http://www.nightvisiononline.com/$FORM{'LL'}?$addQuery';
+					</script>
+				~;
+			}
+			
+		}
+		else { 
+			##--> push to startsrceen
+			print qq~
+				<script language="javascript">
+					parent.location.href = '/';
+				</script>
+			~;
+			##--> load default startsrceen
+			## require("startScreen.htm");
+		}
+	}
+	## login form
+	else {
+		print "Content-type: text/html\n\n";
+
+print qq~
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Associate Log In</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script language="Javascript">
+<!--
+function checkForm() {
+	if ((document.login.uNaim.value == "") || (document.login.uNaim.value == "0") || (document.login.uNaim.value == " ")) {
+	alert('Before you can login you must type in your profile user name.')
+	document.login.uNaim.focus();
+	return false;
+	}	
+	if ((document.login.pDub.value == "") || (document.login.pDub.value == "0") || (document.login.pDub.value == " ")) {
+	alert('Before you can login you must type in your profile password.')
+	document.login.pDub.focus();
+	return false;
+	}	
+	else {
+	return true;
+	}	
+}
+function focusOnMe(cual) {
+	var este = cual;
+	este.style.background = "FFFFFF";
+}
+
+function blurMe(cual) {
+	var este = cual;
+	este.style.background = "F7F7F7";
+}
+
+//-->
+</script>
+<style type="text/css">
+	body { scrollbar-face-color:#CCCCCC; scrollbar-highlight-color:#000000; scrollbar-shadow-color:#CCCCCC; scrollbar-3dlight-color: #000000; scrollbar-arrow-color:#000000; scrollbar-track-color:#000000; scrollbar-darkshadow-color:#000000; }
+	.welcomeText { font-size:10px;font-family:verdana,arial,helvetica;color:ffffff;line-height:16px; }
+	.commonInput { height:20px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; background-color:#F7F7F7; }
+</style>
+</head>
+<body bgcolor="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" $loadscript>
+<form method="post" name="login" onSubmit="return checkForm();">
+
+~;
+
+
+if ($FORM{'LL'} ne "") { 
+	$addQ = "LL=$FORM{'LL'}";
+	print "<input type=\"hidden\" name=\"LL\" value=\"$FORM{'LL'}\">"; 
+	if ($FORM{'LL'} eq "fg") { 
+		$addQ = $addQ . "&PID=$FORM{'PID'}&AN=$FORM{'AN'}";
+		print "<input type=\"hidden\" name=\"PID\" value=\"$FORM{'PID'}\">"; 
+		print "<input type=\"hidden\" name=\"AN\" value=\"$FORM{'AN'}\">"; 
+	}
+	if ($FORM{'LL'} eq "fdisp" || $FORM{'LL'} eq "fmsgr") { 
+		$addQ = $addQ . "&v=$FORM{'v'}";
+		print "<input type=\"hidden\" name=\"v\" value=\"$FORM{'v'}\">"; 
+	}
+}
+
+
+
+print qq~
+<table width="100%" border="0" height="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="25%">&nbsp;</td>
+      <td align="center" width="50%" valign="middle"><br>
+
+<!--Start Wrapper1-->
+	  <table align="center" cellpadding="10" cellspacing="0" border="0" style="border:#000000 1px solid;">
+	  <tr>
+	  	<td width="100%" align="center" valign="middle">
+<!--End Wrapper1-->
+
+
+        <font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><b>Bad Login Attempt</b><br><b style="color:#FF6500">*</b>Bad login attempt, please try again.<br><br></font>
+        <table width="300" border="0" cellspacing="0" cellpadding="0">
+          <tr> 
+            <td width="135"><font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><b><nobr>User Name</nobr></b></font></td>
+            <td rowspan="4" bgcolor="#000000" width="1"><img src="images/spacer.gif" width="1" height="25"></td>
+            <td width="15">&nbsp;</td>
+            <td rowspan="4">
+				<font face="verdana,arial,helvetica" size="1" color="#D6D6D6">
+              		<center>
+                		<a href="/getuser.htm?$addQ" style="color:#FF6500">Forgot your username?</a><br><br>
+                		<a href="/getpass.htm?$addQ" style="color:#FF6500">Forgot your password?</a> 
+              		</center>
+              	</font>
+			</td>
+          </tr>
+          <tr> 
+            <td width="135"> 
+              <input type="text" name="uNaim" value="$Username" size="25" tabIndex="1" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);">
+            </td>
+            <td width="15">&nbsp;</td>
+          </tr>
+          <tr> 
+            <td width="135"><font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><b>Password</b></font></td>
+            <td width="15">&nbsp;</td>
+          </tr>
+          <tr> 
+            <td width="135"> 
+              <input type="password" name="pDub" value="$Password" size="25" tabIndex="2" class="commonInput" onFocus="this.select();focusOnMe(this);" OnBlur="blurMe(this);">
+            </td>
+            <td width="15">&nbsp;</td>
+          </tr>
+          <tr> 
+            <td colspan="4" height="20"><font face="verdana" size="-5">&nbsp;</font><font face="verdana" size="-5">&nbsp;</font><font face="verdana" size="-5">&nbsp;</font><font face="verdana" size="-5">&nbsp;</font></td>
+          </tr>
+          <tr align="center"> 
+            <td colspan="4">
+			<input type="submit" tabIndex="3">
+			<font size="-4" face="verdana">&nbsp;</font>
+			<input type="reset" tabIndex="4" onClick="this.form.uNaim.focus();">
+			</td>
+          </tr>
+          <tr align="center"> 
+            <td colspan="4">
+	        	<center><font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><br><br><br><br><b style="line-height:24px;">Don't have a profile yet?</b><br><font style="color:#FF6500;">*</font> <a href="/newprofile.htm?$addQ" style="color:#D6D6D6;">Create one today! It's easy! It's free! </a><font style="color:#FF6500;">*</font><br><br></font>
+			</td>
+          </tr>
+
+
+        </table>
+<!--Start Wrapper2-->
+		</td>
+	  </tr>
+	  </table>
+<!--End Wrapper2-->
+
+    </td>
+      <td width="25%">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="25%" height="50">&nbsp;</td>
+    <td width="50%" height="50">&nbsp;</td>
+    <td width="25%" height="50">&nbsp;</td>
+  </tr>
+</table>
+</form>
+</body>
+</html>
+
+~;
+
+	}
+	$dbh->disconnect; 
+exit;
+}
+
+else {
+
+
+print "Content-type: text/html\n\n";
+
+print qq~
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Associate Log In</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script language="Javascript">
+<!--
+function checkForm() {
+	if ((document.login.uNaim.value == "") || (document.login.uNaim.value == "0") || (document.login.uNaim.value == " ")) {
+	alert('Before you can login you must type in your profile user name.')
+	document.login.uNaim.focus();
+	return false;
+	}	
+	if ((document.login.pDub.value == "") || (document.login.pDub.value == "0") || (document.login.pDub.value == " ")) {
+	alert('Before you can login you must type in your profile password.')
+	document.login.pDub.focus();
+	return false;
+	}	
+	else {
+	return true;
+	}	
+}
+function focusOnMe(cual) {
+	var este = cual;
+	este.style.background = "FFFFFF";
+}
+
+function blurMe(cual) {
+	var este = cual;
+	este.style.background = "F7F7F7";
+}
+
+//-->
+</script>
+<style type="text/css">
+body { scrollbar-face-color:#CCCCCC; scrollbar-highlight-color:#000000; scrollbar-shadow-color:#CCCCCC; scrollbar-3dlight-color: #000000; scrollbar-arrow-color:#000000; scrollbar-track-color:#000000; scrollbar-darkshadow-color:#000000; }
+.welcomeText { font-size:10px;font-family:verdana,arial,helvetica;color:ffffff;line-height:16px; }
+.commonInput { height:20px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px;  background-color:#F7F7F7; }
+</style>
+</head>
+<body bgcolor="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" $loadscript>
+<form method="post" name="login" onSubmit="return checkForm();">
+~;
+
+
+if ($FORM{'LL'} ne "") { 
+	$addQ = "LL=$FORM{'LL'}";
+	print "<input type=\"hidden\" name=\"LL\" value=\"$FORM{'LL'}\">"; 
+	if ($FORM{'LL'} eq "fg") { 
+		$addQ = $addQ . "&PID=$FORM{'PID'}&AN=$FORM{'AN'}";
+		print "<input type=\"hidden\" name=\"PID\" value=\"$FORM{'PID'}\">"; 
+		print "<input type=\"hidden\" name=\"AN\" value=\"$FORM{'AN'}\">"; 
+	}
+	if ($FORM{'LL'} eq "fdisp" || $FORM{'LL'} eq "fmsgr") { 
+		$addQ = $addQ . "&v=$FORM{'v'}";
+		print "<input type=\"hidden\" name=\"v\" value=\"$FORM{'v'}\">"; 
+	}
+}
+
+print qq~
+<table width="100%" border="0" height="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="25%">&nbsp;</td>
+      <td align="center" width="50%" valign="middle"><br>
+
+<!--Start Wrapper1-->
+	  <table align="center" cellpadding="10" cellspacing="0" border="0" style="border:#000000 1px solid;">
+	  <tr>
+	  	<td width="100%" align="center" valign="middle">
+<!--End Wrapper1-->
+
+        <font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><b>Profile Login</b><br><br>Please login using your profile login information.<br><br></font> 
+        <table width="300" border="0" cellspacing="0" cellpadding="0">
+          <tr> 
+            <td width="135"><font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><b><nobr>User Name</nobr></b></font></td>
+            <td rowspan="4" width="1"><img src="images/spacer.gif" width="1" height="25"></td>
+            <td width="15">&nbsp;</td>
+            <td rowspan="4"><font face="verdana,arial,helvetica" size="1" color="#D6D6D6">
+              <center>
+                <a href="/getuser.htm?$addQ" style="color:#FF6500">Forgot your username?</a><br><br>
+                <a href="/getpass.htm?$addQ" style="color:#FF6500">Forgot your password?</a> 
+              </center>
+              </font></td>
+          </tr>
+          <tr> 
+            <td width="135"> 
+              <input type="text" name="uNaim" size="25" tabIndex="1" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);">
+            </td>
+            <td width="15">&nbsp;</td>
+          </tr>
+          <tr> 
+            <td width="135"><font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><b>Password</b></font></td>
+            <td width="15">&nbsp;</td>
+          </tr>
+          <tr> 
+            <td width="135"> 
+              <input type="password" name="pDub" size="25" tabIndex="2" class="commonInput" onFocus="this.select();focusOnMe(this);" OnBlur="blurMe(this);">
+            </td>
+            <td width="15">&nbsp;</td>
+          </tr>
+          <tr> 
+            <td colspan="4" height="20"><font face="verdana" size="-5">&nbsp;</font><font face="verdana" size="-5">&nbsp;</font><font face="verdana" size="-5">&nbsp;</font><font face="verdana" size="-5">&nbsp;</font></td>
+          </tr>
+          <tr align="center"> 
+            <td colspan="4">
+			<input type="submit" tabIndex="3">
+			<font size="-4" face="verdana">&nbsp;</font>
+			<input type="reset" tabIndex="4" onClick="this.form.uNaim.focus();">
+			</td>
+          </tr>
+          <tr align="center"> 
+            <td colspan="4">
+	        	<center><font face="verdana,arial,helvetica" size="1" color="#D6D6D6"><br><br><br><br><b style="line-height:24px;">Don't have a profile yet?</b><br><font style="color:#FF6500;">*</font> <a href="/newprofile.htm?$addQ" style="color:#D6D6D6;">Create one today! It's easy! It's free! </a><font style="color:#FF6500;">*</font><br><br></font>
+			</td>
+          </tr>
+        </table>
+<!--Start Wrapper2-->
+		</td>
+	  </tr>
+	  </table>
+<!--End Wrapper2-->
+
+    </td>
+      <td width="25%">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="25%" height="50">&nbsp;</td>
+    <td width="50%" height="50">&nbsp;</td>
+    <td width="25%" height="50">&nbsp;</td>
+  </tr>
+</table>
+</form>
+</body>
+</html>
+
+~;
+
+}
+
+1;

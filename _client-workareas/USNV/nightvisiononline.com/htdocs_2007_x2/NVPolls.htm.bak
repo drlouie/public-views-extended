@@ -1,0 +1,2318 @@
+#!/usr/bin/perl5 -s
+
+###########################################################
+# HTTP ADMIN - SimPoll Polling System                     #
+# This CGI/Perl Script is Property of NetMedia Solutions  #
+#                                                         #
+#                                                         #
+# This online software is for sale at                     #
+# http://www.netmediasol.com                              #
+#                                                         #
+#                                                         #
+# Software Written by:                                    #
+# Luis Rodriguez (drlouie)                                #
+#                                                         #
+#                                                         #
+# Current version runs on most UNIX/Linux based systems   #
+# and comes standard with an online ADMIN TOOL for ease   #
+# of updates and additions                                #
+#                                                         #
+# If you have any questions or problems with this script  #
+# Please contact me directly for help                     #
+# drlouie@hapasol.com                                     #
+###########################################################
+
+## script's name
+$script = $ENV{'SCRIPT_NAME'};
+
+################# START parse form ##################
+    if ($ENV{'REQUEST_METHOD'} eq 'GET') {
+        @pairs = split(/&/, $ENV{'QUERY_STRING'});
+    }
+    elsif ($ENV{'REQUEST_METHOD'} eq 'POST') {
+        read(STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
+ 
+        @pairs = split(/&/, $buffer);
+    }
+    else {
+        &error('request_method');
+    }
+
+    foreach $pair (@pairs) {
+
+        local($name, $value) = split(/=/, $pair);
+ 
+        $name =~ tr/+/ /;
+        $name =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ tr/+/ /;
+        $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ s/<!--(.|\n)*-->//g;
+
+        if (defined($Config{$name})) {
+            $Config{$name} = $value;
+        }
+        else {
+            if ($Form{$name} && $value) {
+                $Form{$name} = "$Form{$name}, $value";
+            }
+            elsif ($value) {
+                push(@Field_Order,$name);
+                $Form{$name} = $value;
+            }
+        }
+    }
+################# END parse form ##################
+
+## check for pollstuff directory on server, the directory used to store this script's configuration
+## if it is present, move on with this script
+$firstcheck = "./pollstuff";
+if (-e $firstcheck) { $nextone=1; }
+## if not present, must mean this script has not been configured, forward to the Configuration Sub-Routine
+else { &configpoll; }
+
+##############################################################
+########## ROUTE USER DEPENDING ON LINK/FORM INPUT ###########
+##############################################################
+
+
+################ IF POLLING ################
+if ($Form{'addvote'}) { &addvote; }
+
+################ IF FINISHED ADDING A SOURCE ################
+elsif ($Form{'thanks'}) { &thanks; }
+
+################ IF CREATING ADMIN ACCOUNT ################
+elsif ($Form{'makeuser'}) { &makeuser; }
+
+################ IF LOGING IN ################
+elsif ($Form{'verifyuser'}) { &verifyuser; }
+
+################ IF ASKING FOR ADMIN LOGIN VIA EMAIL ################
+elsif ($Form{'getuser'}) { &getuser; }
+
+################ IF CALLING A JAVASCRIPT SOURCE FROM THIS SCRIPT ################
+elsif ($Form{'jscript'}) { &jscript; }
+
+################ IF CREATING FIRST POLL SUBJECT NAME ################
+elsif ($Form{'makefirst'}) { &makefirst; }
+
+################ IF LOOKING FOR ADMIN NAVIGATION FRAME ################
+elsif ($Form{'naviadmin'}) { &naviadmin; }
+
+################ IF LOOKING FOR ADMIN MAIN FRAME ################
+elsif ($Form{'mainadmin'}) { &mainadmin; }
+
+################ IF RUNNING ADMIN WHILE ALREADY LOGGED IN ################
+elsif ($Form{'admin'} eq '1' && $Form{'internal'} eq '1') { &admin; }
+
+################ IF LOOKING TO ADD A NEW SOURCE LINK ################
+elsif ($Form{'admin'}) { &login; }
+
+################ IF ADDING A NEW POLL SUBJECT ################
+elsif ($Form{'newpoll'}) { &newpoll; }
+
+################ IF DELETING A POLL SUBJECT ################
+elsif ($Form{'makecurrent'}) { &makecurrent; }
+
+################ IF DELETING A POLL SUBJECT ################
+elsif ($Form{'delepoll'}) { &delepoll; }
+
+################ IF WANTING TO CUSTOMIZE A POLL ################
+elsif ($Form{'custpoll'}) { &custpoll; }
+
+################ IF CUSTOMIZING A POLL ################
+elsif ($Form{'buildCustom'}) { &buildCustom; }
+
+################ IF SAVING CUSTOMIZATIONS TO A POLL ################
+elsif ($Form{'saveCustom'}) { &saveCustom; }
+
+################ IF LOOKING TO PUBLISH A POLL ################
+elsif ($Form{'publish'}) { &publish; }
+
+################ ELSE PARSE DEFULT ROUTINE ################
+elsif (!$inserted) { &first; }
+
+############### SUB CALLED INTERNALLY FOR POLL CONFIGRATION ###############
+sub getconfig {
+#if asking for specific poll, IE: TESTING A POLL
+if ($Form{'subject'}) {
+$subject = "$Form{'subject'}";
+}
+## else
+else {
+## FIND CONFIGURATION
+$currsub = "pollstuff/currsub.txt";
+$subject = `cat pollstuff/currsub.txt`;
+}
+
+$configuration = "pollstuff/$subject/configfile.txt";
+##if the current subject's config file is made, admin must have customzied this poll
+## if so pick up the admin's config for this poll
+if (-e $configuration) {
+	$runconfig = `cat $configuration`;
+	################# START parse form ##################
+        @pairs = split(/\n/, $runconfig);
+
+    foreach $pair (@pairs) {
+
+        local($name, $value) = split(/=/, $pair);
+ 
+        $name =~ tr/+/ /;
+        $name =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ tr/+/ /;
+        $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ s/<!--(.|\n)*-->//g;
+
+        if (defined($Config{$name})) {
+            $Config{$name} = $value;
+        }
+        else {
+            if ($Saved{$name} && $value) {
+                $Saved{$name} = "$Saved{$name}, $value";
+            }
+            elsif ($value) {
+                push(@Field_Order,$name);
+                $Saved{$name} = $value;
+            }
+        }
+	}
+	################# END parse form ##################
+	$subjectname = "$Saved{'subjectname'}";
+	$explanation = "$Saved{'explanation'}";
+	$voteprompt = "$Saved{'voteprompt'}";
+	$yesprompt = "$Saved{'yesprompt'}";
+	$noprompt = "$Saved{'noprompt'}";
+	$title = "$Saved{'title'}";
+	$tb_head_font = "$Saved{'tb_head_font'}";
+	$tb_head_bg = "$Saved{'tb_head_bg'}";
+	$tb_border = "$Saved{'tb_border'}";
+	$req_field = "$Saved{'req_field'}";
+	$bgcolor = "$Saved{'bgcolor'}";
+	$text = "$Saved{'text'}";
+	$link = "$Saved{'link'}";
+	$alink = "$Saved{'alink'}";
+	$vlink = "$Saved{'vlink'}";
+	$fontface = "$Saved{'fontface'}";
+	$smallfont = "$Saved{'smallfont'}";
+	$medfont = "$Saved{'medfont'}";
+	$largefont = "$Saved{'largefont'}";
+	$background = "$Saved{'background'}";
+
+	if ($background ne "" && $background ne " " && $background ne "FFFFFF") { $myBG = "style=\"background-image: url($background); background-repeat: no-repeat; background-position: left top; \" "; }
+	else { $myBG = ""; }
+
+}
+
+## else error
+else {
+&error ('cant open configuration file');
+}
+}
+
+
+
+############### SUB CALLED INTERNALLY FOR POLL CONFIGRATION ###############
+sub getAllPolls {
+
+## Define all folders/files within Pollstuff. Then uncall the files and name the folders.
+## This will come up with list of names of all available polls
+$currpolls = "pollstuff/";
+opendir(DIR, $currpolls) or die "can't opendir $currpolls $!";
+while (defined($file = readdir(DIR))) {
+	next if $file =~ /^\.\.?$/; ## skip . and .. directories
+	next if $file =~ /.txt\.?$/; ## skip .txt files, the SimPoll config files
+	next if $file =~ /.htaccess\.?$/; ## skip .htaccess files, the SimPoll config files
+	next if $file =~ /.htpasswd\.?$/; ## skip .htpasswd files, the SimPoll config files
+
+	$Saved1{'title'} = "";
+	
+	$configuration1 = "pollstuff/$file/configfile.txt";
+	## if so pick up the admin's config for this poll
+	if (-e $configuration1) {
+		$runconfig1 = `cat $configuration1`;
+		################# START parse form ##################
+        	my @lePairs = split(/\n/, $runconfig1);
+
+    	foreach $pair1 (@lePairs) {
+        	local($name, $value) = split(/=/, $pair1);
+        	$name =~ tr/+/ /;
+        	$name =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+        	$value =~ tr/+/ /;
+        	$value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+        	$value =~ s/<!--(.|\n)*-->//g;
+        	if (defined($Config{$name})) { $Config{$name} = $value; }
+        	else {
+            	if ($Saved1{$name} && $value) { $Saved1{$name} = "$Saved1{$name}, $value"; }
+            	elsif ($value) { push(@Field_Order,$name); $Saved1{$name} = $value; }
+        	}
+		}
+		################# END parse form ##################
+		$leTitle = "$Saved1{'title'}";
+	}
+	print "<option value=\"$file\">$leTitle";	
+	
+}
+
+}
+
+
+###########################################################
+################ DEFAULT ROUTINE/MAIN PAGE ################
+###########################################################
+sub first {
+
+&getconfig;
+
+## CAPTURE POLL TOTALS
+$cyes = `cat pollstuff/$subject/yes.txt`;
+$cno = `cat pollstuff/$subject/no.txt`;
+if ($cyes >= '1') { $cyes = $cyes; }
+else { $cyes = "0";}
+if ($cno >= '1') { $cno = $cno; }
+else { $cno = "0";}
+
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+
+<HTML>
+<HEAD>
+<TITLE>$title - $subjectname</TITLE>
+<html>
+<head>
+<title></title>
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript" src="js/mousetable.js"></script>
+<LINK REL="STYLESHEET" HREF="common_css.css" Type="text/css">
+<script language="Javascript">
+function runPoll() {
+	var formindex = document.OtherPolls.AllPolls.selectedIndex;
+	var thisone = document.OtherPolls.AllPolls.options[formindex].value;
+	if (thisone != "NOGOOD") {
+		location.href='$script?subject='+thisone;
+	}
+}
+</script>
+</head>
+<BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0" $myBG>
+      <table width="100%" border="0" cellspacing="0" cellpadding="7" bgcolor="#CCCCCC" valign="bottom">
+		<form name="OtherPolls">
+        <tr align="center"> 
+          <td width="100%" align="right" valign="middle"><nobr><font class="pollMore">Other Polls > > &nbsp;</font>
+		  <select name="AllPolls" class="pollSelect" onChange="runPoll();">
+<option value="NOGOOD">Select a poll to view it...</option>
+EOF
+}
+	
+&getAllPolls;
+
+{
+print <<EOF
+
+		  </select></select></nobr></td>
+        </tr>
+		</form>
+      </table>
+<table width="100%" align="center" cellpadding="10" cellspacing="0" border="0">
+<tr height="16">
+<td width="50%" align="left" valign="top" ></td>
+<td width="50%" align="right" valign="top" ><a href="#" onClick="javascript:window.close();"><font class="pollTopLinks">Close NV Polls </font><img src="images/button_close.gif" width="14" height="14" border="0"></a></td>
+</tr>
+<tr><td colspan="2" width="100%"><img src="images/spacer.gif" height="80" width="10" border="0"></td></tr>
+</table>
+<table cellpadding="10" cellspacing="0" border="0" align="center" width="100%">
+  <tr align="center"> 
+    <td valign="top" height="40"><font class="pollMainTitle">$title Poll</font></td>
+  </tr>
+  <tr> 
+    <td align="center" bgcolor="#33530F" valign="middle"><font class="pollSubTitle1">$subjectname</font></td>
+  </tr>
+  <tr> 
+    <td valign="top" width="100%"><font class="pollExplain">$explanation<br></font></td>
+  </tr>
+  <tr> 
+    <td valign="top" width="100%" align="center">
+
+      <table width="95%" border="2" cellspacing="0" cellpadding="5" bgcolor="#33540F" bordercolor="#33540F">
+        <tr align="center">
+          <td height="20" width="50%"><font class="pollYesNoTitle">What Do You Think?</font></td>
+          <td height="20" width="50%"><font class="pollYesNoTitle">Current Count</font></td>
+        </tr>
+        <tr align="center" bgcolor="#CCCCCC"> 
+          <td height="20" width="50%" style="cursor:hand;" title="Click to Vote!" onMouseOver="TDrunto(this,'FFFFFF');" onMouseOut="TDrunback(this,'CCCCCC');" onClick="location.href='$script?addvote=1&subject=$subject';"><font id="poller1" class="castVote">Cast Your Vote!</font></td>
+          <td height="20" width="50%"><font class="pollYesNoText"><p>Yes (<b>$cyes</b>)</p><p>No (<b>$cno</b>)</p></font></td>
+        </tr>
+      </table>
+
+	</td>
+  </tr>
+<tr><td width="100%"><img src="images/spacer.gif" height="15" width="10" border="0"></td></tr>
+</table>  
+
+
+
+</BODY>
+</HTML>
+
+EOF
+}
+exit;
+}
+
+#####################################################################
+################ POLLING SCREEN, SCREEN USED TO VOTE ################
+#####################################################################
+sub addvote {
+&getconfig;
+
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+	
+<HTML>
+<HEAD>
+<TITLE>$title - $subjectname</TITLE>
+<html>
+<head>
+<title></title>
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript" src="js/mousetable.js"></script>
+<LINK REL="STYLESHEET" HREF="common_css.css" Type="text/css">
+<script language="Javascript">
+function runPoll() {
+	var formindex = document.OtherPolls.AllPolls.selectedIndex;
+	var thisone = document.OtherPolls.AllPolls.options[formindex].value;
+	if (thisone != "NOGOOD") {
+		location.href='$script?addvote=1&subject='+thisone;
+	}
+}
+</script>
+	<script language="Javascript">
+	<!--
+	function checkForm() {
+	 var lengthOfForm=document.userpoll.length;
+	 var i=0;
+	 var formOK=0;
+	 for(i=0;i<lengthOfForm;i++) {
+	  if(document.userpoll[i].checked) {
+	    formOK=1;
+	  }
+	 }
+ 
+	if(formOK) {
+	 document.userpoll.submit();
+	  	return true;
+	 }
+
+	else {
+	  alert("Ooops, you have not selected a choice...");
+	  	return false;
+	 }
+	}
+	//-->
+	</script>
+<script langauge="Javascript">
+function toggleRadio(cual,mychoice) {
+	if (document.userpoll[cual][0].checked) { document.userpoll[cual][1].checked = true; }
+	else if (document.userpoll[cual][1].checked) { document.userpoll[cual][0].checked = true; }
+	else if (mychoice == "yes")	{ document.userpoll[cual][0].checked = true; }
+	else if (mychoice == "no")	{ document.userpoll[cual][1].checked = true; }
+}
+</script>
+</head>
+<BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0" $myBG>
+      <table width="100%" border="0" cellspacing="0" cellpadding="7" bgcolor="#CCCCCC" valign="bottom">
+		<form name="OtherPolls">
+        <tr align="center"> 
+          <td width="100%" align="right" valign="middle"><nobr><font class="pollMore">Other Polls > > &nbsp;</font>
+		  <select name="AllPolls" class="pollSelect" onChange="runPoll();">
+<option value="NOGOOD">Select a poll to view it...</option>
+EOF
+}
+	
+&getAllPolls;
+
+{
+print <<EOF
+
+		  </select></nobr></td>
+        </tr>
+		</form>
+      </table>
+
+<table width="100%" align="center" cellpadding="10" cellspacing="0" border="0">
+
+<form method="post" name="userpoll" action="$script" onSubmit="return checkForm();">
+<input type="hidden" name="thanks" value="1">
+<input type="hidden" name="polling" value="1">
+<input type="hidden" name="subject" value="$subject">
+
+<tr height="16">
+<td width="50%" align="left" valign="top"><a href="$script?subject=$subject"><font class="pollTopLinks"><img src="images/button_home.gif" width="15" height="14" border="0"> NV Polls Home</font></td>
+<td width="50%" align="right" valign="top"><a href="#" onClick="javascript:window.close();"><font class="pollTopLinks">Close NV Polls </font><img src="images/button_close.gif" width="14" height="14" border="0"></a></td>
+</tr>
+<tr><td colspan="2" width="100%"><img src="images/spacer.gif" height="80" width="10" border="0"></td></tr>
+</table>
+<table cellpadding="10" cellspacing="0" border="0" align="center" width="100%">
+  <tr align="center"> 
+    <td valign="top" height="40"><font class="pollMainTitle">$title Poll</font></td>
+  </tr>
+  <tr> 
+    <td align="center" bgcolor="#33530F" valign="middle"><font class="pollSubTitle1">Cast Your Vote on the Subject...</font></td>
+  </tr>
+  <tr> 
+    <td valign="top" width="100%"><font class="pollExplain">$voteprompt<br></font></td>
+  </tr>
+  <tr> 
+    <td valign="top" width="100%" align="center">
+
+      <table width="95%" border="2" cellspacing="0" cellpadding="5" bgcolor="#33540F" bordercolor="#33540F">
+        <tr align="center" bgcolor="#CCCCCC" onMouseOver="runto(this,'FFFFFF');" onMouseOut="runback(this,'CCCCCC');">
+          <td height="20" width="50"><input type="radio" name="question1" value="yes"></td>
+          <td height="20" width="100%" align="left" onClick="toggleRadio('question1','yes');" style="cursor:hand;" title="Click to Vote!"><font id="yesprompt" class="votePrompt">$yesprompt</font></td>
+        </tr>
+        <tr align="center" bgcolor="#CCCCCC" onMouseOver="runto(this,'FFFFFF');" onMouseOut="runback(this,'CCCCCC');">
+          <td height="20" width="50"><input type="radio" name="question1" value="no"></td>
+          <td height="20" width="100%" align="left" onClick="toggleRadio('question1','no');" style="cursor:hand;" title="Click to Vote!"><font class="votePrompt">$noprompt</font></td>
+        </tr>
+        <tr align="center" bgcolor="#CCCCCC">
+          <td height="20" width="100%" colspan="2"><font class="votePrompt"><font class="star1">*</font>Email Address<br><input type="text" name="email" class="pollEmail"><font class="pollSmall"><br>(example john\@doe.com)<br><br>Submit email addrress only if you want us to contact you with the poll totals at the end of the month.</font></font></td>
+        </tr>
+      </table>
+
+	</td>
+  </tr>
+<tr><td width="100%" align="center"><input type="image" name="submit" src="images/button_castvote.gif" width="114" height="30"><img src="images/spacer.gif" height="15" width="30" border="0"><a href="#" onClick="document.userpoll.reset();"><img src="images/button_resetballot.gif" width="114" height="30" border="0"></a></td></tr>
+</table>  
+	    </td>
+	  </tr>
+	</form>
+	</table>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+##################################################
+################ THANK YOU SCREEN ################
+##################################################
+
+sub thanks {
+
+&getconfig;
+
+print "Content-type: text/html\n\n";
+## grab poll subject
+	
+## PREPARE COMMON FORM FIELDS FOR SAVING
+$question1 = "$Form{'question1'}";
+$email = "$Form{'email'}";
+
+## IF EMAIL ADDRESS IS PRESENT AND CONTAINS ALL EMAIL CHARACTERS - SAVE USERINFO
+if ($email =~ "@" && $email =~ ".") {
+	## ALL FORM FIELDS IN ARRAY READY FOR ONE LINE FILE PRINT
+	@formfields = ("$email-$question1");
+	## Write current form data
+	$logfile = "pollstuff/$subject/userinfo.txt";	
+  	$line = `cat $logfile`;
+if (-e $logfile) {
+  	open(FILE,">$logfile") || &error('can not write log file');
+	print FILE "$line\n"; 
+	print FILE "@formfields";
+}	
+else {
+  	open(FILE,">$logfile") || &error('cant write user email address, file pollstuff/$subject/userinfo.txt must be corrupt');
+	print FILE "@formfields";
+}	
+close(FILE);
+}
+
+
+## TO SEE CURRENT NUMBERS ON THANK YOU PAGE
+## CAPTURE POLL TOTALS
+$cyes = `cat pollstuff/$subject/yes.txt`;
+$cno = `cat pollstuff/$subject/no.txt`;
+if ($cyes >= '1') { $cyes = $cyes; }
+else { $cyes = "0";}
+if ($cno >= '1') { $cno = $cno; }
+else { $cno = "0";}
+$seeall = $cno + $cyes;
+
+	## TALLY QUESTION ANSWERS
+if ($question1 eq "yes") {	
+	$thanksmes = "<p>You said <b>YES</b>, and it seems like <b>$cyes</b> other people agree with you on the subject.<br><br><br>Yet, <b>$cno</b> people believe the opposite on the subject.<br><br><br>A total of <b>$seeall</b> people have voted so far...</p>";
+	## ADDONE TO COUNT/SAVE COUNT RESOURCE
+	$logfile1 = "pollstuff/$subject/yes.txt";
+	$count1 = `cat $logfile1`;
+	$count1++;
+  	open(FILE,">$logfile1") || &error('can not write resources count');
+  	print FILE "$count1";
+  	close(FILE);
+}
+elsif ($question1 eq "no") {	
+	$thanksmes = "<p>You said <b>NO</b>, and it seems like <b>$cno</b> other people agree with you on the subject.<br><br><br>Yet, <b>$cyes</b> people believe the opposite on the subject.<br><br><br>A total of <b>$seeall</b> people have voted so far...</p>";
+	## ADDONE TO COUNT/SAVE COUNT RESOURCE
+	$logfile2 = "pollstuff/$subject/no.txt";
+	$count2 = `cat $logfile2`;
+	$count2++;
+  	open(FILE,">$logfile2") || &error('can not write resources count');
+  	print FILE "$count2";
+  	close(FILE);
+}
+else { 
+$thanksmes = "Sorry, you did not come prepared to view this file, please return to the main page to start over.<br><br><a href=\"$script\" target=\"_top\">Main Screen</a>"; 
+}
+
+####### IF NONE OF THE ABOVE REDIRECT TO MAIN PAGE #######
+{
+print <<EOF
+
+<HTML>
+<HEAD>
+<TITLE>$title - $subjectname</TITLE>
+<html>
+<head>
+<title></title>
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript" src="js/mousetable.js"></script>
+<LINK REL="STYLESHEET" HREF="common_css.css" Type="text/css">
+<script language="Javascript">
+function runPoll() {
+	var formindex = document.OtherPolls.AllPolls.selectedIndex;
+	var thisone = document.OtherPolls.AllPolls.options[formindex].value;
+	if (thisone != "NOGOOD") {
+		location.href='$script?subject='+thisone;
+	}
+}
+</script>
+</head>
+<BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0" $myBG>
+      <table width="100%" border="0" cellspacing="0" cellpadding="7" bgcolor="#CCCCCC" valign="bottom">
+		<form name="OtherPolls">
+        <tr align="center"> 
+          <td width="100%" align="right" valign="middle"><nobr><font class="pollMore">Other Polls > > &nbsp;</font>
+		  <select name="AllPolls" class="pollSelect" onChange="runPoll();">
+<option value="NOGOOD">Select a poll to view it...</option>
+EOF
+}
+	
+&getAllPolls;
+
+{
+print <<EOF
+
+		  </select></select></nobr></td>
+        </tr>
+		</form>
+      </table>
+<table width="100%" align="center" cellpadding="10" cellspacing="0" border="0">
+<tr height="16">
+<td width="50%" align="left" valign="top" ></td>
+<td width="50%" align="right" valign="top" ><a href="#" onClick="javascript:window.close();"><font class="pollTopLinks">Close NV Polls </font><img src="images/button_close.gif" width="14" height="14" border="0"></a></td>
+</tr>
+<tr><td colspan="2" width="100%"><img src="images/spacer.gif" height="80" width="10" border="0"></td></tr>
+</table>
+<table cellpadding="10" cellspacing="0" border="0" align="center" width="100%">
+  <tr align="center"> 
+    <td valign="top" height="40"><font class="pollMainTitle">$title Poll</font></td>
+  </tr>
+  <tr> 
+    <td valign="top" width="100%" align="center"><font class="pollExplain">$thanksmes<br></font></td>
+  </tr>
+</table>
+</BODY>
+</HTML>
+
+EOF
+}
+exit;
+}
+
+
+########################################################################################
+################ FIRST START CONFIG SCREEN, USED FOR SETTING ADMIN INFO ################
+########################################################################################
+sub configpoll {
+mkdir("pollstuff", 0700) || &error('cant write create pollstuff, you must not have admin permissions on this server');
+print "Content-type: text/html\n\n";
+
+{
+print <<EOF
+
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Online Admin Tool</TITLE>
+
+	<SCRIPT LANGUAGE="JavaScript">
+	//Check Search field for completion
+	function checkForm() {
+		if (document.configpoll.username.value == "") {
+		alert('Your Username is missing.');
+		document.configpoll.username.focus();
+		return false;
+		}	
+
+		if (document.configpoll.password.value == "") {
+		alert('Your Password are missing.');
+		document.configpoll.password.focus();
+		return false;
+		}	
+	
+		var x= document.configpoll.email.value;
+		if( x.indexOf('\@')==-1 || x.indexOf('.')==-1 || x.indexOf(' ')!=-1 || x.length<7) {
+    	alert('Your Email Address is invalid or missing. Please enter a valid email address.');
+		document.configpoll.email.focus();
+    	return false;
+    	}
+		
+		else {
+		return true;
+		}	
+	}
+	</SCRIPT>
+
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<table cellpadding=0 cellspacing=0 border=0 align="center" width="350">
+  	<tr> 
+    	<td valign="top" width="284"> 
+      	<form method="post" name="configpoll" action="$script" onSubmit="return checkForm();">
+        	<input type="hidden" name="makeuser" value="1">
+        	<br>
+        	<table width="100%" border="0" cellspacing="0" cellpadding="3">
+          	<tr valign="top"> 
+            	<td><font face="verdana,arial,helvetica" size="1"><br>We have detected that you have not configured your <a href="#" onClick="javascript:window.open('http://www.nightvisiononline.com/')">SimPoll</a> Polling System. To do so, please follow the simple step-by-step instructions.<br>
+              <br>Start by setting the administrator's username, password and email address by filling in the following form fields. Then click 'Create'.<br>
+              </font> </td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td>&nbsp;<br></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Username</strong></font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="center"><input type="text" name="username"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Password</strong></font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="center"><input type="password" name="password"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="center"> <font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Email Address</strong></font><br><input type="text" name="email"><br><font face="verdana,arial,helvetica" size="1">(example john\@doe.com)</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><br><font color="#FF0000">*</font>Required Fields.<br></font></td>
+	          </tr>
+	        </table>
+	        <br>
+	        <br>
+	        <center><input type="submit" value="Create!">&nbsp;&nbsp;&nbsp;&nbsp;<input type="Reset" value="Clear Form"></center>
+	      </form>
+	    </td>
+	  </tr>
+	</table>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+##############################################################################################################
+################ ONCE THE ADMINISTRATOR INFO IS SUBMITTED CORRECTLY, WRTIE THE AMAN.TXT FILE, ################
+################ THE FILE THAT WILL HOLD THE ADMIN LOGIN INFO, WHICH RESTS WITHIN POLLSTUFF	  ################
+##############################################################################################################
+sub makeuser {
+$username = "$Form{'username'}";
+$password = "$Form{'password'}";
+$email = "$Form{'email'}";
+$passfile = "pollstuff/.htpasswd";
+
+## ADD ADMIN AS .HTACCESS
+if (!$password) {
+	print "Please don't leave the password field blank!";
+	exit;
+}
+
+# crypt pass
+$newpass = crypt($password, tnnntv);
+
+open (HTACCESS, ">/usr/local/etc/httpd/htdocs/scentral/perl/pollstuff/.htaccess")|| die "Content-type: text/html\n\nError opening /usr/local/etc/httpd/htdocs/scentral/perl/pollstuff/.htaccess\n";
+print HTACCESS "AuthUserFile /usr/local/etc/httpd/htdocs/scentral/perl/pollstuff/.htpasswd\nAuthName \"Access\"\nAuthType Basic\n<limit GET>\nrequire valid-user\n</limit>\n";
+close (HTACCESS);
+
+open (PASS, ">/usr/local/etc/httpd/htdocs/scentral/perl/pollstuff/.htpasswd")|| die print "Error opening file: /usr/local/etc/httpd/htdocs/scentral/perl/pollstuff/.htpasswd\n";
+print PASS "$username:$newpass\n"; 
+close (PASS);
+
+
+## save email address for admin needs
+$adminfile = "pollstuff/aman.txt";
+open(FILE,">$adminfile") || &error('can not write resources count');
+print FILE "realuser=$username&realpass=$password&email=$email";
+close(FILE);
+chmod(0777, $adminfile) || &error('cant write to pollstuff/aman.txt, the file that holds the admin email address');
+&login;
+}
+
+##################################################################################################################
+################ LOGIN SCREEN, PRESENTED IF USER CALLS THIS SCRIPT WITH ADMIN=1 VARIABLE IN PLACE ################
+##################################################################################################################
+
+sub login {
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administrator Login</TITLE>
+
+	<SCRIPT LANGUAGE="JavaScript">
+	//Check Search field for completion
+	function checkForm() {
+		if (document.login.username.value == "") {
+		alert('Your Username is missing.');
+		document.login.username.focus();
+		return false;
+		}	
+
+		if (document.login.password.value == "") {
+		alert('Your Password are missing.');
+		document.login.password.focus();
+		return false;
+		}	
+			
+		else {
+		return true;
+		}	
+	}
+	</SCRIPT>
+
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<table cellpadding=0 cellspacing=0 border=0 align="center" width="350">
+	  <tr>
+	    <td valign="top" width="284">
+	      <form method="post" name="login" action="$script" onSubmit="return checkForm();">
+	        <input type="hidden" name="verifyuser" value="1">
+	        <br>
+	        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+	          <tr valign="top">
+	            <td><font face="verdana,arial,helvetica" size="1"><br>
+	              Welcome to the <a href="#" onClick="javascript:window.open('http://www.netmediasol.com/')">SimPoll</a> Administration System. Before you can change the script's settings you must login with the administrator's username and password.<br></font> </td>
+	          </tr>
+	          <tr valign="top">
+	            <td>&nbsp;<br></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Username</strong></font></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><input type="text" name="username"></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Password</strong></font></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><input type="password" name="password"></td>
+	          </tr>
+	        </table>
+	        <br>
+	        <br>
+	        <center><input type="submit" value="Login">&nbsp;&nbsp;&nbsp;&nbsp;<input type="Reset" value="Clear Form"></center>
+	      </form>
+	    </td>
+	  </tr>
+	</table>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+################################################################################################
+################ VERIFY USERNAME AND PASSWORD IN ORDER TO ADMINSTER THIS SCRIPT ################
+################################################################################################
+sub verifyuser {
+$adminfile = "pollstuff/aman.txt";
+$admin = `cat $adminfile`;
+
+################# START parse form ##################
+        @pairs = split(/&/, $admin);
+
+    foreach $pair (@pairs) {
+
+        local($name, $value) = split(/=/, $pair);
+ 
+        $name =~ tr/+/ /;
+        $name =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ tr/+/ /;
+        $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ s/<!--(.|\n)*-->//g;
+
+        if (defined($Config{$name})) {
+            $Config{$name} = $value;
+        }
+        else {
+            if ($Saved{$name} && $value) {
+                $Saved{$name} = "$Saved{$name}, $value";
+            }
+            elsif ($value) {
+                push(@Field_Order,$name);
+                $Saved{$name} = $value;
+            }
+        }
+}
+################# END parse form ##################
+
+$realuser = "$Saved{'realuser'}";
+$realpass = "$Saved{'realpass'}";
+$username = "$Form{'username'}";
+$password = "$Form{'password'}";
+
+if (($username eq $realuser) && ($password eq $realpass)) { &admin; }
+else {
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administrator Login: Error</TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+	//Check Search field for completion
+	function checkForm() {
+		if (document.login.username.value == "") {
+		alert('Your Username is missing.');
+		document.login.username.focus();
+		return false;
+		}	
+
+		if (document.login.password.value == "") {
+		alert('Your Password are missing.');
+		document.login.password.focus();
+		return false;
+		}	
+		
+		else {
+		return true;
+		}	
+	}
+	</SCRIPT>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<table cellpadding=0 cellspacing=0 border=0 align="center" width="350">
+	  <tr>
+	    <td valign="top" width="284">
+	      <form method="post" name="login" action="$script" onSubmit="return checkForm();">
+	        <input type="hidden" name="verifyuser" value="1">
+	        <br>
+	        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+	          <tr valign="top">
+	            <td><font face="verdana,arial,helvetica" size="1"><br>Sorry, you have submitted the wrong username and password combination. Please try logging in once again. If you forgot your username and/or password <a href="$script?getuser=1"><b>click here</b></a> to request it via email.<br></font> </td>
+	          </tr>
+	          <tr valign="top">
+	            <td>&nbsp;<br></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Username</strong></font></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><input type="text" name="username"></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Password</strong></font></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><input type="password" name="password"></td>
+	          </tr>
+	        </table>
+	        <br>
+	        <br>
+	        <center><input type="submit" value="Create!">&nbsp;&nbsp;&nbsp;&nbsp;<input type="Reset" value="Clear Form"></center>
+	      </form>
+	    </td>
+	  </tr>
+	</table>
+	</BODY>
+	</HTML>
+
+EOF
+}
+}
+exit;
+}
+
+###################################################################################################################################################
+################ IF ADMIN FORGOT USERNAME/PASSWORD, SEND THE INFORMATION TO THE ADMINISTRATOR'S EMAIL ADDRESS AS SAVED ON AMAN.TXT ################
+###################################################################################################################################################
+sub getuser {
+$admin = `cat pollstuff/aman.txt`;
+
+	################# START parse form ##################
+        @pairs = split(/&/, $admin);
+
+    foreach $pair (@pairs) {
+
+        local($name, $value) = split(/=/, $pair);
+ 
+        $name =~ tr/+/ /;
+        $name =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ tr/+/ /;
+        $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ s/<!--(.|\n)*-->//g;
+
+        if (defined($Config{$name})) {
+            $Config{$name} = $value;
+        }
+        else {
+            if ($Saved{$name} && $value) {
+                $Saved{$name} = "$Saved{$name}, $value";
+            }
+            elsif ($value) {
+                push(@Field_Order,$name);
+                $Saved{$name} = $value;
+            }
+        }
+}
+	################# END parse form ##################
+
+$email = "$Saved{'email'}";
+$realuser = "$Saved{'realuser'}";
+$realpass = "$Saved{'realpass'}";
+$mailprog = '/bin/sendmail';
+
+    # Open The Mail Program
+    open(MAIL,"|$mailprog -t");
+    print MAIL "To: $email(SimPoll Administrator)\n";
+    print MAIL "From: SimPoll\@nightvisiononline.com(SimPoll Administration System)\n";
+    print MAIL "Subject: Your SimPoll Login Information\n\n";
+ 	print MAIL "Concerned,\nHere is the administrator login information you requested for the SimPoll Polling System located at $ENV{'HTTP_REFERER'}.\n\nUsername: $realuser\nPassword: $realpass\n\n\n";
+ 	print MAIL "#################################################\n";
+ 	print MAIL "###### The SimPoll Polling System and the  ######\n";
+	print MAIL "###### SimPoll Administration System are   ######\n";
+	print MAIL "###### properties of NetMedia Solutions.   ######\n";
+	print MAIL "###### For more information on this script ######\n";
+	print MAIL "###### please visit SimPoll's Site at      ######\n";
+	print MAIL "###### http://www.netmediasol.com/simpoll/ ######\n";
+ 	print MAIL "#################################################\n";
+    close (MAIL);
+
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administrator Login: Error</TITLE>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<table cellpadding=0 cellspacing=0 border=0 align="center" width="350">
+	  <tr>
+	    <td valign="top" width="284">
+	        <br>
+	        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+	          <tr valign="top">
+	            <td><font face="verdana,arial,helvetica" size="1"><br>Your SimPoll login information was sent to <b>$email</b>. Once you have recieved the email, you can <a href="$script?admin=1"><b>login</b></a> here.<br></font></td>
+	          </tr>
+	        </table>
+	    </td>
+	  </tr>
+	</table>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+###################################################################################
+################ FROM HERE ON IS THE SIMPOLL ADMINISTRATION SYSTEM ################
+###################################################################################
+sub admin {
+
+## SECOND STEP : Check for 'current subject' directory if not present 
+## Must be running script for first time create it will the necessary files and permissions
+$subfile = "pollstuff/subjects.txt";
+if (-e $subfile) {
+$subject = `cat $subfile`;
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+	
+<html>
+<head>
+<title>SimPoll - Administration System</title>
+</head>
+
+<frameset rows="*" cols="175,*" border="0" framespacing="0"> 
+  <frame name="navi" scrolling="NO" noresize src="$script?naviadmin=1" marginwidth="0" marginheight="0" frameborder="NO">
+  <frame name="main" src="$script?mainadmin=1" frameborder="NO" marginheight="0" marginwidth="0" scrolling="AUTO">
+</frameset>
+<noframes><body bgcolor="#FFFFFF">
+
+</body></noframes>
+</html>
+
+EOF
+}
+exit;
+}
+
+#### IF SUBJECT DIRECTORY IS NOT THERE, OR SUBJECT ITSELF IS UNDEF ASK FOR STARTING SUBJECT NAME
+else { 
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+	
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administrator Login: Error</TITLE>
+	<SCRIPT LANGUAGE="JavaScript">
+	//Check Search field for completion
+	function checkForm() {
+		if (document.makesub.subject.value == "") {
+		alert('Please type in a ONE word subject name example: slimshady');
+		document.makesub.subject.focus();
+		return false;
+		}	
+		
+		else {
+		return true;
+		}	
+	}
+	</SCRIPT>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+	<table cellpadding=0 cellspacing=0 border=0 align="center" width="350">
+	  <tr>
+	    <td valign="top" width="284">
+	      <form method="post" name="makesub" action="$script" onSubmit="return checkForm();">
+	        <input type="hidden" name="makefirst" value="1">
+	        <br>
+	        <table width="100%" border="0" cellspacing="0" cellpadding="3">
+	          <tr valign="top">
+	            <td><font face="verdana,arial,helvetica" size="1"><br>SimPoll has detected that you have not created your first Poll Subject Name. The Poll Subject Name allows this polling application to run and save multiple polls using just one script. Also, with the Poll Subject Name you can track, delete, add and archive your site's polls using the SimPoll Administration System, which is included in this application. <br><br>Please try to be as definitive as possible when creating your Poll Subject Name. Keep in mind that all UPPERCASE and lowercase letters and all numbers are valid for the Poll Subject Name. Sorry, illegal characters such as @, #, $, %, ^, &, *, (, ), _, -, +, etc. are not valid for the Poll Subject Name.<br><br>Please type in a ONE word phrase to begin creating your first poll. For example, I am about to create a poll that emphasizes on Slim Shady's (aka <a href="#" onClick="javascript:window.open('http://eminem.farmclub.com/')">Eminem</a>) Controversial Lyrics which are continuously getting full media coverage around the world. Therefore, I will name my first poll subject <b>slimshady</b>.</font></td>
+	          </tr>
+	          <tr valign="top">
+	            <td>&nbsp;<br></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><font face="verdana,arial,helvetica" size="1"><font color="#FF0000">*</font><strong>Poll Subject Name</strong></font></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="center"><input type="text" name="subject"></td>
+	          </tr>
+	        </table>
+	        <br>
+	        <br>
+	        <center><input type="submit" value="Create!">&nbsp;&nbsp;&nbsp;&nbsp;<input type="Reset" value="Clear Form"></center>
+	      </form>
+	    </td>
+	  </tr>
+	</table>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+}
+
+######################################################
+################ CREATE FIRST SUBJECT ################
+######################################################
+sub makefirst {
+$subject = "$Form{'subject'}";
+
+	## if the subject contains illegal characters place this error message
+	if ($subject =~ m/!/ || $subject =~ m/~/ || $subject =~ m/`/ || $subject =~ m/@/ || $subject =~ m/\$/ || $subject =~ m/\%/ || $subject =~ m/\&/ || $subject =~ m/\*/ || $subject =~ m/\(/ || $subject =~ m/\)/ || $subject =~ m/\-/ || $subject =~ m/\_/ || $subject =~ m/\+/ || $subject =~ m/\=/ || $subject =~ m/\[/ || $subject =~ m/\]/ || $subject =~ m/\{/ || $subject =~ m/\}/ || $subject =~ m/\\/ || $subject =~ m/\|/ || $subject =~ m/\:/ || $subject =~ m/\;/ || $subject =~ m/\"/ || $subject =~ m/\'/ || $subject =~ m/\</ || $subject =~ m/\>/ || $subject =~ m/\,/ || $subject =~ m/\./ || $subject =~ m/\?/ || $subject =~ m/\// || $subject =~ m/\#/ || $subject =~ m/\^/ || $subject =~ m/\ /) {
+		print "Content-type: text/html\n\n";
+		print "<HTML><HEAD><TITLE>SimPoll - Administrator Login: Error</TITLE></HEAD>";
+		print "<BODY TEXT=\"#666666\" LINK=\"#666666\" VLINK=\"#666666\" ALINK=\"#666666\" BGCOLOR=\"#ffffff\" leftmargin=\"0\" topmargin=\"0\" marginwidth=\"0\" marginheight=\"0\">";
+		print "<p>&nbsp;</p>";
+		print "<table width=\"85%\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"35\"><font face=\"verdana,arial,helvetica\" size=\"1\" color=\"#FF0000\"><b>ERROR: Illegal Characters Found</b></font></td></tr><tr><td><font face=\"verdana,arial,helvetica\" size=\"1\">Your Poll Subject Name contained one or more illegal characters, please make sure you use only letters and numbers in your Poll Subject Name. <a href=\"#\" onClick=\"javascript:history.go(-1)\">Click here to try again.</a></font></td></tr></table>";
+		print "</BODY></HTML>";
+	}
+
+	else {
+		## CREATE DIRECTORIES AS NEEDED
+		mkdir("pollstuff/$subject", 0777) || &error('cant make folder pollstuff/$subject, used to save poll information');
+		## MAKE AND WRITE SUBJECT INTO SUBJECT TRACKING FILE
+		$subfile = "pollstuff/subjects.txt";
+		open(FILE,">$subfile") || &error('can not write resources count');
+		print FILE "$subject";
+		close(FILE);
+		print "Content-type: text/html\n\n";
+		print "<HTML><HEAD><TITLE>SimPoll - Poll Subject Name Created</TITLE></HEAD>";
+		print "<BODY TEXT=\"#666666\" LINK=\"#666666\" VLINK=\"#666666\" ALINK=\"#666666\" BGCOLOR=\"#ffffff\" leftmargin=\"0\" topmargin=\"0\" marginwidth=\"0\" marginheight=\"0\">";
+		print "<p>&nbsp;</p>";
+		print "<table width=\"85%\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td><font face=\"verdana,arial,helvetica\" size=\"1\">Now that your first subject is in place, its time to begin customizing the application to fit your needs. <a href=\"$script?admin=1&internal=1\">Click here to get started with the process.</a></font></td></tr></table>";
+		print "</BODY></HTML>";
+
+		## CREATE DEFULT POLL CONFIGURATION
+		$configure = "pollstuff/$subject/configfile.txt";
+		open(CONFIGME,">$configure") || &error('can not make default configuration file');
+		print CONFIGME "subjectname=George Bush for President?\n";
+		print CONFIGME "explanation=It seems like many citizens of the United States aren't happy with the new president. Yet, a comparible amount of people do find President George Bush a natural born leader. Where do you fit in all this? Do you think President George Bush has what is takes to make this country better and stronger than it currently is?\n";
+		print CONFIGME "voteprompt=What is your opinion? Do you think George Bush is fully capable of running our beloved country in the new millenium?\n";
+		print CONFIGME "yesprompt=Yes, George Bush is the best possible person for the job.\n";
+		print CONFIGME "noprompt=No, George Bush must be re-evaluated for the position of the President of the United States of America.\n";
+		print CONFIGME "title=Monthly Poll\n";
+		print CONFIGME "tb_head_font=FFFFFF\n";
+		print CONFIGME "tb_head_bg=999999\n";
+		print CONFIGME "tb_border=999999\n";
+		print CONFIGME "req_field=FF0000\n";
+		print CONFIGME "bgcolor=FFFFFF\n";
+		print CONFIGME "text=666666\n";
+		print CONFIGME "link=999999\n";
+		print CONFIGME "vlink=999999\n";
+		print CONFIGME "alink=999999\n";
+		print CONFIGME "fontface=verdana,arial,helvetica\n";
+		print CONFIGME "smallfont=1\n";
+		print CONFIGME "medfont=2\n";
+		print CONFIGME "largefont=3\n";
+		print CONFIGME "background=FFFFFF\n";
+		close(CONFIGME);
+	}
+exit;
+}
+
+################################################################
+################ ADMINISTRATION NAVIGATION MENU ################
+################################################################
+sub naviadmin {
+
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+	
+<html>
+<head>
+<title>SimPoll - Administration System</title>
+<script language="Javascript" src="$script?jscript=1&mousetable=1"></script>
+</head>
+
+<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#D1D1D1" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0" onMouseOver="runto('ebebeb')" onMouseOut="runback('D1D1D1')">
+<tr><td height="100" id="ignore" align="center"><img src="http://www.hapasol.com/simpoll/images/simpoll_logo.jpg" width="113" height="72" border="0"></td></tr>
+<tr><td height="25" id="ignore"><b><font face="verdana,arial,helvetica" size="2">&nbsp;&nbsp;Administrator's Menu</b></font></td></tr>
+<tr><td height="25" valign="middle"><font face="verdana,arial,helvetica" size="1">&nbsp;&nbsp;&nbsp;&nbsp;<a href="$script?mainadmin=1" target="main">Main Screen</a></font></td></tr>
+<tr><td height="25" valign="middle"><font face="verdana,arial,helvetica" size="1">&nbsp;&nbsp;&nbsp;&nbsp;<a href="$script?custpoll=1" target="main">Customize Poll</a></font></td></tr>
+<tr><td height="25" valign="middle"><font face="verdana,arial,helvetica" size="1">&nbsp;&nbsp;&nbsp;&nbsp;<a href="$script?newpoll=1" target="main">Create New Poll</a></font></td></tr>
+<tr><td height="25" valign="middle"><font face="verdana,arial,helvetica" size="1">&nbsp;&nbsp;&nbsp;&nbsp;<a href="$script?delepoll=1" target="main">Delete Poll</a></font></td></tr>
+<tr><td height="25" valign="middle"><font face="verdana,arial,helvetica" size="1">&nbsp;&nbsp;&nbsp;&nbsp;<a href="$script?publish=1" target="main">Publish Poll(s)</a></font></td></tr>
+<tr><td height="25" valign="middle"><font face="verdana,arial,helvetica" size="1">&nbsp;&nbsp;&nbsp;&nbsp;<a href="$script?emailpolls=1" target="main">E-Mail Poll Results</a></font></td></tr>
+<tr><td height="25" valign="middle"><font face="verdana,arial,helvetica" size="1">&nbsp;&nbsp;&nbsp;&nbsp;<a href="$script?changeuser=1" target="main">Change Login</a></font></td></tr>
+</table>
+</body>
+</html>
+
+EOF
+}
+exit;
+}
+################################################################
+################ ADMINISTRATION START/MAIN PAGE ################
+################################################################
+sub mainadmin {
+print "Content-type: text/html\n\n";
+
+## check for file that contains the name of the poll running LIVE
+	$currsub = "pollstuff/currsub.txt";
+	if (-e $currsub) {
+		$printcurr = `cat pollstuff/currsub.txt`;
+		$secondline = "Currently, <b>$printcurr</b> is the default poll running";
+	}
+## if not present 
+	else {
+		$secondline = "<b>NO</b> default polls are currently running at this location";
+	}
+	
+{
+print <<EOF
+	
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administration System</TITLE>
+<script language="Javascript" src="$script?jscript=1&mousetable=1"></script>
+<SCRIPT LANGUAGE="JavaScript">
+//run new pop-up window
+function runThis(thistype) {
+var formindex = document.router.subject.selectedIndex;
+var thisone = document.router.subject.options[formindex].value;
+window.open('$script?'+thistype+'=1&subject='+thisone+'','POLLS','width=450,height=550,scrollbars=yes');
+}	
+
+//run current window
+function runForm(thistype) {
+var formindex = document.router.subject.selectedIndex;
+var thisone = document.router.subject.options[formindex].value;
+location.href = "$script?"+thistype+"=1&subject="+thisone+"";
+}
+
+</SCRIPT>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form method="post" action="$script" name="router">
+	        <br>
+  <table border="1" cellspacing="0" cellpadding="0" align="center" bordercolor="#D1D1D1" width="450">
+    <tr valign="top" bgcolor="#D1D1D1" align="center"> 
+      <td height="35" valign="middle" colspan="2"><font face="verdana,arial,helvetica" size="2"><b>SimPoll 
+        Adminstration System</b></font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%"><br>
+        <table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">
+          <tr> 
+            <td><font face="verdana,arial,helvetica" size="1">Welcome to the SimPoll 
+              Administration System. This portion of the application was created 
+              to make it easy for content Editors and Webmasters to customize 
+              and manage their site's polls. <br>
+              <br>
+              Using this adminstration panel you can customize fonts, colors, 
+              backgrounds, user prompts and many other things. You can also implement 
+              banner ad rotations into your polls, making SimPoll a feasible source 
+              for site generated revenue. All these features are what makes SimPoll 
+              the easiest and most powerful online polling system to this day.</font></td>
+          </tr>
+        </table>
+        <br>
+        <font face="verdana,arial,helvetica" size="1"> </font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%" align="center"> 
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#FFFFFF"><b><font color="#D1D1D1"> 
+              <font color="#666666">Instructions</font></font></b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="left" height="110" valign="bottom"><font face="verdana,arial,helvetica" size="1"> 
+              <ol type="1">
+                <li>Start by selecting a poll from the drop-down menu below.</li>
+                <li>Then, click the action you would like to perform on the selected 
+                  poll.<br>
+                  <br>
+                  <i>(You can also use the SimPoll Menu, the menu of the left 
+                  of your screen, for more administrative options.)</i></li>
+              </ol>
+              </font></td>
+          </tr>
+        </table>
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>SimPoll 
+              Status</b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="center"><font face="verdana,arial,helvetica" size="1">$secondline</font> 
+            </td>
+          </tr>
+        </table>
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Available 
+              Polls</b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="center" height="50"> 
+              <select name="subject">
+EOF
+}
+	
+## Define all folders/files within Pollstuff. Then uncall the files and name the folders.
+## This will come up with list of names of all available polls
+	$currpolls = "pollstuff/";
+	opendir(DIR, $currpolls) or die "can't opendir $currpolls $!";
+	while (defined($file = readdir(DIR))) {
+	next if $file =~ /^\.\.?$/; ## skip . and .. directories
+	next if $file =~ /.txt\.?$/; ## skip .txt files, the SimPoll config files
+	next if $file =~ /.htaccess\.?$/; ## skip .htaccess files, the SimPoll config files
+	next if $file =~ /.htpasswd\.?$/; ## skip .htpasswd files, the SimPoll config files
+	print "<option value=\"$file\">$file";	
+	}
+{
+print <<EOF
+              </select>
+            </td>
+          </tr>
+        </table>
+        <table width="448" border="1" cellspacing="0" cellpadding="3" bordercolor="#D1D1D1" onMouseOver="runto('ebebeb')" onMouseOut="runback('white')">
+          <tr> 
+            <td bgcolor="#D1D1D1" align="center" height="20" id="ignore"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Action 
+              to Perform</b></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runThis('thispoll')">Test 
+              selected poll</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('buildCustom')">Configure 
+              selected poll</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('publish')">Publish 
+              selected poll</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('delepoll')">Delete 
+              selected poll</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('makecurrent')">Make 
+              selected the default poll</a></font></td>
+          </tr>
+        </table>
+        <table width="448" border="1" cellspacing="0" cellpadding="3" bordercolor="#D1D1D1" onMouseOver="runto('ebebeb')" onMouseOut="runback('white')">
+          <tr> 
+            <td bgcolor="#D1D1D1" align="center" height="20" id="ignore"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Other 
+              Actions</b></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="#" onClick="javascript:window.open('$script','POLLS','width=450,height=550,scrollbars=yes')">View default poll</a></font></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <br>
+</form>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+#########################################################
+################ CREATE NEW POLL SUBJECT ################
+#########################################################
+sub newpoll {
+$subject = "$Form{'subject'}";
+
+print "Content-type: text/html\n\n";
+
+## if subject form field is being submitted, must be coming from the ADD A POLL FORM
+if ($subject) {
+	## if the subject already exists
+	$subfile = "pollstuff/$subject";
+	if (-e $subfile) {
+		print "<HTML><HEAD><TITLE>SimPoll - Administration System : Error</TITLE></HEAD>";
+		print "<BODY TEXT=\"#666666\" LINK=\"#666666\" VLINK=\"#666666\" ALINK=\"#666666\" BGCOLOR=\"#ffffff\" leftmargin=\"0\" topmargin=\"0\" marginwidth=\"0\" marginheight=\"0\">";
+		print "<p>&nbsp;</p>";
+		print "<table width=\"85%\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"35\"><font face=\"verdana,arial,helvetica\" size=\"1\" color=\"#FF0000\"><b>ERROR: $subject Already Exists</b></font></td></tr><tr><td><font face=\"verdana,arial,helvetica\" size=\"1\">If you would like to start a NEW poll using <b>$subject</b> as your Poll Subject Name, please delete the existing <b>$subject</b> poll. Then try adding <b>$subject</b> once again.<br><br> Or you can <a href=\"#\" onClick=\"javascript:history.go(-1)\">click here</a> to try a different Poll Subject Name.</font></td></tr></table>";
+		print "</BODY></HTML>";
+		exit;
+	}
+	
+	## if the subject contains illegal characters place this error message
+	elsif ($subject =~ m/!/ || $subject =~ m/~/ || $subject =~ m/`/ || $subject =~ m/@/ || $subject =~ m/\$/ || $subject =~ m/\%/ || $subject =~ m/\&/ || $subject =~ m/\*/ || $subject =~ m/\(/ || $subject =~ m/\)/ || $subject =~ m/\-/ || $subject =~ m/\_/ || $subject =~ m/\+/ || $subject =~ m/\=/ || $subject =~ m/\[/ || $subject =~ m/\]/ || $subject =~ m/\{/ || $subject =~ m/\}/ || $subject =~ m/\\/ || $subject =~ m/\|/ || $subject =~ m/\:/ || $subject =~ m/\;/ || $subject =~ m/\"/ || $subject =~ m/\'/ || $subject =~ m/\</ || $subject =~ m/\>/ || $subject =~ m/\,/ || $subject =~ m/\./ || $subject =~ m/\?/ || $subject =~ m/\// || $subject =~ m/\#/ || $subject =~ m/\^/ || $subject =~ m/\ /) {
+		print "<HTML><HEAD><TITLE>SimPoll - Administration System : Error</TITLE></HEAD>";
+		print "<BODY TEXT=\"#666666\" LINK=\"#666666\" VLINK=\"#666666\" ALINK=\"#666666\" BGCOLOR=\"#ffffff\" leftmargin=\"0\" topmargin=\"0\" marginwidth=\"0\" marginheight=\"0\">";
+		print "<p>&nbsp;</p>";
+		print "<table width=\"85%\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"35\"><font face=\"verdana,arial,helvetica\" size=\"1\" color=\"#FF0000\"><b>ERROR: Illegal Characters Found</b></font></td></tr><tr><td><font face=\"verdana,arial,helvetica\" size=\"1\">Your Poll Subject Name contained one or more illegal characters, please make sure you use only letters and numbers in your Poll Subject Name. <a href=\"#\" onClick=\"javascript:history.go(-1)\">Click here to try again.</a></font></td></tr></table>";
+		print "</BODY></HTML>";
+		exit;
+	}
+		
+	else {
+		## CREATE DIRECTORIES AS NEEDED
+		mkdir("pollstuff/$subject", 0777) || &error('cant create poll subject file, the one that contains all the subjects available on this implementation of SimPoll');
+		## MAKE AND WRITE SUBJECT INTO SUBJECT TRACKING FILE
+		$subfile = "pollstuff/subjects.txt";
+		$subcat = `cat pollstuff/subjects.txt`;
+		open(FILE,">$subfile") || &error('can not write resources count');
+		print FILE "$subcat\n";
+		print FILE "$subject";
+		close(FILE);
+		## CREATE DEFULT POLL CONFIGURATION
+		$configure = "pollstuff/$subject/configfile.txt";
+		open(CONFIGME2,">$configure") || &error('can not write default configuration file');
+		print CONFIGME2 "subjectname=George Bush for President?\n";
+		print CONFIGME2 "explanation=It seems like many citizens of the United States aren't happy with the new president. Yet, a comparible amount of people do find President George Bush a natural born leader. Where do you fit in all this? Do you think President George Bush has what is takes to make this country better and stronger than it currently is?\n";
+		print CONFIGME2 "voteprompt=What is your opinion? Do you think George Bush is fully capable of running our beloved country in the new millenium?\n";
+		print CONFIGME2 "yesprompt=Yes, George Bush is the best possible person for the job.\n";
+		print CONFIGME2 "noprompt=No, George Bush must be re-evaluated for the position of the President of the United States of America.\n";
+		print CONFIGME2 "title=Monthly Poll\n";
+		print CONFIGME2 "tb_head_font=FFFFFF\n";
+		print CONFIGME2 "tb_head_bg=999999\n";
+		print CONFIGME2 "tb_border=999999\n";
+		print CONFIGME2 "req_field=FF0000\n";
+		print CONFIGME2 "bgcolor=FFFFFF\n";
+		print CONFIGME2 "text=666666\n";
+		print CONFIGME2 "link=999999\n";
+		print CONFIGME2 "alink=999999\n";
+		print CONFIGME2 "vlink=999999\n";
+		print CONFIGME2 "fontface=verdana,arial,helvetica\n";
+		print CONFIGME2 "smallfont=1\n";
+		print CONFIGME2 "medfont=2\n";
+		print CONFIGME2 "largefont=3\n";
+		print CONFIGME2 "background=FFFFFF\n";
+		close(CONFIGME2);
+		print "<HTML><HEAD><TITLE>SimPoll - New Poll Subject Name Created</TITLE></HEAD>";
+		print "<BODY TEXT=\"#666666\" LINK=\"#666666\" VLINK=\"#666666\" ALINK=\"#666666\" BGCOLOR=\"#ffffff\" leftmargin=\"0\" topmargin=\"0\" marginwidth=\"0\" marginheight=\"0\">";
+		print "<p>&nbsp;</p>";
+		print "<table width=\"85%\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td height=\"35\"><font face=\"verdana,arial,helvetica\" size=\"1\"><b>Poll Addition Successfull</b></font></td></tr><tr><td><font face=\"verdana,arial,helvetica\" size=\"1\">Your new poll, <b>$subject</b>, has been successfully added to SimPoll\'s database.<br>You can now <a href=\"$script?buildCustom=1&subject=$subject\"><b>customize $subject</b></a> to your polling needs</font></td></tr></table>";
+		print "</BODY></HTML>";
+		exit;
+	}
+}
+## if subject form field is NOT being submitted, parse the ADD A POLL FORM
+else {
+{
+print <<EOF
+	
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administration System</TITLE>
+<script language="Javascript" src="$script?jscript=1&mousetable=1"></script>
+<SCRIPT LANGUAGE="JavaScript">
+//Check Search field for completion
+function checkForm() {
+if (document.router.subject.value == "") {
+	alert('Please type in a ONE word subject name example: slimshady');
+	document.router.subject.focus();
+}			
+else {
+	var thisone = document.router.subject.value;
+	location.href = "$script?newpoll=1&subject="+thisone+"";
+}	
+}
+
+function checkForm2() {
+if (document.router.subject.value == "") {
+	alert('Please type in a ONE word subject name example: slimshady');
+	document.router.subject.focus();
+	return false;
+}			
+else {
+	var thisone = document.router.subject.value;
+	location.href = "$script?newpoll=1&subject="+thisone+"";
+	return false;
+}	
+}
+</SCRIPT>
+</HEAD>
+<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form method="post" name="router" action="$script" onSubmit="return checkForm2();">
+<input type="hidden" value="1" name="newpoll">
+  <br>
+  <table border="1" cellspacing="0" cellpadding="0" align="center" bordercolor="#D1D1D1" width="450">
+    <tr valign="top" bgcolor="#D1D1D1" align="center"> 
+      <td height="35" valign="middle" colspan="2"><font face="verdana,arial,helvetica" size="2"><b>SimPoll Adminstration System</b></font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%" align="center"><br>
+        <table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">
+          <tr> 
+            <td><font face="verdana,arial,helvetica" size="1">To add new Poll 
+              Subject Name, please read these instructions carefully. The Poll 
+              Subject Name allows this polling application to run and save multiple 
+              polls using just one script. Also, with the Poll Subject Name you 
+              can track, delete, add and archive your site's polls using the SimPoll 
+              Administration System, which is included in this application.<br>
+              <br>
+              Please try to be as definitive as possible when creating your Poll 
+              Subject Name. Keep in mind that all UPPERCASE and lowercase letters 
+              and all numbers are valid for the Poll Subject Name. Sorry, illegal 
+              characters such as @, #, $, %, ^, &, *, (, ), _, -, +, etc. are 
+              not valid for the Poll Subject Name.<br>
+              <br>
+              Please type in a <b>one word</b> phrase to begin creating your first 
+              poll. If you put any spaces in the name you will recieve an error. 
+              For example, I am about to create a poll that emphasizes on Slim 
+              Shady's (aka <a href="#" onClick="javascript:window.open('http://eminem.farmclub.com/')">Eminem</a>) 
+              Controversial Lyrics which are continuously getting full media coverage 
+              around the world. Therefore, I will name my first poll subject <b>slimshady</b>. 
+              </font></td>
+          </tr>
+        </table>
+        <br>
+      </td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%" align="center"> 
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#FFFFFF"><b><font color="#D1D1D1"> 
+              <font color="#666666">Create New Poll Instructions</font></font></b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="left" height="75" valign="bottom"><font face="verdana,arial,helvetica" size="1"> 
+              <ol type="1">
+                <li>Start by typing in a Poll Subject Name for your new poll.</li>
+                <li>Then click the Create Poll button below to add your new poll 
+                  to the system.<br>
+                </li>
+              </ol>
+              </font></td>
+          </tr>
+        </table>
+        <table width="448" border="1" cellspacing="0" cellpadding="3" bordercolor="#D1D1D1" onMouseOver="runto('ebebeb')" onMouseOut="runback('white')">
+          <tr> 
+            <td bgcolor="#D1D1D1" align="center" height="20" id="ignore"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Poll Name</b></font></td>
+          </tr>
+          <tr> 
+            <td align="center" id="ignore"><input type="text" value="" name="subject"></td>
+          </tr>
+          <tr> 
+            <td height="25" align="center">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:checkForm()">Create Poll</a></font></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</form>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+#####################################################
+################ MAKE A POLL DEFAULT ################
+#####################################################
+sub makecurrent {
+$subject = "$Form{'subject'}";
+
+	## MAKE AND WRITE SUBJECT INTO SUBJECT TRACKING FILE
+	$currfile = "pollstuff/currsub.txt";
+	open(FILE,">$currfile") || &error('can not write resources count');
+	print FILE "$subject";
+	close(FILE);
+	&mainadmin;
+}
+
+#####################################################
+################ DELETE POLL SUBJECT ################
+#####################################################
+sub delepoll {
+
+$height = "70";
+
+print "Content-type: text/html\n\n";
+## if subject form field is being submitted, must be coming from the DELETE A POLL FORM
+if ("$Form{'subject'}") {
+$subject = "$Form{'subject'}";
+$subfile1 = "pollstuff/$subject/yes.txt";
+$subfile2 = "pollstuff/$subject/no.txt";
+$subfile3 = "pollstuff/$subject/userinfo.txt";
+$subfile4 = "pollstuff/$subject/configfile.txt";
+$subfile5 = "pollstuff/$subject";
+
+	if (-e $subfile1) { unlink($subfile1) || &error('cant delete $subfile1'); }
+	if (-e $subfile2) { unlink($subfile2) || &error('cant delete $subfile2'); }
+	if (-e $subfile3) { unlink($subfile3) || &error('cant delete $subfile3'); }
+	if (-e $subfile4) { unlink($subfile4) || &error('cant delete $subfile4'); }
+	if (-e $subfile5) { rmdir($subfile5) || &error('cant delete $subfile5'); }
+
+$deleted = "<center><font color=\"#FF0000\"><b>$subject</b> was sucessfully deleted</font></center><br><br>";
+$height = "100";
+}
+
+## if subject form field is NOT being submitted, parse the DELETE A POLL FORM
+{
+print <<EOF
+	
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administration System</TITLE>
+<script language="Javascript" src="$script?jscript=1&mousetable=1"></script>
+<SCRIPT LANGUAGE="JavaScript">
+//run new pop-up window
+function runThis(thistype) {
+var formindex = document.router.subject.selectedIndex;
+var thisone = document.router.subject.options[formindex].value;
+window.open('$script?'+thistype+'=1&subject='+thisone+'','POLLS','width=450,height=550,scrollbars=yes');
+}	
+
+//run current window
+function runForm(thistype) {
+var formindex = document.router.subject.selectedIndex;
+var thisone = document.router.subject.options[formindex].value;
+location.href = "$script?"+thistype+"=1&subject="+thisone+"";
+}
+
+</SCRIPT>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form method="post" action="$script" name="router">
+	        <br>
+  <table border="1" cellspacing="0" cellpadding="0" align="center" bordercolor="#D1D1D1" width="450">
+    <tr valign="top" bgcolor="#D1D1D1" align="center"> 
+      <td height="35" valign="middle" colspan="2"><font face="verdana,arial,helvetica" size="2"><b>SimPoll 
+        Adminstration System</b></font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%"><br>
+        <table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">
+          <tr> 
+            <td><font face="verdana,arial,helvetica" size="1">You are about to 
+              delete an entire poll and its database of information. Please be 
+              extremely carefull in what you are deleting. You cannot undo the 
+              deletion of a poll.</font></td>
+          </tr>
+        </table>
+        <br>
+        <font face="verdana,arial,helvetica" size="1"> </font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%" align="center"> 
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#FFFFFF"><b><font color="#D1D1D1"> 
+              <font color="#666666">Delete Poll Instructions</font></font></b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="left" height="$height" valign="bottom"><font face="verdana,arial,helvetica" size="1"> 
+              <ol type="1">
+                <li>Start by selecting a poll from the drop-down menu below.</li>
+                <li>Then, click the action you would like to perform on the selected 
+                  poll.</li>
+              </ol>$deleted</td>
+          </tr>
+        </table>
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Available 
+              Polls</b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="center" height="50"> 
+              <select name="subject">
+EOF
+}
+	
+## Define all folders/files within Pollstuff. Then uncall the files and name the folders.
+## This will come up with list of names of all available polls
+	$currpolls = "pollstuff/";
+	opendir(DIR, $currpolls) or die "can't opendir $currpolls $!";
+	while (defined($file = readdir(DIR))) {
+	next if $file =~ /^\.\.?$/; ## skip . and .. directories
+	next if $file =~ /.txt\.?$/; ## skip .txt files, the SimPoll config files
+	next if $file =~ /.htaccess\.?$/; ## skip .htaccess files, the SimPoll config files
+	next if $file =~ /.htpasswd\.?$/; ## skip .htpasswd files, the SimPoll config files
+	print "<option value=\"$file\">$file";	
+	}
+{
+print <<EOF
+              </select>
+            </td>
+          </tr>
+        </table>
+        <table width="448" border="1" cellspacing="0" cellpadding="3" bordercolor="#D1D1D1" onMouseOver="runto('ebebeb')" onMouseOut="runback('white')">
+          <tr> 
+            <td bgcolor="#D1D1D1" align="center" height="20" id="ignore"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Action 
+              to Perform</b></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runThis('thispoll')">Test selected poll</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('delepoll')">Delete selected poll</a></font></td>
+          </tr>
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+  <br>
+</form>
+	</BODY>
+	</HTML>
+
+EOF
+}
+}
+exit;
+}
+
+################################################
+################ CUSTOMIZE POLL ################
+################################################
+sub custpoll {
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+	
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administration System</TITLE>
+<script language="Javascript" src="$script?jscript=1&mousetable=1"></script>
+<SCRIPT LANGUAGE="JavaScript">
+//run new pop-up window
+function runThis(thistype) {
+var formindex = document.router.subject.selectedIndex;
+var thisone = document.router.subject.options[formindex].value;
+window.open('$script?'+thistype+'=1&subject='+thisone+'','POLLS','width=450,height=550,scrollbars=yes');
+}	
+
+//run current window
+function runForm(thistype) {
+var formindex = document.router.subject.selectedIndex;
+var thisone = document.router.subject.options[formindex].value;
+location.href = "$script?"+thistype+"=1&subject="+thisone+"";
+}
+
+</SCRIPT>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form method="post" action="$script" name="router">
+  <br>
+  <table border="1" cellspacing="0" cellpadding="0" align="center" bordercolor="#D1D1D1" width="450">
+    <tr valign="top" bgcolor="#D1D1D1" align="center"> 
+      <td height="35" valign="middle" colspan="2"><font face="verdana,arial,helvetica" size="2"><b>SimPoll 
+        Adminstration System</b></font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%" align="center"> 
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#FFFFFF"><b><font color="#D1D1D1"> 
+              <font color="#666666">Customize Poll Instructions</font></font></b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="left" height="75" valign="bottom"><font face="verdana,arial,helvetica" size="1"> 
+              <ol type="1">
+                <li>Start by selecting a poll from the drop-down menu below.</li>
+                <li>Then, click the action you would like to perform on the selected 
+                  poll..<br>
+                </li>
+              </ol>
+              </font></td>
+          </tr>
+        </table>
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Available 
+              Polls</b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="center" height="50"> 
+              <select name="subject">
+EOF
+}
+	
+## Define all folders/files within Pollstuff. Then uncall the files and name the folders.
+## This will come up with list of names of all available polls
+	$currpolls = "pollstuff/";
+	opendir(DIR, $currpolls) or die "can't opendir $currpolls $!";
+	while (defined($file = readdir(DIR))) {
+	next if $file =~ /^\.\.?$/; ## skip . and .. directories
+	next if $file =~ /.txt\.?$/; ## skip .txt files, the SimPoll config files
+	next if $file =~ /.htaccess\.?$/; ## skip .htaccess files, the SimPoll config files
+	next if $file =~ /.htpasswd\.?$/; ## skip .htpasswd files, the SimPoll config files
+	print "<option value=\"$file\">$file";	
+	}
+{
+print <<EOF
+              </select>
+            </td>
+          </tr>
+        </table>
+        <table width="448" border="1" cellspacing="0" cellpadding="3" bordercolor="#D1D1D1" onMouseOver="runto('ebebeb')" onMouseOut="runback('white')">
+          <tr> 
+            <td bgcolor="#D1D1D1" align="center" height="20" id="ignore"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Action 
+              to Perform</b></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runThis('thispoll')">Test selected poll</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('buildCustom')">Customize 
+              selected poll</a></font></td>
+          </tr>
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+  <br>
+</form>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+################################################
+################ CUSTOMIZE POLL ################
+################################################
+sub buildCustom {
+$subject = "$Form{'subject'}";
+
+## FIND CONFIGURATION
+$configuration = "pollstuff/$subject/configfile.txt";
+
+##if the current subject's config file is made, admin must have customzied this poll
+## if so pick up the admin's config for this poll
+if (-e $configuration) {
+	$runconfig = `cat $configuration`;
+	################# START parse form ##################
+        @pairs = split(/\n/, $runconfig);
+
+    foreach $pair (@pairs) {
+
+        local($name, $value) = split(/=/, $pair);
+ 
+        $name =~ tr/+/ /;
+        $name =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ tr/+/ /;
+        $value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+
+        $value =~ s/<!--(.|\n)*-->//g;
+
+        if (defined($Config{$name})) {
+            $Config{$name} = $value;
+        }
+        else {
+            if ($Saved{$name} && $value) {
+                $Saved{$name} = "$Saved{$name}, $value";
+            }
+            elsif ($value) {
+                push(@Field_Order,$name);
+                $Saved{$name} = $value;
+            }
+        }
+	}
+	################# END parse form ##################
+	$subjectname = "$Saved{'subjectname'}";
+	$explanation = "$Saved{'explanation'}";
+	$voteprompt = "$Saved{'voteprompt'}";
+	$yesprompt = "$Saved{'yesprompt'}";
+	$noprompt = "$Saved{'noprompt'}";
+	$title = "$Saved{'title'}";
+	$tb_head_font = "$Saved{'tb_head_font'}";
+	$tb_head_bg = "$Saved{'tb_head_bg'}";
+	$tb_border = "$Saved{'tb_border'}";
+	$req_field = "$Saved{'req_field'}";
+	$bgcolor = "$Saved{'bgcolor'}";
+	$text = "$Saved{'text'}";
+	$link = "$Saved{'link'}";
+	$alink = "$Saved{'alink'}";
+	$vlink = "$Saved{'vlink'}";
+	$fontface = "$Saved{'fontface'}";
+	$smallfont = "$Saved{'smallfont'}";
+	$medfont = "$Saved{'medfont'}";
+	$largefont = "$Saved{'largefont'}";
+	$background = "$Saved{'background'}";
+}
+else {
+&error ('cant open config file for this poll');
+}
+
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+	
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administration System</TITLE>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form method="post" action="$script">
+<input type="hidden" name="saveCustom" value="1">
+<input type="hidden" name="subject" value="$subject">
+	        <br>
+	<table cellpadding=0 cellspacing=0 border=0 align="center" width="95%">
+	  <tr>
+	    <td valign="top" width="100%">
+	        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	          <tr valign="top">
+	            <td height="35"><br><font face="verdana,arial,helvetica" size="2"><b>Customizing $subject</b></font></td>
+	          </tr>
+	          <tr valign="top">
+	            <td height="35"><br><font face="verdana,arial,helvetica" size="1">Welcome to the SimPoll Administration System. This portion of the application was created to make it easy for content Editors and Webmasters to customize and manage their site's polls. <br><br>Using this adminstration panel you can customize fonts, colors, backgrounds, user prompts and many other things. You can also implement banner ad rotations into your polls, making SimPoll a feasible source for site generated revenue. All these features are what makes SimPoll the easiest and most powerful online polling system to this day.<br><br>Everytime you save changes to your poll, you will automatically see your selected changes within this page. You can test this poll you are configuring, by clicking <a href="#" onClick="javascript:window.open('$script?','POLLS','width=450,height=550,scrollbars=yes')">here</a>.</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Poll subject name</b></font><br><input type="text" name="subjectname" value="$subjectname" size="25"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Explanation of subject</b></font><br><textarea name="explanation" cols="25" rows="5">$explanation</textarea></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Line used to prompt user to cast a vote</b></font><br><textarea name="voteprompt" cols="25" rows="5">$voteprompt</textarea></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Line used to prompt user to vote YES</b></font><br><textarea name="yesprompt" cols="25" rows="5">$yesprompt</textarea></td>
+	          </tr>
+	          <tr valign="top">
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Line used to prompt user to vote NO</b></font><br><textarea name="noprompt" cols="25" rows="5">$noprompt</textarea></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Title for your online polling system</b></font><br><input type="text" name="title" value="$title" size="25"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Background Image</b></font><br><input type="text" name="background" value="$background" size="30"></td>
+	          </tr>
+<!--
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Table header font color</b></font><br><input type="text" name="tb_head_font" value="$tb_head_font" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Table header background color</b></font><br><input type="text" name="tb_head_bg" value="$tb_head_bg" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Table border color</b></font><br><input type="text" name="tb_border" value="$tb_border" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Error Message/Required Field Color</b></font><br><input type="text" name="req_field" value="$req_field" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Poll background color</b></font><br><input type="text" name="bgcolor" value="$bgcolor" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Text color</b></font><br><input type="text" name="text" value="$text" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Link color</b></font><br><input type="text" name="link" value="$link" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Active link color</b> (link that has not been visited)</font><br><input type="text" name="alink" value="$alink" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Visted link color</b></font><br><input type="text" name="vlink" value="$vlink" size="6"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Font type</b></font><br><input type="text" name="fontface" value="$fontface" size="25"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Small font size</b></font><br><input type="text" name="smallfont" value="$smallfont" size="1"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Medium font size</b></font><br><input type="text" name="medfont" value="$medfont" size="1"></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1">&nbsp;</font></td>
+	          </tr>
+	          <tr valign="top"> 
+	            <td align="left" height="35"><font face="verdana,arial,helvetica" size="1"><b>Large font size</b></font><br><input type="text" name="largefont" value="$largefont" size="1"></td>
+	          </tr>
+-->
+	        </table>
+	    </td>
+	  </tr>
+	</table>
+	        <br>
+	        <br>
+	        <center><input type="submit" value="Save Changes"></center>
+</form>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+sub saveCustom {
+## GET SUBJECT
+$subject = "$Form{'subject'}";
+## DEFINE CONFIGURATION FILE
+$configuration = "pollstuff/$subject/configfile.txt";
+
+	$subjectname = "$Form{'subjectname'}";
+	$explanation = "$Form{'explanation'}";
+	$voteprompt = "$Form{'voteprompt'}";
+	$yesprompt = "$Form{'yesprompt'}";
+	$noprompt = "$Form{'noprompt'}";
+	$title = "$Form{'title'}";
+	$tb_head_font = "$Form{'tb_head_font'}";
+	$tb_head_bg = "$Form{'tb_head_bg'}";
+	$tb_border = "$Form{'tb_border'}";
+	$req_field = "$Form{'req_field'}";
+	$bgcolor = "$Form{'bgcolor'}";
+	$text = "$Form{'text'}";
+	$link = "$Form{'link'}";
+	$alink = "$Form{'alink'}";
+	$vlink = "$Form{'vlink'}";
+	$fontface = "$Form{'fontface'}";
+	$smallfont = "$Form{'smallfont'}";
+	$medfont = "$Form{'medfont'}";
+	$largefont = "$Form{'largefont'}";
+	$background = "$Form{'background'}";
+
+	open(CONFIGME,">$configuration") || &error('can not make default configuration file');
+	print CONFIGME "subjectname=$subjectname\n";
+	print CONFIGME "explanation=$explanation\n";
+	print CONFIGME "voteprompt=$voteprompt\n";
+	print CONFIGME "yesprompt=$yesprompt\n";
+	print CONFIGME "noprompt=$noprompt\n";
+	print CONFIGME "title=$title\n";
+	print CONFIGME "tb_head_font=$tb_head_font\n";
+	print CONFIGME "tb_head_bg=$tb_head_bg\n";
+	print CONFIGME "tb_border=$tb_border\n";
+	print CONFIGME "req_field=$req_field\n";
+	print CONFIGME "bgcolor=$bgcolor\n";
+	print CONFIGME "text=$text\n";
+	print CONFIGME "link=$link\n";
+	print CONFIGME "vlink=$vlink\n";
+	print CONFIGME "alink=$alink\n";
+	print CONFIGME "fontface=$fontface\n";
+	print CONFIGME "smallfont=$smallfont\n";
+	print CONFIGME "medfont=$medfont\n";
+	print CONFIGME "largefont=$largefont\n";
+	print CONFIGME "background=$background\n";
+	close(CONFIGME);
+&buildCustom;
+}
+exit;
+
+########################################################################
+################ PUBLISHING A POLL / MAKING A POLL LIVE ################
+########################################################################
+sub publish {
+print "Content-type: text/html\n\n";
+{
+print <<EOF
+	
+	<HTML>
+	<HEAD>
+	<TITLE>SimPoll - Administration System</TITLE>
+<script language="Javascript" src="$script?jscript=1&mousetable=1"></script>
+<SCRIPT LANGUAGE="JavaScript">
+//run current window
+function runForm(thistype) {
+var formindex = document.router.subject.selectedIndex;
+var thisone = document.router.subject.options[formindex].value;
+location.href = "$script?publish="+thistype+"&subject="+thisone+"";
+}
+
+</SCRIPT>
+	</HEAD>
+	<BODY TEXT="#666666" LINK="#666666" VLINK="#666666" ALINK="#666666" BGCOLOR="#ffffff" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<form method="post" action="$script" name="router">
+	        <br>
+  <table border="1" cellspacing="0" cellpadding="0" align="center" bordercolor="#D1D1D1" width="450">
+    <tr valign="top" bgcolor="#D1D1D1" align="center"> 
+      <td height="35" valign="middle" colspan="2"><font face="verdana,arial,helvetica" size="2"><b>SimPoll 
+        Adminstration System</b></font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%"><br>
+        <table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">
+          <tr> 
+            <td><font face="verdana,arial,helvetica" size="1">You are about to 
+              publish a poll, in other words, you are going to make a poll LIVE 
+              online. Please follow the directions on the screen carefully in 
+              order to sucessfully run your poll seamlessly with your current 
+              website content.<br>
+              <br>
+              Running more than one poll at a time is as simple as running just 
+              one alone. All you have to do is publish each subject you would 
+              like to run, SimPoll will do the rest for you, simple as that...<br>
+              <br>
+              So go ahead, have a blast creating, customizing and running your 
+              newfound poll system at your leisure.</font></td>
+          </tr>
+        </table>
+        <br>
+        <font face="verdana,arial,helvetica" size="1"> </font></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="100%" align="center"> 
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#FFFFFF"><b><font color="#D1D1D1"> 
+              <font color="#666666">Publish Poll(s) Instructions</font></font></b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="left" height="75" valign="bottom"><font face="verdana,arial,helvetica" size="1"> 
+              <ol type="1">
+                <li>Start by selecting a poll from the drop-down menu below.</li>
+                <li>Then, click the Publishing Option you would like to perform 
+                  on the selected poll.</li>
+              </ol>
+              </font></td>
+          </tr>
+        </table>
+        <table width="448" border="1" bordercolor="#D1D1D1" cellpadding="3" cellspacing="0">
+          <tr bgcolor="#666666" align="center"> 
+            <td width="50%" height="20" bgcolor="#D1D1D1" align="center"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Available 
+              Polls</b></font></td>
+          </tr>
+          <tr> 
+            <td width="50%" align="center" height="50"> 
+              <select name="subject">
+EOF
+}
+	
+## Define all folders/files within Pollstuff. Then uncall the files and name the folders.
+## This will come up with list of names of all available polls
+	$currpolls = "pollstuff/";
+	opendir(DIR, $currpolls) or die "can't opendir $currpolls $!";
+	while (defined($file = readdir(DIR))) {
+	next if $file =~ /^\.\.?$/; ## skip . and .. directories
+	next if $file =~ /.txt\.?$/; ## skip .txt files, the SimPoll config files
+	next if $file =~ /.htaccess\.?$/; ## skip .htaccess files, the SimPoll config files
+	next if $file =~ /.htpasswd\.?$/; ## skip .htpasswd files, the SimPoll config files
+	print "<option value=\"$file\">$file";	
+	}
+{
+print <<EOF
+              </select>
+            </td>
+          </tr>
+        </table>
+        <table width="448" border="1" cellspacing="0" cellpadding="3" bordercolor="#D1D1D1" onMouseOver="runto('ebebeb')" onMouseOut="runback('white')">
+          <tr> 
+            <td bgcolor="#D1D1D1" align="center" height="20" id="ignore"><font face="verdana,arial,helvetica" size="1" color="#666666"><b>Publishing 
+              Options </b></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('ssi')">SSI (Server-Side Include)</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('newpop')">New Pop-Up Window</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('another')">From another program or script</a></font></td>
+          </tr>
+          <tr> 
+            <td height="25" align="left">&nbsp;&nbsp;<font face="verdana,arial,helvetica" size="1"><a href="javascript:runForm('directlink')">Direct link from site</a></font></td>
+          </tr>
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+  <br>
+</form>
+	</BODY>
+	</HTML>
+
+EOF
+}
+exit;
+}
+
+sub jscript {
+print "Content-type: text/html\n\n";
+if ($Form{'mousetable'} eq "1") {
+{
+print <<EOF
+
+/*
+Highlight Table Cells Script- 
+Last updated: 99/01/21
+© Dynamic Drive (www.dynamicdrive.com)
+For full source code, installation instructions,
+100's more DHTML scripts, and Terms Of
+Use, visit dynamicdrive.com
+*/
+
+function runto(highlightcolor){
+source=event.srcElement
+if (source.tagName=="TR"||source.tagName=="TABLE")
+return
+while(source.tagName!="TD")
+source=source.parentElement
+if (source.style.backgroundColor!=highlightcolor&&source.id!="ignore")
+source.style.backgroundColor=highlightcolor
+}
+
+function runback(originalcolor){
+if (event.fromElement.contains(event.toElement)||source.contains(event.toElement)||source.id=="ignore")
+return
+if (event.toElement!=source)
+source.style.backgroundColor=originalcolor
+}
+
+EOF
+}
+}
+
+else {
+&error('A valid script name was not specified...');
+}
+exit;
+}
+
+sub error{
+print "Content-type: text/html\n\n";
+print "An error has occured, the error is $_[0]<br>\n";
+print "<font color=\"red\">$!</font>\n";
+exit;
+}
+exit;

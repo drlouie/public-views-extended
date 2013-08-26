@@ -1,0 +1,21 @@
+subjectname=Schwarzenegger for Governor?
+explanation=Are the innovative and hard-working people of California ready to have Mr. Arnold Schwarzenegger govern and manage the state's  economic, political, energy and other high-demanding needs? 
+
+voteprompt=If the choice was presented to you, would you vote for Arnold Schwarzenegger as the Governor of your State?
+yesprompt=Yes, I sure would!
+noprompt=No, I dont suppose I would ...
+title=Our Governor the 'Terminator'
+tb_head_font=
+tb_head_bg=
+tb_border=
+req_field=
+bgcolor=
+text=
+link=
+vlink=
+alink=
+fontface=
+smallfont=
+medfont=
+largefont=
+background=images/pback_copter.jpg

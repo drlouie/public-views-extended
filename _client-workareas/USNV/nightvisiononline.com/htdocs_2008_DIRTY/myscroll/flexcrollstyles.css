@@ -1,0 +1,8 @@
+.scrollgeneric { line-height: 1px; font-size: 1px; position: absolute; top: 0; left: 0; }
+.vscrollerbase { width:14px; }
+.vscrollerbar { background-image: url(scrollbar.png); width: 14px; height: 50px !important; background-image: url(scrollbar.png); }
+* html .vscrollerbar { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop src='scrollbar.png'); background-image: none; }
+.hscrollerbase {height: 14px;}
+.hscrollerbar {height: 14px; background-color: #000000;}
+.vscrollerbar, .hscrollerbar { padding: 0px; z-index: 2; }
+.scrollerjogbox { width: 14px; height: 14px; top: auto; left: auto; bottom: 0px; right: 0px; background: #000000; }

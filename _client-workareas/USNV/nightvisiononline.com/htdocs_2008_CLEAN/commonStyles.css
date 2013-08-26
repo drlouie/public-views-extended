@@ -1,0 +1,135 @@
+	.sortSelector { padding-left:8px; padding-top:0px; background-color:#D6D6D6; color:#000000; border:0px; font-size: 9px; line-height:20px; width:150px; height:24px; font-family:verdana,arial,helvetica; }
+
+	.SmallInput { height:17px; width:134px; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+	.LargeInput { height:17px; width:280px; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+
+	.productSelector { color:#FFFFFF; background-color:#C64141; width:270px; font-weight:normal; font-size:11px; margin-top:4px; margin-right:4px; font-family:arial,verdana,helvetica; font-weight:bold; }
+	.redTitle { color:#C60001; font-size:11px; font-family:verdana,arial,helevtica; letter-spacing:5px; line-height:20px; }
+	.selectionText { font-size:9px; font-family:verdana,arial,helevtica; color:#FFFFFF; }
+
+	.photoTitle { font-family:arial,verdana,helvetica; font-size:12px; padding-top:5px; letter-spacing:1px; line-height:20px; color:#D6D6D6; }
+	.photoTitleSolo { font-family:arial,verdana,helvetica; font-size:13px; letter-spacing:0px; color:#D6D6D6; }	
+	.photoTitlesManage { font-family:arial,verdana,helvetica; font-size:11px; padding-top:5px; letter-spacing:6px; color:#D6D6D6; }
+	.photoTitlesManageAdd { font-family:verdana,arial,helvetica; font-size:9px; letter-spacing:0px; color:#D6D6D6; }
+	.photoTitles { font-family:verdana,arial,helvetica; font-size:11px; padding-top:1px; padding-left:10px; letter-spacing:6px; line-height:20px; color:#000000; }
+	.photoTitlesR { font-family:verdana,arial,helvetica; font-size:11px; padding-top:1px; padding-left:55px; letter-spacing:6px; line-height:20px; color:#337701; }
+	.photoTitlesSmall { font-family:verdana,arial,helvetica; font-size:10px; color:#000000; }
+	.photoSmallest { font-size:9px; font-family:arial,verdana,helevtica; color:#FFFFFF; }
+	.photoSmall { font-size:10px; font-family:verdana,arial,helevtica; color:#FFFFFF; }
+	.photoSmallFBM { font-size:9px; font-family:verdana,arial,helevtica; color:#FFFFFF; }
+	
+	.titloAlbumBrowse { font-family:arial,verdana,helvetica; font-size:14px; color:#000000; }
+	.titloGallery { font-family:arial,verdana,helvetica; font-size:14px; color:#D6D6D6; }
+	
+	.breadCrumb { font-size:10px; font-family:verdana,arial,helevtica; color:#000000; }
+
+	.listItems { padding-right:5px; padding-left:20px; padding-top:7px; padding-bottom:8px; font-size:11px; font-family:verdana,arial,helevtica; color:#337701; }
+	.listItems2 { padding:7px; font-size:11px; line-height:13px; font-family:verdana,arial,helevtica; color:#D6D6D6; }
+
+	.mainInput { font-size: 9px; font-family:verdana,arial,helvetica; padding: 3px; width:280px;}
+	.commonTArea { font-size: 9px; font-family:verdana,arial,helvetica; padding: 3px; }
+	.commonText { font-size:10px; font-family:verdana,arial,helvetica; }
+	.instruct { font-size: 9px; font-family:verdana,arial,helvetica; }
+	.titleForum { font-family:arial,verdana,helvetica; font-size:14px; color:#000000; }
+	.pagin { font-size:10px; font-family:verdana,arial,helvetica; color:#000000; }
+	.numPages { color:#000000; background-color: #C0C0C0; font-size: 9px; height:20px; font-family:verdana,arial,helvetica; }
+	.search { padding-left:8px; padding-top:3px; background-image:url(/nvi/searchBacker.jpg); color:#D6D6D6; border:0px; font-size: 11px; line-height:20px; width:254px; height:27px; font-family:verdana,arial,helvetica; }
+	.searchTitle { font-size:11px; letter-spacing:2px; font-family:verdana,arial,helvetica; color:#000000; }
+
+	
+	.resultsBreakdown { font-size:10px; font-family:verdana,arial,helvetica;color:#666666; }
+	.mainPhoto { margin:1px; border:#666666 1px solid; }
+
+	.prevNext { text-align:center: height:40px; font-size:10px; font-family:verdana,arial,helvetica;color:#666666;}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	.title { font-family:arial,verdana,helvetica; font-size:15px; line-height:20px; color:#000000; font-weight:bold; margin-left:10px; }
+	.description { font-family:arial,verdana,helvetica; font-size:12px; line-height:16px; color:#000000; }
+
+	.inputDescription { font-size:10px; font-family:arial,verdana,helevtica; color:#000000; }
+	.EmailInput { height:17px; width:150px; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+	.NameInput { height:17px; width:60px; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+	.Buttons { font-size:10px; font-family:arial,verdana,helevtica; }
+
+	.albumSelector { color:#FFFFFF; background-color:#337701; width:270px; font-weight:normal; font-size:10px; font-family:verdana,arial,helvetica; }
+	.redTitle { color:#C60001; font-size:11px; font-family:verdana,arial,helevtica; letter-spacing:5px; line-height:20px; }
+	.recipientSelectionText { font-size:9px; font-family:verdana,arial,helevtica; color:#000000; }
+
+	.photoTitles { font-family:verdana,arial,helvetica; font-size:11px; padding-top:1px; padding-left:10px; letter-spacing:6px; line-height:20px; color:#ffffff; }
+	.photoTitlesR { font-family:verdana,arial,helvetica; font-size:11px; padding-top:1px; padding-left:55px; letter-spacing:6px; line-height:20px; color:#337701; }
+	.photoSmallest { font-size:9px; font-family:arial,verdana,helevtica; color:#ffffff; }
+	.FotoMMLinks { font-size:10px; font-family:verdana,arial,helevtica; color:#ADBEA1; }
+	.FotoMMLinksA { font-size:10px; font-family:verdana,arial,helevtica; color:#337701; text-decoration:underline; }
+
+	.numberPhotos { font-size:11px; font-family:verdana,arial,helevtica; color:#000000; letter-spacing:1px; line-height:18px; width:125px; }
+	.elNumeroPhoto { font-size:16px; font-weight:bold; font-family:verdana,arial,helevtica; color:#000000; }
+	.albumOwner { font-size:11px; font-family:verdana,arial,helevtica; color:#000000; }
+	.albumLastUp { font-size:9px; font-family:verdana,arial,helevtica; color:#000000; }
+
+	.FBmanageText { font-size:11px; font-family:verdana,arial,helevtica; color:#000000; line-height:18px; }	
+	
+	.numberPhotosManage { font-size:9px; font-family:verdana,arial,helevtica; color:#000000; letter-spacing:1px; line-height:14px; }
+	.elNumeroPhotoManage { font-size:12px; font-weight:bold; font-family:verdana,arial,helevtica; color:#000000; }
+	
+	.galleryOwner { font-size:11px; font-family:verdana,arial,helevtica; color:#000000; }
+	.galleryLastUp { font-size:9px; font-family:verdana,arial,helevtica; color:#000000; }
+	
+
+	.commentBy { font-size:11px; font-family:verdana,arial,helevtica; color:#FFFFFF; }
+
+	.commentPlaced { font-size:9px; font-family:verdana,arial,helevtica; color:#FFFFFF; }
+	.elComment { font-size:11px; font-family:verdana,arial,helevtica; color:#FFFFFF; }
+	
+	
+	.fbSmallInput { height:17px; width:79; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+	.fbLargeInput { height:17px; width:120; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+	.fbTArea { width:250; height:54px; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+	.fbButtons { font-size:10px; font-family:verdana,arial,helevtica; }
+	
+	font.label { font-size:11px; font-family:verdana,arial,helvetica; color: #000000;  }
+	font.mainLabel { font-size:11px; font-weight:bold; font-family:verdana,arial,helvetica; color: #000000; }	
+	
+	
+	.footerInfo { font-size:9px; font-family:arial,verdana,helvetica; color: #000000; }
+	
+	
+	
+		
+	.panelBarNEWStop { padding-left:3px; padding-bottom:3px; font-size:10px; font-weight:bold; font-family:verdana,arial,helevtica; color:#000000; }
+	.panelBarNEWSbutton { padding-bottom:4px; }
+	.panelBarNEWSbot { padding-right:3px; padding-top:3px; font-size:9px; font-family:arial,verdana,helevtica; color:#B8B8B8; }
+
+	.panelBarWIKItop { padding-left:3px; padding-bottom:5px; font-size:10px; font-weight:bold; font-family:verdana,arial,helevtica; color:#ADADAE; }
+	.panelBarWIKIbutton { padding-bottom:6px; }
+	.panelBarWIKIbot { padding-right:5px; padding-top:5px; font-size:9px; font-family:verdana,arial,helevtica; color:#ADADAE; }
+
+	.panelBarUSNVtop { padding-bottom:2px; font-size:9px; font-family:arial,verdana,helevtica; color:#B8B8B8; }
+	
+	#overDiv { padding:0px; position:absolute; top:0px; left:0px; visibility:hidden; z-index:5000; border:1px solid #326728; }
+	.news {	font-size:10px; color:#000000; }
+	.wiki {	font-size:10px; color:#ADADAE; }
+	.prompt { line-height:14px; font-size:9px; letter-spacing:1px; font-family:verdana,arial,helvetica; color: #D6D6D6; }
+	#news {	line-height:12px; width:140px; font-family:verdana,arial,helvetica; font-size:9px; color:#000000; padding-bottom:5px; }
+	#wiki {	line-height:12px; width:140px; font-family:verdana,arial,helvetica; font-size:9px; color:#ADADAE; padding-bottom:5px; padding-top:2px; }	
+
+	.dnwb { background-image:url(/nvi/panelBar_weatherBar.gif); background-repeat:no-repeat; }
+	#dnweather { height:50px; width:140px; }
+	.wCity { font-family:arial narrow,arial,verdana; font-size:10px; color:#000000; padding-bottom:2px; }
+	.wTherm { font-family:arial,verdana,helvetica; font-weight:bold; font-size:11px; color:#000000; }
+	.wCond { font-family:arial,verdana,helvetica; font-size:9px; color:#000000; }
+	
+	.formInput { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:20px; background-color:#101E06;color:#F7F7F7; padding: 3px; font-weight:normal; }
+	.formTA { z }
+	.formSelect { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:20px; background-color:#101E06; color:#F7F7F7; padding: 3px; font-weight:normal; }
+	
+	.commonInput { font-size: 10px; font-family:verdana,arial,helvetica; border: #636163 1px solid; height:20px; background-color:#0D1905; color:#F7F7F7; padding: 3px; font-weight:normal; }
+	.commonArea { font-size: 10px; font-family:verdana,arial,helvetica; border: #636163 1px solid; height:60px; background-color:#0D1905; color:#F7F7F7; padding: 3px; font-weight:normal; }
+	.vFormTitle { font-size:10px; font-family:verdana,arial,helevtica; color:#000000; }

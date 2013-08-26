@@ -1,0 +1,115 @@
+#!/usr/bin/perl5 -s
+
+print "Content-type: text/html\n\n";
+
+## --> Snif cookie, if present test for logged in status
+## --> LOGin IS REQuired ( but we remove this checker to customize our login prompt )
+$logreq = 0;
+require ("cookiesnif.nsp");
+require ("parse_query.nsp");
+$noDateParse = 1;
+require ("dateNewest.nsp");
+require ("pm.nsp");
+use CGI qw(:standard);
+$query = new CGI;
+
+## not logged in?
+if ($CSen ne "SI") {
+	print qq~
+	<script language="Javascript">
+		alert('Before you can access the photo gallery management system you must first log in.');
+		document.location.href = 'http://www.nightvisiononline.com/login.htm?LL=fbm';
+	</script>
+	~;
+}
+else {
+	
+	print qq~
+	<script language="Javascript" src="js/b4dom.js"></script>
+	<script language="Javascript">
+	function runLoad() {
+		if (parent.document && parent.document.getElementById) {
+			if (parent.document.getElementById("mainContent")) {
+				// parent.document.getElementById("mainContent").innerHTML = document.getElementById("contentLayer").innerHTML;
+			}
+		}
+	}
+
+
+	</script>
+	~;
+
+
+print qq~
+	<div id="contentLayer">
+	<center>
+
+	<table width="227" border="0" cellspacing="0" cellpadding="0" style="background-image:url('nvi/uploadPhotos_tableBack.gif');background-repeat:repeat-y;">
+    	<tr>
+        	<td align="center" valign="top" height="8" style="height:8px;background-image:url('nvi/uploadPhotos_tableTop.gif');background-repeat:no-repeat;">
+
+~;
+
+
+
+
+
+	
+	if ($FORM{'que'} eq "postForm") {
+
+
+		print qq~
+				<table width="227" border="0" cellspacing="0" cellpadding="0">
+					<tr> 
+						<td align="center" valign="bottom" height="30" class="photoTitlesManage" style="padding-bottom:6px;font-size:14px;letter-spacing:0px;font-family:verdana,arial,helevtica" nowrap><font style="font-size:10px;"><i>UPLOAD:</i></font> <b>Photos</b></td>
+					</tr>
+					<tr>
+						<td align="center"><div style="background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);"></div></td>
+					</tr>
+					<tr>
+						<td align="center"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+       	<tr> 
+        	<td align="center" height="20" valign="top" style="padding-bottom:10px;padding-top:10px;">
+				<table width="222" border="0" cellspacing="0" cellpadding="0" style="background-image:url('nvi/biggoArrow.gif');background-repeat:no-repeat;">
+		~;
+
+				### COMING FROM param references fbup.htm
+				$CF = "fbup";
+				require("NVFCManage.nsp");
+
+		print qq~
+				</table>
+		~;
+		
+	}
+
+	
+	
+	
+	
+
+
+
+
+print qq~
+			</td>
+		</tr>
+		<tr>
+        	<td align="center" valign="bottom" height="15"><img src="nvi/uploadPhotos_tableBot.gif" width="227" height="15"></td>
+        </tr>
+	</table>
+	</center>
+	</div>
+~;
+
+
+
+print qq~ <script>if (runLoad) { runLoad(); }</script> ~;
+
+}
+
+exit;

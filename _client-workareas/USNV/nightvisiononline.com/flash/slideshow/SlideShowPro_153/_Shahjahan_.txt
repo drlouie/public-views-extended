@@ -1,0 +1,3 @@
+SlideShowPro is an ActionScript 2.0 component for Flash MX 2004, Flash 8 and Flash CS3 that helps you display photo galleries and slideshows on your own web site. With over 60 customizable options, SlideShowPro works how you want it to, and can easily be styled and resized to match your existing site design.
+
+Thousands of web sites — from personal to high-traffic destinations like Rolling Stone, ESPN and The New York Times — use SlideShowPro to display photography, editorial slide shows, design portfolios, and countless other creative uses. 

@@ -1,0 +1,11 @@
+#!/usr/bin/perl5 -s
+
+push(@losDynSpots,"<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td valign=\"bottom\" class=\"headerBarText\" style=\"font-family:arial,verdana,helvetica;padding-top:12px;\" align=\"right\">Threat Level Advisory</td></tr><tr><td align=\"right\" valign=\"middle\"><a href=\"http://www.dhs.gov/index.shtm\" target=\"DHS\"><img src=\"http://www.disasternotify.com/DHS_Threat_Advisory.htm?parseImage=1&size=1\" width=\"110\" height=\"26\" border=\"0\" vspace=\"5\" vspace=\"0\" alt=\"[DHS] U.S. Department of Homeland Security - Threat Level Advisory (checked every few hours)\"></a></td></tr><tr><td class=\"headerBarText\" valign=\"top\" style=\"font-family:arial,verdana,helvetica;\" align=\"right\">U.S. Dept of Homeland Security</td></tr></table>");
+push(@losDynSpots,"<img src=\"http://www.disasternotify.com/m.htm?parseImage=1\" width=\"150\" height=\"70\" border=\"0\" vspace=\"8\" vspace=\"5\">");
+$myDSount = int(@losDynSpots);
+$randomDS = int(rand($myDSount));
+$randomDynSpot = "$losDynSpots[$randomDS]";
+
+#$randomDynSpot = "$losDynSpots[0]";
+
+1;

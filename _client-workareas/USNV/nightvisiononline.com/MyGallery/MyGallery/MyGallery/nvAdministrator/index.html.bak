@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<link rel="stylesheet" href="/commonStyles.css" type="text/css">
+<script>
+var gallery = 'nvAdministrator';
+var ui = '1';
+var phid = '';
+var elph = '';
+var aln = 'FoRcEd_Photography';
+var caln = 'FoRcEd Photography';
+
+var defIn = 'Your comments: 200 Characters MAX';
+var thirdIn = 'Type your comments here: 200 Characters MAX';
+var sixthIn = 'Posting comments to a blog requires some typing. Please type in your feedback message here: 200 Characters MAX';
+var countBlurs = 0;
+var cualIn = '';
+function checkStat(who,cualIn) {
+	countBlurs++;
+	if (countBlurs == 6 || countBlurs == 8 || countBlurs == 10) { myNew = sixthIn; }
+	else if (countBlurs >= 2) { myNew = thirdIn; }
+	else { myNew = defIn; }
+
+	if (cualIn != defIn) {
+		if (cualIn == '' || cualIn == ' ') { who.value = myNew; }
+		else { who.value = cualIn; }
+	}
+	else { who.value = myNew; }
+}
+
+function contentsChanged(who,cualIn) {
+	if (cualIn == defIn || cualIn == thirdIn || cualIn == sixthIn) { who.value = ''; }
+	else { who.value = cualIn; }
+}
+
+function textLimit() {
+	if (document.addComment) {
+		if (document.addComment.bod.value.length > 200) {
+			document.addComment.bod.value = document.addComment.bod.value.substring(0, 200);
+			alert("Your message is longer than 200 characters in length, we have truncated it to be 200 characters long...");
+		} 
+		return true;
+	}
+}
+
+
+
+function runBrowser() {
+	if (aln != '' && phid != '') {
+		document.location.href='/FotoBlog.htm?browseType=1&albumChoice='+aln+'&PN='+phid+'&que=showPics&startPic=0&amountOfPhotos=10&Thumbnails=yes&showDates=yes&deleteInfo=Show';
+	}
+}
+
+
+function logMeIn() {
+	window.open("/login.htm?LL=fg&PID="+phid+"&AN="+aln+"","login");
+}
+
+
+function blanket() {
+	viewComments();
+}	
+
+
+var whosAskin = '';
+var rootDocT = '';
+var cancelAddComment = '';
+var hasArtistComments = '';
+function addComment() {
+	trigger('/FBComments.htm?lz=add&PID=' + phid + '&AN=' + aln + '');
+	countBlurs = 0;
+	setAutoPlayStop();
+}
+
+
+function submitComment() {
+	if (document.addComment) {
+		pid = document.addComment.PID.value;
+		an = document.addComment.AN.value;
+		bod = document.addComment.bod.value;
+		if (bod != defIn && bod != thirdIn && bod != sixthIn && bod != "" && bod != " ") { 
+			thebod = bod.replace(/@/gi, "");
+			thebod = thebod.replace(/~/gi, "");
+			thebod = thebod.replace(/$/gi, "");
+			thebod = thebod.replace(/#/gi, "");
+			thebod = thebod.replace(/&/gi, "");
+			thebod = thebod.replace(/^/gi, "");
+			thebod = thebod.replace(/=/gi, "");
+			thebod = thebod.replace(/\+/gi, "");
+			thebod = thebod.replace(/|/gi, "");
+			thebod = thebod.replace(/>/gi, "");
+			thebod = thebod.replace(/</gi, "");
+			thebod = thebod.replace(/\n/gi, "%%br%%");
+			// pre trans cleanup
+			trigger('/FBComments.htm?lz=submitC&PID=' + pid + '&AN=' + an + '&mes=' + thebod + '');
+			setAutoPlayStop();
+		}
+		else {
+			return false;
+		}
+	}
+	countBlurs = 0;
+}
+function viewComments() {
+	trigger('/FBComments.htm?lz=view&PID=' + phid + '&AN=' + aln + '');
+	countBlurs = 0;
+	setAutoPlayStop();
+}
+
+function hideQQ() {
+	document.getElementById("fbqq").style.visibility = 'hidden';
+}
+function showQQ() {
+	document.getElementById("fbqq").style.visibility = 'visible';
+}
+function viewLarge() {
+	// for later use in viewing large photos already set to onClick photo inside SWF
+}
+
+
+// to read vars in flash and toggle on and off the AutoPlay for ssp [in essance a linked scriped to inner flash]
+function setAutoPlayStop() {
+	var sspMovie = document.ssp;
+	sspMovie.SetVariable("_root.stopTheAP", "1");
+}
+function setAutoPlayResume() {
+	var sspMovie = document.ssp;
+	sspMovie.SetVariable("_root.stopTheAP", "0");
+}
+function setDynLoad() {
+	var sspMovie = document.ssp;
+	sspMovie.SetVariable("_root.dynLoad", "1");
+	sspMovie.SetVariable("_root.DLalbum", "USNV_Moderators_Colleczioni");
+	sspMovie.SetVariable("_root.DLphoto", "5");
+}
+
+var theCB = 0;
+var countT = 0;
+function trigger(myurl) {
+	var myurl = myurl;
+	if (myurl.indexOf("?") != -1) {
+		if (countT != 0) { theCB = '&CB=' + countT + ''; }
+		frame.loadpage(''+myurl+'&'+theCB+'');
+		countT++;
+	}
+	else {
+		frame.loadpage(''+myurl+'');
+	}
+}
+
+function setCurrPH(tphid,telph,taln,tcaln) {
+//	alert(tphid+''+telph+''+taln+''+tcaln);
+	phid = tphid;
+	elph = telph;
+	aln = taln;
+	caln = tcaln;
+	document.getElementById("viewComments").innerHTML = '';
+	document.getElementById("GalleryName").innerHTML = ''+gallery+'';
+	document.getElementById("GalleryCurrentAlbum").innerHTML = ''+caln+'';
+	trigger('/fbqq.htm?PID='+tphid+'');
+	showQQ();
+	setAutoPlayResume();
+}
+function setCurrALN() {
+	document.getElementById("GalleryName").innerHTML = ''+gallery+'';
+	document.getElementById("GalleryCurrentAlbum").innerHTML = ''+caln+'';
+//	alert(''+aln+'');
+}
+
+
+</script>
+</head>
+<body bgcolor="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="setDynLoad();">
+<style>
+	#divLoad { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; background-color: #000000; }
+	#overDiv, #divLinks, #divArrows, #bground, #divCont, #divIEText, #addCommentForm { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; background-color: #000000; }
+</style>
+<center>
+<!-- THIS DIV IS USED BY ALL BROWSERS EXCEPT IE5.5 AND NS6 FOR DYNAMIC CONTENT WINDOW SCROLLING -->
+<script language="Javascript" src="/js/b4dom.js"></script>
+<script language="Javascript" src="/js/stars.js"></script>
+<script language="JavaScript" src="/js/pageload1.js"></script>
+<!-- Copyright NetMedia Solutions and USNV-->
+<script language="Javascript" src="/js/pageload2.js"></script>
+
+<!--SPLITTER-->
+<div id="fbqq" style="z-index:100;visibility:visible;"></div>
+<div style="position:absolute;left:0px;top:0px;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#D6D6D6">
+	<tr> 
+		<td align="center">
+  			<table width="800" border="0" cellspacing="0" cellpadding="0">
+	  			<tr>
+    				<td colspan="2"><div style="width:1px;height:5px;overflow:hidden;clip:rect(0px 1px 5px 0px);"></div></td>
+	  			</tr>
+      			<tr> 
+        			<td align="left" style="padding-left:10px;"><a href="/FotoBlog.htm"><img src="../../nvi/fotoBlogLogoSmall.gif" width="104" height="20" border="0"></a></td>
+        			<td align="right" style="padding-right:10px;"><div id="FotoMMLinks" class="FotoMMLinks"><a href="javascript:runBrowser();" title="Album Browser" class="FotoMMLinksA">album browser</a> &nbsp;&nbsp;|&nbsp;&nbsp; <span title="Artist's Gallery of Albums" class="FotoMMLinks" style="color:#000000;font-weight:bold;">gallery</span> &nbsp;&nbsp;|&nbsp;&nbsp; <font class="FotoMMLinksA">manage</font> &nbsp;&nbsp;|&nbsp;&nbsp; <font class="FotoMMLinksA">share</font></div></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr> 
+		<td height="1"><div style="width:1px;height:5px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+	</tr>
+	<tr> 
+		<td height="1" background="../../nvi/horizontalDottie.gif"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+	</tr>
+	<tr>
+		<td height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+	</tr>
+</table>
+
+<!--SPLITTER-->
+<table width="800" border="0" cellspacing="0" cellpadding="0" align="center">
+	<tr>
+		<td>
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr height="30">
+              		<td align="left" valign="bottom" style="padding-left:50px;padding-bottom:10px;" class="titloGallery" nowrap><nobr><font style="font-size:9px;letter-spacing:1px;color:#595959;"><em>GALLERY&nbsp;&nbsp;</em></font><b><span id="GalleryName"></span></b></nobr></td>
+              		<td align="right" valign="bottom" style="padding-right:50px;padding-bottom:10px;" class="titloGallery" nowrap><nobr><span id="GalleryCurrentAlbum" style="font-weight:bold;"></span><font style="font-size:9px;letter-spacing:1px;color:#595959;"><em>&nbsp;&nbsp;ALBUM</em></font></nobr></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr> 
+		<td>
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="background-image:url(../../nvi/fotoBlogSS_greenback.jpg);background-repeat:repeat-x;background-position:bottom left;">
+				<tr valign="top"> 
+					<td width="100%" align="center">
+						<div id="main" STYLE="visibility: visible; width:660px; height:360px;overflow:hidden;">
+							<table><tr><td><script language="JavaScript" src="swf.js"></script></td></tr></table>
+						</div>
+					</td>
+			    </tr>
+			</table>
+		</td>
+	</tr>
+	<tr><td bgcolor="#0F1E06"><div style="height:1px;width:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+	<tr><td bgcolor="#000000"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td></tr>
+	<tr><td bgcolor="#0D1905"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+	<tr><td bgcolor="#000000"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td></tr>
+	<tr><td bgcolor="#0B1605"><div style="width:1px;height:3px;overflow:hidden;clip:rect(0px 1px 3px 0px);"></div></td></tr>
+	<tr><td bgcolor="#000000"><div style="width:1px;height:4px;overflow:hidden;clip:rect(0px 1px 4px 0px);"></div></td></tr>
+	<tr><td bgcolor="#0A1304"><div style="width:1px;height:5px;overflow:hidden;clip:rect(0px 1px 5px 0px);"></div></td></tr>
+	<tr><td bgcolor="#000000"><div style="width:1px;height:6px;overflow:hidden;clip:rect(0px 1px 6px 0px);"></div></td></tr>
+	<tr><td bgcolor="#070E03"><div style="width:1px;height:7px;overflow:hidden;clip:rect(0px 1px 7px 0px);"></div></td></tr>
+	<tr>
+		<td algn="center"><div id="viewComments" style="width:100%;color:#ffffff"></div></td>
+	</tr>
+	<!--%%HIDDEN_FIELDS%%-->
+</table>
+</div>
+<!--SPLITTER-->
+</center>
+<div id="overDiv">&nbsp;</div>
+<div id="divLinks"></div>
+<div id="divArrows"></div>
+<map name="StarRates">
+	<area shape="poly" coords="58,0,64,0,64,13,58,13,58,0" href="javascript:rateMe('5.0')" title="Vote 5 Stars" alt="Vote 5 Stars" onMouseOver="mouseStars('5');" onMouseOut="resetStars();">
+	<area shape="poly" coords="52,0,58,0,58,13,52,13,52,0" href="javascript:rateMe('4.5')" title="Vote 4 1/2 Stars" alt="Vote 4 1/2 Stars" onMouseOver="mouseStars('4.5');" onMouseOut="resetStars();">
+	<area shape="poly" coords="45,0,53,0,53,13,45,13,45,0" href="javascript:rateMe('4.0')" title="Vote 4 Stars" alt="Vote 4 Stars" onMouseOver="mouseStars('4');" onMouseOut="resetStars();">
+	<area shape="poly" coords="39,0,45,0,45,13,39,13,39,0" href="javascript:rateMe('3.5')" title="Vote 3 1/2 Stars" alt="Vote 3 1/2 Stars" onMouseOver="mouseStars('3.5');" onMouseOut="resetStars();">
+	<area shape="poly" coords="32,0,40,0,40,13,32,13,32,0" href="javascript:rateMe('3.0')" title="Vote 3 Stars" alt="Vote 3 Stars" onMouseOver="mouseStars('3');" onMouseOut="resetStars();">
+	<area shape="poly" coords="26,0,32,0,32,13,26,13,26,0" href="javascript:rateMe('2.5')" title="Vote 2 1/2 Stars" alt="Vote 2 1/2 Stars" onMouseOver="mouseStars('2.5');" onMouseOut="resetStars();">
+	<area shape="poly" coords="19,0,26,0,26,13,19,13,19,0" href="javascript:rateMe('2.0')" title="Vote 2 Stars" alt="Vote 2 Stars" onMouseOver="mouseStars('2');" onMouseOut="resetStars();">
+	<area shape="poly" coords="13,0,30,0,19,13,13,13,13,0" href="javascript:rateMe('1.5')" title="Vote 1 1/2 Stars" alt="Vote 1 1/2 Stars" onMouseOver="mouseStars('1.5');" onMouseOut="resetStars();">
+	<area shape="poly" coords="6,0,13,0,13,13,6,13,6,0" href="javascript:rateMe('1.0')" title="Vote 1 Star" alt="Vote 1 Star" onMouseOver="mouseStars('1');" onMouseOut="resetStars();">
+	<area shape="poly" coords="0,0,6,0,6,13,0,13,0,0" href="javascript:rateMe('0.5')" title="Vote 1/2 Star" alt="Vote 1/2 Star" onMouseOver="mouseStars('.5');" onMouseOut="resetStars();">
+</map>
+
+<script language="Javascript">
+	ifrinit();
+</script>
+<style>
+	#divLoad { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; background-color: #000000; }
+	#overDiv, #divLinks, #divArrows, #bground, #divCont, #divIEText, #addCommentForm { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; background-color: #000000; }
+</style>
+<script>
+//		document.getElementById('divLoad').style.visibility = 'hidden';
+</script>
+</body>
+</html>

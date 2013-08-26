@@ -1,0 +1,62 @@
+#!/usr/bin/perl5 -s
+
+## print "Content-type: text/html\n\n";
+
+## --> Parse Request Query
+require ("parse_query.nsp");
+
+$notFound = 0;
+
+if ($FORM{'galleryChoice'}) {
+	$galleryChoice = "$FORM{'galleryChoice'}"; 
+
+	## -->  CONNECT TO DB
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+	my $sth = $dbh->prepare("SELECT UserName, GalleryDirectory FROM vAcctsNew where AccountID = '$galleryChoice'");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$UN = $row[0];
+		$GD = $row[1];
+	}
+	$sth->finish;
+	$dbh->disconnect;
+
+	$parentDirectory = "/usr/local/www/vhosts/nightvisiononline.com/htdocs/MyGallery/";
+	$myExtras = '';
+	
+	$miFIL = "$parentDirectory" . "/" . "$GD";
+	$AB = '';
+	$VB = '';
+	if ($GD ne "") {
+		if (-e $miFIL) {
+			##-- has start photo id && start album
+			$SID = int($FORM{'SID'});
+			if ($FORM{'ab'} eq "1") { $AB = "&ab=1"; }
+			elsif ($FORM{'vb'} eq "1") { $VB = "&vb=1"; }
+			if ($FORM{'SA'} && $SID > 0) { $myExtras = "?SID=$SID&SA=$FORM{'SA'}" . $AB . "" . $VB; }
+			
+			print "Location: http://www.nightvisiononline.com/MyGallery/$GD/$myExtras\n\n";
+		}
+		else { $notFound = 1; }
+	}
+	elsif ($UN ne "") { $notFound = 1; }
+	else { print "Content-type: text/html\n\n"; }
+
+	if ($notFound == 1) {
+		print "Content-type: text/html\n\n";
+		print "
+		<script>
+		alert('Could not locate $UN\\' Gallery, please try again later.');
+		javascript:history.go(-1);
+		</script>
+		";	
+	}
+}
+else { print "Content-type: text/html\n\n"; exit; }
+
+
+exit;

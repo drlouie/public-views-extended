@@ -1,0 +1,99 @@
+#!/usr/bin/perl5 -s
+
+print "Content-type: text/html\n\n";
+
+## --> Snif cookie, if present test for logged in status
+# require ("cookiesnif.nsp");
+
+## --> Parse Request Query
+require ("parse_query.nsp");
+
+## -->  CONNECT TO DB
+use DBI;
+my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+$dbh->{RaiseError} = 1; 
+
+if ($FORM{'albumChoice'}) {
+
+	$albumNombre = "$FORM{'albumChoice'}";
+
+	## -->  GET PAGE CONTENT
+	my $sth = $dbh->prepare("SELECT * FROM losPhotos where Title = '$albumNombre'");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+		while(@row = $sth->fetchrow_array) {
+
+			$PID = $row[0];
+			$FileName = $row[2];
+			$Width = $row[3];
+			$Height = $row[4];
+			$ArtistCom = $row[5];
+			$UserCom = $row[6];
+			$Equip = $row[7];
+			$Rate = $row[8];
+			
+			push(@allPhotoP,"$PID");
+			push(@allPhotoN,"$FileName");
+			push(@allPhotoW,"$Width");
+			push(@allPhotoH,"$Height");
+			push(@allPhotoA,"$ArtistCom");
+			push(@allPhotoU,"$UserCom");
+			push(@allPhotoE,"$Equip");
+			push(@allPhotoR,"$Rate");
+
+			$PCount++;
+		}
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+
+}
+
+
+
+print qq~
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript">
+
+
+
+	parent.document.getElementById("collectionPreview").innerHTML = '~;
+## -->> NO NEWLINE ABOVE(javascript specific)
+
+
+$sd = "'";
+$sdk = "\\'";
+$albumChoice = $FORM{'albumChoice'};
+$albumChoice =~ s/$sd/$sdk/gi;
+
+##-->> SCRIPT INSERT
+if (@allPhotoN) {
+	print "<br>";
+	$cPN=0;
+	foreach $aPN (@allPhotoN) {
+		$allPhotoP[$cPN] = int($allPhotoP[$cPN]);
+		## FIX NEEDED FOR runSlideShow2 ( byPictureID )
+		##>		fix will allow call for PictureID and will also use 
+		##>		albumSelected to show inline pics for only that album
+		##> 		print qq~ <a href="javascript:runSlideShow2($allPhotoP[$cPN]);"><img alt="Click to Enlarge in Slideshow" src="/PhotoAlbums/$albumChoice/$aPN" width="70" style="border:#337701 1px solid;"></a> ~;
+
+		## ONLY PRINT THE FIRST 10 PHOTOS SINCE OUR PAGE ONLY PARSES 10 per page, no need to supercode...
+		### WANNA SEE MORE PICS BROWSE THROUGH 
+		if ($cPN < 9) {
+			print qq~ <a href="?browseAll=1&albumChoice=$FORM{'albumChoice'}&PN=$allPhotoP[$cPN]&doWhat=showPics&startPic=0&amountOfPhotos=10&Thumbnails=yes&showDates=yes&deleteInfo=Show"><img alt="Click to Enlarge in Slideshow" src="/PhotoAlbums/$albumChoice/$aPN" width="70" style="border:#337701 1px solid;"></a> ~;
+		}
+		$cPN++;
+	}
+}
+else {
+	print "no photos in this album";
+}
+##-->> END INSERT
+
+
+
+## -->> NO NEWLINE BELOW (javascript specific)
+print qq~';
+</script>
+~;
+
+exit;

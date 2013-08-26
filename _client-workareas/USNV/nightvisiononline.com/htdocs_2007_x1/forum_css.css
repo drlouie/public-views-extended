@@ -1,0 +1,19 @@
+body { background-color: #C6D0DD; }
+a { color:#304483; }
+table.mainTitle { margin-top: 5px; margin-bottom: 5px; }
+td.titleMid { background-color:#EBEEF5; border-top:1px solid #304483; border-bottom:1px solid #304483; }
+font.titleText { color:#304483; font-family:verdana,arial,helvetica; font-size:11px; font-weight:bold; text-decoration:none; }
+table.fmenu { background-color:#EBEEF5; border-top:1px solid #304483; border-bottom:1px solid #304483; }
+table.fmenulineTop { background-color:#304483; margin-bottom: 3px; }
+table.fmenulineBot { background-color:#304483; margin-top: 3px; }
+font.fmenu { color:#304483; font-family:verdana,arial,helvetica; font-size:10px; font-weight:bold; text-decoration:none; }
+td.commonTable1 { border-left:1px solid #2F4382; border-right:1px solid #2F4382; border-top:1px solid #2F4382; border-bottom:1px solid #2F4382; }
+input.commonInput { background-color: #ffffff; border: 1px solid #2F4382; height:20px; width:120px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+input.IP { background-color: #ffffff; border: 1px solid #2F4382; height:20px; width:50px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+font.commonLabel { font-size:10px; font-weight:bold; font-family:verdana,arial,helvetica; color: #304483; }
+font.commonText { font-size:10px; font-family:verdana,arial,helvetica; color: #304483; }
+table.border1 { border-top:2px solid #304483; border-bottom:2px solid #304483; border-left:2px solid #304483; border-right:2px solid #304483; }
+radio.radio { height:20px; }
+table.leftRightBorder { border-left:1px solid #304483; border-right:1px solid #304483; }
+select.commonSelect { background-color: #EBEEF5; border: 1px solid #2F4382; color:#304483; font-weight:bold; height:20px; width:100px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+.search { padding-left:5px; padding-top:3px; color:#000000; background-color: #D7A368; border: 1px solid #CCCCCC; font-size: 10px; height:20px; font-family:verdana,arial,helvetica; 2px; }

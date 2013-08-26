@@ -1,0 +1,301 @@
+#!/usr/bin/perl5 -s
+##___INUSE___##
+
+###--  copyright   --###
+###-- LouieRd 2öò8 --###
+###--              --###
+
+###-- NV NEWS PARSER  --###
+###-- CPAN: ALTAVISTA --###
+
+use DBI;
+use locale;
+use Text::Autoformat;
+autoformat;
+
+# print "Content-type: text/html\n\n"; 
+
+
+print qq~
+<script>
+var lasNuevas = new Array();
+var lasWiki = new Array();
+~;
+
+##-clima
+require("clim.nsp");
+##-pod
+require("hpPOD.nsp");
+
+
+
+#-- NEWS PERL START
+	$countNews = 1;
+
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+	my $sth = $dbh->prepare("SELECT * FROM NVNewsAltaVista WHERE Blocked = 'N' ORDER BY PubDate DESC LIMIT 0, 10");
+	$sth->execute or die "Sorry, no DB, please try again.\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$A = $row[0]; $T = $row[1]; $L = $row[2]; $PD = $row[3]; $D = $row[4]; 
+		$T =~ s/"//gi;
+		$T =~ s/'//gi; 
+		$D =~ s/"//gi; 
+		$D =~ s/'//gi; $TIT = $T; 
+		##--$TIT = autoformat $TIT, { case => 'title' }; chomp($TIT); $TIT =~ s/\n//gi;
+		##-- loadparse 4
+		if ($countNews < 5) { push(@losDefaultNews,"<div style=\"width:140px;padding:5px;\"><a href=\"$L\" style=\"color:#000000;\" target=\"NEWS\" onmouseover=\"this.style.color='#326728';return overlib('<span class=news>$D<br><br><i>click for full article</i>...</span>', LEFT, CELLPAD, 10, FGCOLOR, '#D6D6D6');\" onmouseout=\"this.style.color='#000000';return nd();\">$TIT</a></div>"); }
+		##-- script parse 10
+		print qq~ lasNuevas[$countNews] = '<div style="width:140px;padding:5px;"><a href="$L" style="color:#000000;" target="NEWS" onmouseover="this.style.color=\\'#326728\\';return overlib(\\'<span class=news>$D<br><br><i>click for full article</i>...</span>\\', LEFT, CELLPAD, 10, FGCOLOR, \\'#D6D6D6\\');" onmouseout="this.style.color=\\'#000000\\';return nd();">$TIT</a></div>';\n ~;
+		$countNews++;
+	}
+	$sth->finish;
+
+	$dbh->disconnect;
+#-- NEWS PERL END
+	
+
+#-- WIKI PERL START
+push(@wt,"Night Vision-----http://en.wikipedia.org/wiki/Night_vision-----Night vision is the ability to see in a dark environment. Whether by biological or technological means, night vision is made possible by a combination of two approaches: sufficient spectral range, and sufficient intensity range.");
+push(@wt,"NV Device (NVD)-----http://en.wikipedia.org/wiki/Night_vision_device-----A night vision device (NVD) is an optical instrument that allows images to be produced in levels of light approaching total darkness. They are most often used by the military and law enforcement agencies, but are available to civilian users. The term usually refers to a complete unit, including an image intensifier tube, a protective and generally water-resistant housing, and some type of mounting system. Many NVDs also include sacrificial lenses, IR illuminators, and telescopic lenses.");
+push(@wt,"Generation [I II III]-----http://en.wikipedia.org/wiki/Image_intensifier#Generation_1__.28GEN_I.29-----[GEN I] 1st generation passive NVDs, introduced during the Vietnam War rely on ambient light instead of an infrared light source.<br><br>[GEN II] 2nd generation NVDs featured an improved image-intensifier tube utilizing microchannel plate (MCP)[13] with an S-25 photocathode[14], resulting in a much brighter image.<br><br>[GEN III] 3rd generation NVDs maintain the MCP from Gen II, but now use a photocathode made with gallium arsenide, which improves image resolution.");
+push(@wt,"Infrared (IR)-----http://en.wikipedia.org/wiki/Infrared-----Infrared (IR) radiation is electromagnetic radiation of a wavelength longer than that of visible light, but shorter than that of microwaves. The name means &lsquo;below red&rsquo; (from the Latin infra, &lsquo;below&rsquo;), red being the color of visible light with the longest wavelength.<br><br>Infrared imaging is used extensively for both military and civilian purposes. Military applications include target acquisition, surveillance, homing and tracking.");
+push(@wt,"Thermal Imaging-----http://en.wikipedia.org/wiki/Thermal_Imaging-----Thermography, thermal imaging, or thermal video, is a type of infrared imaging. Since infrared radiation is emitted by all objects based on their temperatures, according to the black body radiation law, thermography makes it possible to &quot;see&quot; one&rsquo;s environment with or without visible illumination. The amount of radiation emitted by an object increases with temperature, therefore thermography allows one to see variations in temperature (hence the name).");
+push(@wt,"Laser Designator-----http://en.wikipedia.org/wiki/Laser_designator-----A laser designator is a laser light source which is used to illuminate a target. Laser designators provide targeting for laser guided bombs, missiles, or precision artillery munitions. Laser designators may be mounted on aircraft, ground vehicles, or handheld.");
+push(@wt,"Monocular-----http://en.wikipedia.org/wiki/Monocular-----A monocular is a modified refracting telescope used to magnify the images of distant objects by passing light through a series of lenses and prisms; the use of prisms results in a lightweight telescope. Volume and weight are less than half those of binoculars, making it easy to carry.<br><br>Monoculars, sometimes called telescopes when used in this capacity, are often used by visually impaired people to see distant objects that would normally be undiscernable.");
+push(@wt,"AN/PVS-14-----http://en.wikipedia.org/wiki/AN/PVS-14-----The AN/PVS-14 Monocular Night Vision Device (MNVD) is in widespread use by US Armed Forces as well as NATO allies around the world. It uses a GEN III image intensifier tube, and is manufactured by US Night Vision Corporation. It is often used &lsquo;hands free&lsquo; using a head harness or attached to a combat helmet such as the PASGT, Advanced Combat Helmet, or Marine Lightweight Helmet. It can also be used as a weapons night sight, such as on the M110 SASS. Also, it was part of the equipment fielded in the US Army&rsquo;s Land Warrior program.");
+push(@wt,"Photonics-----http://en.wikipedia.org/wiki/Photonics-----Photonics is the science of generating, controlling, and detecting photons, particularly in the visible and near infra-red spectrum, but also extending to the ultraviolet (0.2 - 0.35 µm wavelength), long-wave infrared (8 - 12 µm wavelength), and far-infrared/THz portion of the spectrum (e.g., 2-4 THz corresponding to 75-150 µm wavelength).<br><br>Photonics is closely related to optics.");
+push(@wt,"Optoelectronics-----http://en.wikipedia.org/wiki/Optoelectronics-----Optoelectronics is the study and application of electronic devices that interact with light, and thus is usually considered a sub-field of photonics. In this context, light often includes invisible forms of radiation such as gamma rays, X-rays, ultraviolet and infrared. Optoelectronic devices are electrical-to-optical or optical-to-electrical transducers, or instruments that use such devices in their operation.");
+$countWiki = 1;
+foreach $unWT (@wt) {
+	($T, $L, $D) = split(/-----/,$unWT);
+	##-- loadparse 5
+	if ($countWiki < 6) { push(@losDefaultWIKI,"<div style=\"width:140px;padding:5px;color:#ADADAE;\">- <a href=\"$L\" style=\"color:#ADADAE;\" target=\"WIKI\" onmouseover=\"this.style.color='#326728';return overlib('<span class=news><i>term:</i><b>$T</b><br><br>$D<br><br><i>click to read more</i>...</span>', LEFT, CELLPAD, 10, FGCOLOR, '#D6D6D6');\" onmouseout=\"this.style.color='#ADADAE';return nd();\">$T</a></div>"); }
+	print qq~ lasWiki[$countWiki] = '<div style="width:140px;padding:5px;color:#ADADAE;">- <a href="$L" style="color:#ADADAE;" target="WIKI" onmouseover="this.style.color=\\'#326728\\';return overlib(\\'<span class=news><i>term:</i><b>$T</b><br><br>$D<br><br><i>click to read more</i>...</span>\\', LEFT, CELLPAD, 10, FGCOLOR, \\'#D6D6D6\\');" onmouseout="this.style.color=\\'#ADADAE\\';return nd();">$T</a></div>';\n ~;
+	$countWiki++;
+}
+#-- WIKI PERL END
+	
+print qq~
+
+var newsC = 5;
+var todosNews = $countNews;
+function moreNews() {
+	// less than 20 or as many available if less
+	if (newsC < todosNews) {
+		currINNER = ""+ document.getElementById("news").innerHTML +"";
+		document.getElementById("news").innerHTML = ""+ currINNER +""+ lasNuevas[newsC] +"";
+		newsC++;
+	}
+}
+function lessNews() {
+	// less than 20 or as many available if less
+	var nuevasNuevas = '';
+	if (newsC > 2) {
+		document.getElementById("news").innerHTML = '';
+
+		newsC--;
+		i = 1;
+		while (i < newsC) {
+			nuevasNuevas = nuevasNuevas + "" + lasNuevas[i];
+			i++;
+		}
+		document.getElementById("news").innerHTML = ""+ nuevasNuevas +"";
+	}
+
+}
+
+
+
+var wikiC = 6;
+var todosWiki = $countWiki;
+function moreWiki() {
+	// less than 20 or as many available if less
+	if (wikiC < todosWiki) {
+		currINNERw = ""+ document.getElementById("wiki").innerHTML +"";
+		document.getElementById("wiki").innerHTML = ""+ currINNERw +""+ lasWiki[wikiC] +"";
+		wikiC++;
+	}
+}
+function lessWiki() {
+	// less than 20 or as many available if less
+	var nuevasWiki = '';
+	if (wikiC > 2) {
+		wikiC--;
+		i = 1;
+		while (i < wikiC) {
+			nuevasWiki = nuevasWiki + "" + lasWiki[i];
+			i++;
+		}
+		document.getElementById("wiki").innerHTML = ""+ nuevasWiki +"";
+	}
+
+}
+
+</script>
+
+							<div id="NVOFweather">
+							<table width="140" align="center" border="0" cellpadding="0" cellspacing="0" bgcolor="#B8B8B8">
+								<tr><td bgcolor="#B8B8B8" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr>
+									<td height="20" class="dnwb" valign="top">
+										<div style="position:relative;left:0px;top:0px;width:140px;height:50px;overflow:hidden;clip:rect(0px 140px 50px 0px);" title="Current weather conditions for $city, $state: $condition ($farenheit / $celcius)">
+											<div class="thyImagen" style="position:relative;left:90px;top:0px;z-index:1;width:140px;height:50px;overflow:hidden;clip:rect(0px 140px 50px 0px);"></div>
+											<div id="dnweather" style="position:relative;left:0px;top:-50px;width:140px;height:50px;z-index:2;">
+												<table width="140" align="left" border="0" cellpadding="0" cellspacing="0">
+													<tr>
+														<td class="wCity" align="center" valign="bottom" width="90">$cityLC, $stateAbrvLC</td>
+														<td class="spaceHold" width="50"><div style="width:50px;height:21px;overflow:hidden;clip:rect(0px 50px 21px 0px);"></div></td>
+													</tr>
+													<tr>
+														<td class="wTherm" align="center" valign="bottom" width="90">$farenheit / $celcius</td>
+														<td class="spaceHold" width="50"><div style="width:50px;height:16px;overflow:hidden;clip:rect(0px 50px 16px 0px);"></div></td>
+													</tr>
+													<tr>
+														<td class="wCond" align="center" valign="top" width="90">$conditionLC</td>
+														<td class="spaceHold" width="50"><div style="width:50px;height:13px;overflow:hidden;clip:rect(0px 50px 13px 0px);"></div></td>
+													</tr>
+												</table>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr><td bgcolor="#000000" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#B8B8B8" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr>
+							    	<td bgcolor="#000000">
+										<table width="140" height="17" align="center" border="0" cellpadding="0" cellspacing="0">
+											<tr valign="top">
+							    				<td align="right" width="100%"><a href="http://www.disasternotify.com/" target="DN"><img src="nvi/panelBar_weatherSource.gif" width="78" height="15" border="0" alt="Disaster Notify Modules - Local Up-To-The Minute Weather"></a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr><td bgcolor="#000000" height="35"><div style="width:1px;height:35px;overflow:hidden;clip:rect(0px 1px 35px 0px);"></div></td></tr>
+							</table>
+							</div>
+
+							<div id="NVOFfotoblog">
+							<table width="140" align="center" border="0" cellpadding="0" cellspacing="0">
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="2"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="2"><div id="fbpreview">$muaGRAP</div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="2"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr>
+							    	<td>
+										<table width="140" height="17" align="center" border="0" cellpadding="0" cellspacing="0">
+											<tr valign="top">
+							    				<td align="center" width="100%"><a href="/FotoBlog.htm"><img src="nvi/panelBar_FB.gif" width="140" height="17" border="0" alt="FotoBlog User Managed Galleries and Albums - Upload, Manage and Share Your Night Vision Photography"></a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr><td bgcolor="#000000" height="35"><div style="width:1px;height:35px;overflow:hidden;clip:rect(0px 1px 35px 0px);"></div></td></tr>
+							</table>
+							</div>
+
+
+							<div id="NVOFwiki">
+							<table width="140" align="center" border="0" cellpadding="0" cellspacing="0">
+								<tr> 
+							    	<td>
+										<table width="140" height="26" align="center" border="0" cellpadding="0" cellspacing="0">
+											<tr valign="bottom">
+							    				<td class="panelBarWIKItop" width="100%">Terminology</td>
+							    				<td class="panelBarWIKIbutton" width="15" style="padding-left:3px;padding-right:3px;"><a href="javascript:lessWiki();" onmouseover="return overlib('<span class=prompt><center>less terms</center></span>', CELLPAD, 2, WIDTH, 80, HEIGHT, 20, FGCOLOR, '#000000', BORDER, 0, LEFT, ABOVE, SNAPX, 0, SNAPY, 0);" onmouseout="return nd();"><img src="nvi/panelBar_less.gif" width="9" height="9" border="0"></a></td>
+							    				<td class="panelBarWIKIbutton" width="12" style="padding-right:3px;"><a href="javascript:moreWiki();" onmouseover="return overlib('<span class=prompt><center>more terms</center></span>', CELLPAD, 2, WIDTH, 80, HEIGHT, 20, FGCOLOR, '#000000', BORDER, 0, LEFT, ABOVE, SNAPX, 0, SNAPY, 0);" onmouseout="return nd();"><img src="nvi/panelBar_more.gif" width="9" height="9" border="0"></a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="20"><div id="wiki">@losDefaultWIKI</div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr>
+							    	<td>
+										<table width="140" height="21" align="center" border="0" cellpadding="0" cellspacing="0">
+											<tr valign="top">
+							    				<td align="right" class="panelBarWIKIbot" width="100%"><a href="http://www.wikipedia.com/" target="WIKI"><img src="nvi/panelBar_WIKI.gif" width="85" height="22" border="0" alt="Wikipedia - The Free Encyclopedia"></a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr><td bgcolor="#000000" height="35"><div style="width:1px;height:35px;overflow:hidden;clip:rect(0px 1px 35px 0px);"></div></td></tr>
+							</table>
+							</div>
+
+							
+							<div id="NVOFnews">
+							<table width="140" align="center" border="0" cellpadding="0" cellspacing="0">
+								<tr> 
+							    	<td style="background-image:url(/nvi/NVnewsTDtop.jpg);background-repeat:no-repeat;">
+										<table width="140" height="26" align="center" border="0" cellpadding="0" cellspacing="0">
+											<tr valign="bottom">
+							    				<td class="panelBarNEWStop" width="100%">Night Vision News</td>
+							    				<td class="panelBarNEWSbutton" width="15" style="padding-left:3px;padding-right:3px;"><a href="javascript:lessNews();" onmouseover="return overlib('<span class=prompt><center>less news</center></span>', CELLPAD, 2, WIDTH, 80, HEIGHT, 20, FGCOLOR, '#000000', BORDER, 0, LEFT, ABOVE, SNAPX, 0, SNAPY, 0);" onmouseout="return nd();"><img src="nvi/panelBar_less.gif" width="9" height="9" border="0"></a></td>
+							    				<td class="panelBarNEWSbutton" width="12" style="padding-right:3px;"><a href="javascript:moreNews();" onmouseover="return overlib('<span class=prompt><center>more news</center></span>', CELLPAD, 2, WIDTH, 80, HEIGHT, 20, FGCOLOR, '#000000', BORDER, 0, LEFT, ABOVE, SNAPX, 0, SNAPY, 0);" onmouseout="return nd();"><img src="nvi/panelBar_more.gif" width="9" height="9" border="0"></a></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="2"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#B8B8B8" height="20"><div id="news">@losDefaultNews</div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="2"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td></tr>
+								<tr><td bgcolor="#326728" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr> 
+							    	<td>
+										<table width="140" height="21" align="center" border="0" cellpadding="0" cellspacing="0">
+											<tr valign="top">
+							    				<td align="right" width="100%"><img src="nvi/panelBar_newsSource.gif" width="105" height="15" border="0"></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr><td bgcolor="#000000" height="35"><div style="width:1px;height:35px;overflow:hidden;clip:rect(0px 1px 35px 0px);"></div></td></tr>
+							</table>
+							</div>
+
+							<div id="NVOFsponsor">
+							<table width="140" align="center" border="0" cellpadding="0" cellspacing="0">
+								<tr> 
+							    	<td>
+										<table width="140" height="26" align="center" border="0" cellpadding="0" cellspacing="0">
+											<tr valign="bottom">
+							    				<td class="panelBarUSNVtop" align="center" width="100%">sponsored by</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+								<tr><td bgcolor="#B8B8B8" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="2"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#000000" height="60"><div id="sponsor"><a href="http://www.usnightvision.com/"><img src="nvi/panelBar_USNV.gif" width="140" height="60" border="0" alt="Night Vision Online Forum is sponsored by US Night Vision Corporation as an educational tool and information center for all Optoelectronics with a focus on Night Vision and related technologies."></a></div></td></tr>
+								<tr><td bgcolor="#000000" height="2"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+								<tr><td bgcolor="#B8B8B8" height="1"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td></tr>
+							</table>							
+						</div>
+<style>
+	/* ie */
+	.thyImagen { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, src='http://www.disasternotify.com/DisasterNotifyImages/WCIcons/artsy_5050/$IconID.png'); BACKGROUND-REPEAT: no-repeat; BACKGROUND-ALIGN: top right; }
+	/* moz/ns */
+	.thyImagen[class] { background-image:url(http://www.disasternotify.com/DisasterNotifyImages/WCIcons/artsy_5050/$IconID.png); BACKGROUND-REPEAT: no-repeat; BACKGROUND-ALIGN: top right;  }
+</style>
+~;
+
+
+
+
+
+1;

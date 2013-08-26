@@ -1,0 +1,364 @@
+#!/usr/bin/perl5 -s
+
+print "Content-type: text/html\n\n";
+
+$ERRid1 = "52";
+$ERRid2 = "53";
+
+## --> Snif cookie, if present test for logged in status
+## --> LOGin IS REQuired ( but we remove this checker to customize our login prompt )
+$logreq = 0;
+require ("cookiesnif.nsp");
+require ("parse_query.nsp");
+$noDateParse = 1;
+require ("dateNewest.nsp");
+require ("pm.nsp");
+
+
+## not logged in?
+if ($CSen ne "SI") {
+	print qq~
+	<script language="Javascript">
+		alert('Before you can access the photo gallery management system you must first log in.');
+		document.location.href = 'http://www.nightvisiononline.com/login.htm?LL=fbm';
+	</script>
+	~;
+}
+else {
+
+if (($FORM{'act'} && $FORM{'PN'}) || ($FORM{'delePID'})) {
+
+
+	$parentDirectory = "/usr/local/www/vhosts/nightvisiononline.com/htdocs/PhotoAlbums/$CSun/";
+
+	## -->  CONNECT TO DB
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+	$PN = $FORM{'PN'};
+	if ($FORM{'delePID'}) { $PN = $FORM{'delePID'}; }
+
+	$PN = int($PN);
+	
+	if ($FORM{'albumChoice'}) {
+		$AID = int($FORM{'albumChoice'});
+		my $sth = $dbh->prepare("SELECT Title, ItemCount, Items FROM Albums where AlbumID = '$AID'");
+		$sth->execute or die "DB error processing this request\n"; 
+		my $row = $sth->fetchrow_arrayref;
+			$albumNombre = $row->[0];
+			$ICount = $row->[1];
+			$Items = $row->[2];
+		$sth->finish;
+	}
+
+
+
+	my $sth = $dbh->prepare("SELECT FileName, Albums FROM losPhotos where ImageID = '$PN'");
+	$sth->execute or die "DB error processing this request\n"; 
+	my $row = $sth->fetchrow_arrayref;
+		$FileName = $row->[0];
+		$Albums = $row->[1];
+	$sth->finish;
+
+	$myCSin = int($CSin);
+	$sth = $dbh->prepare("SELECT GalleryDirectory FROM vAcctsNew where AccountID = '$myCSin';");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$aGalleryDir = $row[0];
+	}
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+
+
+
+
+	
+	my $displayAlbum = $albumNombre;
+	$displayAlbum =~ s/_/ /g;
+
+	$jpg = '.jpg';
+	$png = '.png';
+
+	$FileNameClean = substr($FileName, 9);
+	$FileNameClean =~ s/$jpg//gi;
+	$FileNameClean =~ s//$png/gi;
+	$FileNameClean =~ s/_/ /gi;
+	$FileNameClean =~ s/`//gi;
+	
+	@myItems = split(/,/,$Items);
+	$foundIt = 0;
+	foreach $ui (@myItems) {
+		$ui = int($ui);
+		if ($ui == $PN) { $foundIt = 1; }
+		else { push(@ifRemoveThesePhotosStay,"$ui"); }
+	}
+
+
+
+
+	if ($FORM{'act'} eq "attach") {
+		$manageTitle = 'Photo';
+		$typeAction = 'MANAGE';
+		$cualManage = "uploadPhotos";
+		##-- wants to attach but already exists in album
+		if ($foundIt == 1) { $error = "<font style=\"color:#BF0000;font-weight:bold\">BAD RESPONSE</font><br><br>Album: <b>$displayAlbum</b> already contains photo: <b>$FileNameClean</b><br><br>Therefore there's no need to append it to the album again."; }
+		else {
+			#-- for the album
+			if ($Items =~ "," || int($Items) > 0) { $newAItems = "$PN" . "," . "$Items"; }
+			else { $newAItems = "$PN"; }
+			$newAICount = int($ICount + 1);
+
+			
+
+				
+				
+
+			##-- only if no error prior to this do we go on and update DB tables
+			if (!$error) {
+
+				my $sth = $dbh->prepare("UPDATE LOW_PRIORITY Albums 
+										 SET ItemCount='$newAICount', 
+										 Items='$newAItems',
+										 LastUpdated = '$datetime'
+										 WHERE AlbumID = '$AID'");
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+
+				#-- for the photo
+				if ($Albums =~ "," || int($Albums) > 0) { $newAlbums = "$AID" . "," . "$Albums"; }
+				else { $newAlbums = "$AID"; }
+
+				my $sth = $dbh->prepare("UPDATE LOW_PRIORITY losPhotos SET Albums='$newAlbums' WHERE ImageID = '$PN'");
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+				
+				$done = '1';
+				$thyResponse = "<font style=\"color:#009900;font-weight:bold\">SUCCESSFUL!</font><br><br>Photo: <b>$FileNameClean</b> was successfully attached to the album: <b>$displayAlbum</b>.<br><br>The new photo count for the album: <b>$displayAlbum</b> is <strong>$newAICount</strong>.";
+			}
+		}
+	}
+	elsif ($FORM{'act'} eq "detach") {
+		$manageTitle = 'Photo';
+		$typeAction = 'MANAGE';
+		$cualManage = "uploadPhotos";
+
+		$newAICount = int($ICount - 1);
+		$myPStays = join(",", @ifRemoveThesePhotosStay);
+
+		@myAlbums = split(/,/,$Albums);
+		foreach $unA (@myAlbums) {
+			$unA = int($unA);
+			if ($unA == $AID) { $foundIt = 1; }
+			else { push(@ifRemoveTheseAlbumsStay,"$unA"); }
+		}
+		$myAStays = join(",", @ifRemoveTheseAlbumsStay);
+
+		
+		my $sth = $dbh->prepare("UPDATE LOW_PRIORITY Albums 
+								 SET ItemCount='$newAICount', 
+								 Items='$myPStays',
+								 LastUpdated = '$datetime'
+								 WHERE AlbumID = '$AID'");
+		$sth->execute or die "Unable to execute query\n"; 
+		$sth->finish;
+
+		my $sth = $dbh->prepare("UPDATE LOW_PRIORITY losPhotos SET Albums='$myAStays' WHERE ImageID = '$PN'");
+		$sth->execute or die "Unable to execute query\n"; 
+		$sth->finish;
+
+
+		##-- wants to detach but doesnt exist in album
+		if ($foundIt == 0) { $error = "<font style=\"color:#BF0000;font-weight:bold\">BAD RESPONSE</font><br><br>Album: <b>$displayAlbum</b> doesn't contain photo: <b>$FileNameClean</b><br><br>Therefore there's no need to remove it from the album."; }
+		else { $done = '1'; $thyResponse = "<font style=\"color:#009900;font-weight:bold\">SUCCESSFUL!</font><br><br>Photo: <b>$FileNameClean</b> was successfully detached from the album: <b>$displayAlbum</b>.<br><br>The new photo count for the album: <b>$displayAlbum</b> is <strong>$newAICount</strong>."; }
+	}
+
+	##-- wants to delete photo >> detach from all albums
+	elsif ($FORM{'act'} eq "delete") {
+		$manageTitle = 'Photo';
+		$typeAction = 'DELETE';
+		$cualManage = "uploadPhotos";
+		
+		@myAlbums = split(/,/,$Albums);
+		$TMA = int(@myAlbums);
+		if ($TMA > 1) { $plur = "albums"; }
+		else { $plur = "album"; }
+
+		foreach $MA (@myAlbums) { 
+			$MA = int($MA); 
+			my $sth = $dbh->prepare("SELECT Title, ItemCount, Items FROM Albums where AlbumID = '$MA'");
+			$sth->execute or die "Unable to execute query\n";
+			my @row;
+			while(@row = $sth->fetchrow_array) {
+				$albumNo = $row->[0];
+				$ICount = $row->[1];
+				$Items = $row->[2];
+				$ICount = int($ICount);
+				#-- if item count less than 2, this means that this album will be blank when we remove this photo
+				if ($ICount < 2) { 
+					my $DA = $albumNo;
+					$DA =~ s/_/ /g;
+					push(@willBeBlank,"$DA"); 
+				}
+			}
+			$sth->finish;
+		}
+		$thyResponse = "You are about to delete photo: <b>$FileNameClean</b> which is currently featured in <strong>$TMA $plur</strong>.<br><br> Are you sure you want to continue?";
+
+		$thyButton = "<input type=\"button\" value=\"Yes, Delete It!\" onClick=\"javascript:parent.agreeDeletePhoto('$PN');\" class=\"Buttons\">&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\"Cancel\" onClick=\"parent.location.href = 'FotoBlogManage.htm';\" class=\"Buttons\">";
+
+	}
+	elsif ($FORM{'delePID'} ne "") {
+		$manageTitle = 'Photo';
+		$typeAction = 'DELETE';
+		$cualManage = "uploadPhotos";
+
+		@myAlbums = split(/,/,$Albums);
+		foreach $ma (@myAlbums) {
+			$ma = int($ma);
+
+			$myICount = '';
+			$myItems = '';
+			$thisNewAICount = '';
+			$myAStays = '';
+			my $sth = $dbh->prepare("SELECT ItemCount, Items FROM Albums where AlbumID = '$ma'");
+			$sth->execute or die "DB error processing this request\n"; 
+			my $row = $sth->fetchrow_arrayref;
+				$myICount = $row->[0];
+				$myItems = $row->[1];
+			$sth->finish;
+
+			my @theseStay = (); ###-- clear the array
+			$thisNewAICount = int($myICount - 1);
+			@splitA = split(/,/,$myItems);
+			foreach $SA (@splitA) {
+				$SA = int($SA);
+				if ($SA != $PN) {
+					push(@theseStay,"$SA");
+				}
+			}
+			
+			$myAStays = join(",", @theseStay);
+			my $sth = $dbh->prepare("UPDATE LOW_PRIORITY Albums 
+									 SET ItemCount='$thisNewAICount', 
+									 Items='$myAStays',
+									 LastUpdated = '$datetime'
+									 WHERE AlbumID = '$ma'");
+			$sth->execute or die "Unable to execute query\n"; 
+			$sth->finish;
+			
+			my $sth = $dbh->prepare("DELETE from losPhotos where ImageID = '$PN'");
+			$sth->execute or die "DB error processing this request\n"; 
+			$sth->finish;
+			
+			$estaMain = $parentDirectory . "$FileName";
+			$estaThumb = $parentDirectory . "thumb/" . "$FileName";
+			$estaOriginal = $parentDirectory . "original/" . "$FileName";
+			if ((-e $estaMain)) {
+				select(STDOUT); $| = 1;
+				$commandline = "rm $estaMain";
+				system($commandline);
+			}
+			if ((-e $estaThumb)) {
+				select(STDOUT); $| = 1;
+				$commandline = "rm $estaThumb";
+				system($commandline);
+			}
+			if ((-e $estaOrignal)) {
+				select(STDOUT); $| = 1;
+				$commandline = "rm $estaOrignal";
+				system($commandline);
+			}
+
+
+				
+
+
+
+			## $TD = $TD . "$myICount $thisNewAICount :: <br>$myItems<br>$myAStays<br><br>";
+		}
+
+
+
+		$done = '1';
+		$thyResponse = "<font style=\"color:#009900;font-weight:bold\">SUCCESSFUL!</font><br><br>Photo: <b>$FileNameClean</b> was successfully deleted. $also";
+	}
+	
+	
+	
+	$dbh->disconnect; 	
+}
+
+
+##-- last delete action only, means item actually deleted
+if ($typeAction eq "DELETE") {
+	$bT = 'Back to Manage Main';
+	$bA = "parent.location.href = 'FotoBlogManage.htm';";
+}
+else {
+	$bT = 'Okay Thanks!';
+	$bA = "javascript:parent.currAlbum='$albumNombre';parent.manageAlbum();";
+}
+
+if ($error) {
+	$thyResponse = $error;
+	$thyButton = "<input type=\"button\" value=\"$bT\" onClick=\"$bA\" class=\"Buttons\">";
+}
+elsif ($done) {
+	$thyButton = "<input type=\"button\" value=\"$bT\" onClick=\"$bA\" class=\"Buttons\">";
+}
+
+
+print '
+<html>
+<head>
+<script language="Javascript" src="js/b4dom.js"></script>
+</head>
+<body style="background-color:#D6D6D6" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<style>
+body { overflow-x:hidden; overflow-y:auto; scrollbar-face-color:#CCCCCC; scrollbar-highlight-color:#000000; scrollbar-shadow-color:#CCCCCC; scrollbar-3dlight-color: #000000; scrollbar-arrow-color:#000000; scrollbar-track-color:#000000; scrollbar-darkshadow-color:#000000; }
+#overDiv,#divLinks,#divArrows, #bground, #divLoad, #divCont, #divIEText { position:relative;left:0px;top:-520px; z-index:100; visibility:hidden; width:1px; height:1px; overflow:hidden; }
+.formInput { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:20px; background-color:#101E06;color:#F7F7F7; padding: 3px; font-weight:normal; }
+.formTA { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:60px; background-color:#101E06; color:#F7F7F7; padding: 3px; font-weight:normal; }
+.formSelect { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:20px; background-color:#101E06; color:#F7F7F7; padding: 3px; font-weight:normal; }
+</style>
+<link rel="stylesheet" href="commonStyles.css" type="text/css">
+	<center>
+
+
+	<table width="227" border="0" cellspacing="0" cellpadding="0" style="background-image:url(\'nvi/'.$cualManage.'_tableBack.gif\');background-repeat:repeat-y;">
+    	<tr>
+        	<td align="center" valign="top" height="8" style="height:8px;background-image:url(\'nvi/'.$cualManage.'_tableTop.gif\');background-repeat:no-repeat;">
+				<table width="227" border="0" cellspacing="0" cellpadding="0">
+					<tr> 
+						<td align="center" valign="bottom" height="30" class="photoTitlesManage" style="padding-bottom:6px;font-size:14px;letter-spacing:0px;font-family:verdana,arial,helevtica" nowrap><font style="font-size:10px;"><i>'.$typeAction.':</i></font> <b>'.$manageTitle.'</b></td>
+					</tr>
+					<tr>
+						<td align="center"><div style="background-image:url(\'nvi/horizontalDottie.gif\');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);"></div></td>
+					</tr>
+					<tr>
+						<td align="center"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+        	<td align="left" height="50" style="padding:25px;font-size:11px;line-height:14px;" class="photoSmallFBM">'.$thyResponse.'</td>
+        </tr>
+		<tr>
+        	<td align="center" height="50" style="font-size:11px;line-height:14px;" class="photoSmallFBM"><form>'.$thyButton.'</form></td>
+        </tr>
+		<tr>
+        	<td align="center" valign="bottom" height="15"><img src="nvi/'.$cualManage.'_tableBot.gif" width="227" height="15"></td>
+        </tr>
+	</table>
+	</center>
+</body>
+</html>
+';
+
+
+}
+
+exit;

@@ -1,0 +1,2501 @@
+#!/usr/bin/perl5 -s
+
+use CGI qw(:standard);
+
+##################################################################
+# E-mail: scripts@viehland.org                                   #
+# VERSION 3.1 (c) March 2005                                     #
+##################################################################
+
+$debug = "no";
+$internal = "0";
+
+$parentURL = "http://$ENV{'HTTP_HOST'}";
+$parentDirectory = "/usr/local/www/vhosts/nightvisiononline.com/htdocs/";
+$URLToThisFile = "http://$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}";
+$pathToThisFile = "$ENV{'SCRIPT_FILENAME'}";
+
+$maximumFileSize = "1500000";			# in bytes
+@allowedFileExtensions = ('jpg','jpeg','png');
+$useMimeTypeDetection = "yes";			# yes or no
+
+
+$allowUserDefinedAlbums = "no";		# yes or no
+$usePasswordForAlbumAdd = "no";		# yes or no
+$addAlbumPassword = "superusnv";
+
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+$month = ($mon + 1);
+$year += 1900;
+$year %= 100;
+$date = sprintf("%02d-%02d-%02d",$month,$mday,$year);
+
+$servertype = "unix";			# unix or dos
+
+$usedAsAdultGallery = "no"; 	# yes or no
+
+
+$myCSin = int($CSin);
+
+# use PhotoAlbums in the base directory to store all pics
+$parentDirectory =~ s/\/$//g;
+$parentDirectory = $parentDirectory . "/PhotoAlbums";
+$parentURL = $parentURL . "/PhotoAlbums";
+
+
+# words that will not be allowed in the file names or descriptions
+@badwords = ('bastard','fuck','shit','cunt',
+	'whore','hore','twat','bitch','bitch','pussy','pussy','adult',
+	'goddamn','damn','prick','cock','dick','asshole','_ass_',
+	'^ass_','_ass$',' ass ','cock','viagra','cialis','erection','penis',
+	'vagina');
+
+
+if ($debug eq "yes") { 
+	use CGI::Carp qw(fatalsToBrowser);
+}
+
+
+
+
+
+
+##################################################################
+# Script Wrapper
+##################################################################
+	$thyRU = "root";
+	$thyRP = "32GCC5E7TSjqQ";
+	$elDB = "Foto Blogs";
+
+&main();    # run script
+1;     # end program
+
+
+
+
+
+
+
+##################################################################
+# The main part of the script that tells the script what to do
+##################################################################
+sub main {
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+	#-- CONNECT TO DB (GET PAGE CONTENT)
+	
+	$myCSin = int($CSin);
+	$sth = $dbh->prepare("SELECT GalleryDirectory FROM vAcctsNew where AccountID = '$myCSin';");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$aGalleryDir = $row[0];
+	}
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+
+
+	if (param()) { $whatToDo = param('que'); }
+
+	if ($whatToDo eq "showPics"){ &showPics(param); }
+	elsif ($whatToDo eq "SSP"){ &SSP(param); }
+	elsif ($whatToDo eq "editPhoto"){ &editPhoto(param); }
+	elsif ($whatToDo eq "postForm"){ &postForm(param); }
+	elsif ($whatToDo eq "postPics"){ &postPics(param); } 
+	elsif ($whatToDo eq "albumManagement"){ &albumManagement(param); } 
+	elsif ($whatToDo eq "addAlbumAction"){ &addAlbumAction(param); } 
+	##-- default screen
+	else {
+		$whatToDo = "mainScreenLogged";
+		&mainScreenLogged(param);
+	}
+
+	if ($debug eq "yes") { print "\n<!-- End sub main -->\n"; }
+
+	$dbh->disconnect;
+}
+
+
+
+
+
+
+##################################################################
+# This part opens the parent directory and lists all the albums
+# located there in order to provide them to other sub routines
+##################################################################
+sub getAlbums {
+
+
+	##-- NEW WAY
+	## -->  CONNECT TO DB
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1;
+
+	my $sth = $dbh->prepare("SELECT Title FROM Albums WHERE Owner='$myCSin' ORDER BY LastUpdated DESC");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$AT = $row[0];
+		push(@albums,"$AT");
+	}
+	$sth->execute or die "Unable to execute query\n";
+	$dbh->disconnect;
+	return (@albums);
+
+}
+
+
+sub getalbumsUSER {
+
+	##-- NEW WAY
+	## -->  CONNECT TO DB
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+	my $sth = $dbh->prepare("SELECT Title, Owner FROM Albums WHERE Owner='$myCSin' ORDER BY LastUpdated DESC");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$AT = $row[0];
+		$OW = $row[1];
+		push(@albumsUSER,"$AT-----$OW");
+	}
+	$sth->execute or die "Unable to execute query\n";
+	$dbh->disconnect;
+	return (@albumsUSER);
+
+}
+
+
+
+
+sub getUserAlbums {
+
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+	my $sth = $dbh->prepare("SELECT Title FROM Albums WHERE Owner='$myCSin' ORDER BY LastUpdated DESC");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$AT = $row[0];
+		push(@albums,"$AT");
+	}
+	$sth->execute or die "Unable to execute query\n";
+	$dbh->disconnect;
+	return (@albums);
+
+}
+
+
+
+
+
+
+##################################################################
+# Here we display our header - You can also add additional info
+# here if you want
+##################################################################
+sub beginPage {
+
+	if ($debug eq "yes") { print "\n<!-- Begin sub beginPage -->\n"; }
+	$generatedTag = "";
+	print "<center>";
+}
+
+##################################################################
+# Here we end the html display and customize it (somewhat)
+# for the particular page we are on
+##################################################################
+sub endPage {
+
+
+	if ($debug eq "yes") { print "\n<!-- Begin sub endPage -->"; }
+	my ($thisPage) = @_;
+	if ($debug eq "yes") { print "\n<!-- End sub endPage -->"; }
+
+
+
+##	if ($CSen eq "SI") { $myLogPrompt = '<div class="formInput" style="padding-right:15px;">[ <a href="#" style="color:#337701;letter-spacing:2px;">Manage Your Album</a> ]</div>'; }
+##	else { $myLogPrompt = '<div class="formInput" style="padding-right:15px;">[ <a href="#" style="color:#337701;letter-spacing:2px;">Start An Account</a> ]</div>'; }
+
+
+	### --->>> INSERT INTO PAGE
+	$PageContent =~ s/%%LOGINPROMPT%%/$myLogPrompt/gi;
+	$AlbumGallery = "&nbsp;<!--<font style=\"font-family:verdana,arial;color:#ffffff\"><b>Album</b> &nbsp;\| &nbsp; <a href=\"javascript:void(0);\" style=\"color:#ffffff;\" title=\"Photograph Galleries coming soon...\">Gallery</a></font>-->";
+	$PageContent =~ s/%%ALBUM_GALLERY%%/$AlbumGallery/gi;
+
+	print "$PageContent";
+
+
+
+}
+
+##################################################################
+# MainScreen [ONLY FOR LOGGED IN USERS]
+##################################################################
+sub mainScreenLogged {
+
+
+	my $thisPage = "mainScreenLogged";
+	print "\n<!-- Begin action: $thisPage -->\n";
+	&beginPage;
+	my @albumsUSER = &getalbumsUSER;
+	$numberOfAlbums = scalar(@albumsUSER);	
+
+	require("manageGMA.nsp");
+	require("manageGMP.nsp");
+
+	###-- no photos
+	if (!$howManyPhotos || $howManyPhotos == 0) { 
+		$myPhotos = "<font class=\"photoSmallest\" style=\"font-size:11px;line-height:20px;\"><br>no photos found<br>[ <a href=\"javascript:uploadPhoto();\" style=\"color:#347702;\" title=\"Click to upload a photograph\">upload photo</a> ]</font>"; 
+		$myMainContent = '
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr>
+					<td align="left" style="padding-left:15px;padding-right:10px;padding-bottom:10px;" class="FBmanageText"><p><a href="javascript:uploadPhoto();" title="Click to upload a photograph"><img src="nvi/manageUploadPhotos.jpg" width="150" height="150" hspace="10" vspace="10" border="0" align="right"></a>Looks like there are no photos in your gallery. Begin constructing your gallery by uploading your first photograph. While in the process of uploading your first photograph you will also create your first album. Your interactive flash gallery will become populated and visible to the general public upon your successful completion of the process.</p><p>If you have any questions or come across any problems managing your gallery, albums or photography you can <a href="javascript:contactAdmin();" style="color:#FF6300;">contact the administrator</a> anytime. Please allow some time to receive a reply to your questions and assistance requests. Hopefully we\'ve made the FotoBlog easy for you to use and manage.<br>Have fun!</p></td>
+				</tr>
+			</table>
+		';
+	}
+	###-- no albums
+	if (!$myAlbums || $myAlbums eq "") { $myAlbums = "<font class=\"photoSmallest\" style=\"font-size:11px;line-height:20px;\"><br>no albums found<br>[ <a href=\"javascript:createAlbum();\" style=\"color:#BF0000;\" title=\"Create new album for your gallery\">add an album</a> ]</font>"; }
+
+	###-- have not yet parsed myMainContent << ONLY POSSIBLE IF NO PHOTOS FOUND AS SEEN ABOVE
+	if (!$myMainContent) {
+		##-- make dynamic photo context menu
+		$myPhotoMenuData = `cat js/menudata_photo.js`;
+		if (@allMyAlbums) {
+			foreach $AMA (@allMyAlbums) {
+				($myAID,$myAN) = split(/-----%%%%%-----/,$AMA);
+				$muaPhotoMenu = $muaPhotoMenu . "[\"| &nbsp; $myAN &nbsp; \",\"javascript:attachToAlbum('$myAID');\"],\n";
+				$muaPhotoMenu2 = $muaPhotoMenu2 . "[\"| &nbsp; $myAN &nbsp; \",\"javascript:detachFromAlbum('$myAID');\"],\n";
+			}
+		}
+		$myPhotoMenuData =~ s/%%ELDYNSCRIPT%%/$muaPhotoMenu/gi;
+		$myPhotoMenuData =~ s/%%ELDYNSCRIPT2%%/$muaPhotoMenu2/gi;
+		
+		$myMainContent = '
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<form name="manage">
+					<tr>
+						<td align="center" style="padding-left:10px;">
+							<table bgcolor="#BFBFBF" width="120" border="0" cellspacing="0" cellpadding="0" style="border:#000000 1px solid;">
+								<tr height="40">
+									<td class="numberPhotosManage" valign="middle" align="center"><div id="numberAlbums" class="elNumeroPhotoManage">'.$cALbum.'</div><font style="color:#687E58">albums</font></td>
+									<td width="1" valign="middle"><div style="background-color:#000000;width:1px;height:32px;overflow:hidden;clip:rect(0px 1px 32px 0px);"></div></td>
+									<td class="numberPhotosManage" valign="middle" align="center"><div id="numberPhotos" class="elNumeroPhotoManage">'.$howManyPhotos.'</div><font style="color:#687E58">photos</font></td>
+								</tr>
+								<tr height="40">
+									<td colspan="3" class="numberPhotosManage" valign="middle" align="center" width="100%"><div id="timesRated" class="elNumeroPhotoManage">'.$allTimes.'</div><font style="color:#687E58">times rated</font></td>
+								</tr>
+								<tr height="1">
+									<td colspan="3" height="1" align="center" width="100%" bgcolor="#000000"><div style="width:80px;height:1px;overflow:hidden;clip:rect(0px 80px 1px 0px);"></div></td>
+								</tr>
+								<tr height="30">
+									<td colspan="3" class="numberPhotosManage" valign="middle" align="center" width="100%"><div id="averageRating" class="elNumeroPhotoManage" style="padding-top:4px;padding-bottom:6px;background-color:#000000;"><img src="http://www.nightvisiononline.com/nvi/starRate_blackBG_'.$AverageRating.'star.gif" width="64" height="13" border="0" style="padding:2px;" title="Your gallery holds an average rating of '.$AverageRating.' stars!"></div></td>
+								</tr>
+								<tr height="1">
+									<td colspan="3" height="1" align="center" width="100%" bgcolor="#000000"><div style="width:80px;height:1px;overflow:hidden;clip:rect(0px 80px 1px 0px);"></div></td>
+								</tr>
+								<tr height="40">
+									<td colspan="3" class="numberPhotosManage" valign="middle" align="center" width="100%"><div id="totalBlogs" class="elNumeroPhotoManage">'.$allCommentsCounted.'</div><font style="color:#687E58">user comments</font></td>
+								</tr>
+							</table>
+						</td>
+						<td align="left" valign="middle" style="padding-left:0px;padding-top:0px;">
+						
+							<table width="170" border="0" cellspacing="0" cellpadding="0">
+								<tr>
+									<td align="left" class="albumOwner" style="font-size:9px;padding-left:5px;"><i>MANAGE:</i> <font style="font-weight:bold;">YOUR ALBUMS</font></td>
+								</tr>
+								<tr>
+									<td align="left">%%ALB_GAL_LIST%%</td>
+								</tr>
+								<tr>
+									<td align="left" style="padding-left:0px;"><input type="button" name="manageA" value="Manage" class="Buttons" tabindex="1" style="width:60px;color:#BF0000;" onClick="javascript:manageAlbum();" disabled><input type="button" name="deleteA" value="Delete" class="Buttons" tabindex="1" style="width:54px;color:#BF0000;" onClick="javascript:deleteAlbum();" disabled><input type="button" name="addA" value="Add" class="Buttons" tabindex="1" style="width:44px;color:#BF0000;" onClick="javascript:createAlbum();"></td>
+								</tr>
+								<tr>
+									<td align="left" class="albumOwner" style="font-size:9px;padding-left:5px;padding-top:25px;"><i>EDIT:</i> <font style="font-weight:bold;">YOUR PHOTOS</font></td>
+								</tr>
+								<tr>
+									<td align="left">%%PHOTO_GAL_LIST%%</td>
+								</tr>
+								<tr>
+									<td align="left" style="padding-left:0px;"><input type="button" name="editP" value="Edit" class="Buttons" tabindex="1" style="width:44px;color:#347702;" onClick="javascript:editPhoto();" disabled><input type="button" name="deleteP" value="Delete" class="Buttons" tabindex="1" style="width:54px;color:#347702;" onClick="javascript:deletePhoto();" disabled><input type="button" name="uploadP" value="Upload" class="Buttons" tabindex="1" style="width:60px;color:#347702;" onClick="javascript:uploadPhoto();"></td>
+								</tr>
+							</table>
+							
+						<!--<img src="nvi/manageUploadPhotos.jpg" width="150" height="150" border="0">-->
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" align="left" style="padding-left:15px;padding-top:15px;"><img src="nvi/manageAlbums.jpg" width="236" height="114" border="0"></td>
+					</tr>
+					<tr>
+						<td colspan="2" align="right" style="padding-right:15px;padding-top:15px;padding-bottom:5px;"><img src="nvi/managePhotos.jpg" width="254" height="134" border="0"></td>
+					</tr>
+					</form>
+				</table>		
+		';
+	}
+
+	
+$PageContent = '
+<link rel="stylesheet" href="commonStyles.css" type="text/css">
+<SCRIPT language="JavaScript1.2" src="js/menudata_album.js" type="text/javascript"></SCRIPT>
+<SCRIPT language="JavaScript1.2" type="text/javascript">
+' . $myPhotoMenuData . '
+</SCRIPT>
+<script type="text/javascript" src="js/flexcroll.js"></script>
+<style>
+	.scrollgeneric { line-height: 1px; font-size: 1px; position: absolute; top: 0; left: 0; }
+	.vscrollerbase { width:9px; }
+	.vscrollerbar { background-image: url(nvi/manageAlbums_scroll.gif); width: 9px; height: 37px; background-image: url(nvi/manageAlbums_scroll.gif);background-repeat:no-repeat; }
+	* html .vscrollerbar { filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop src=\'nvi/manageAlbums_scroll.gif\'); background-image: none; }
+	.hscrollerbase {height: 9px;}
+	.hscrollerbar {height: 9px; background-color: #000000;}
+	.vscrollerbar, .hscrollerbar { padding: 0px; z-index: 2; }
+	.scrollerjogbox { width: 9px; height: 37px; top: auto; left: auto; bottom: 0px; right: 0px; background: #000000; }
+
+	
+	.albumSelector { width:170px; background-color:#000000; }
+	#mainContent { z-index:1; visibility:visible; }
+</style>
+<center>
+  <table width="800" border="0" cellspacing="0" cellpadding="0">
+      <input type="hidden" name="manageCode" value="1">
+	  <tr>
+    	<td colspan="5"><div style="width:1px;height:5px;overflow:hidden;clip:rect(0px 1px 5px 0px);"></div></td>
+	  </tr>
+<!--<font class="photoSmallest">%%LOGINPROMPT%%</font>-->
+      <tr> 
+        <td align="left" style="padding-left:10px;"><a href="/FotoBlog.htm"><img src="nvi/fotoBlogLogoSmall.gif" width="104" height="20" border="0"></a></td>
+        <td align="right" style="padding-right:10px;"><div id="FotoMMLinks" class="FotoMMLinks"><span title="Album Browser" class="FotoMMLinks">album browser</span> &nbsp;&nbsp;|&nbsp;&nbsp; <span title="Artists\' Gallery of Albums" class="FotoMMLinks">gallery</span> &nbsp;&nbsp;|&nbsp;&nbsp; <a href="/FotoBlogManage.htm"><span class="FotoMMLinks" style="color:#000000;font-weight:bold;text-decoration:none;" title="Click to reload your FotoBlog Management Control Panel">manage</span></a> &nbsp;&nbsp;|&nbsp;&nbsp; <span class="FotoMMLinks" title="COMING SOON: Share photography with your friends, family and colleagues quickly, easily and absolutely FREE!">share</span></div></td>
+      </tr>
+      <tr> 
+        <td colspan="5"><div style="width:1px;height:5px;overflow:hidden;clip:rect(0px 1px 5px 0px);"></div></td>
+      </tr>
+      <tr>
+        <td colspan="5" background="nvi/horizontalDottie.gif"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+      </tr>
+    <tr>
+    	<td colspan="5" valign="top" style="padding-left:20px; padding-right:20px;">
+
+
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+            	<tr> 
+					<td style="padding-top:6px;" valign="top" nowrap><font class="breadCrumb"><a href="/FotoBlog.htm" class="breadCrumb" style="color:#000000">FotoBlog Home</a> > <b><a href="/FotoBlogManage.htm"><span class="FotoMMLinks" style="color:#000000;font-weight:bold;text-decoration:none;" title="Click to reload your FotoBlog Management Control Panel">Manage</span></a></b></font></td>
+              		<td valign="top" align="right">&nbsp;</td>
+            	</tr>
+			</table>		
+		
+		
+		</td>
+    </tr>
+      <tr>
+        <td colspan="5">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr height="30"> 
+              		<td align="left" valign="bottom" style="padding-left:10px;" class="titloAlbumBrowse"><div id="functionTitle"><font style="font-size:9px;letter-spacing:1px;"><em>MANAGE: </em></font> <b>'.$CSun.'\'s Photo Gallery</b></div></td>
+              		<td align="right" valign="bottom" style="padding-right:10px;"><div>
+						<table cellpadding="0" cellspacing="0" border="0"><tr><td class="albumLastUp" align="right" valign="bottom" height="18">...welcome back. . .</td><td valign="right" rowspan="2" style="padding-top:0px;"><img src="ufoto.htm?myPhoto=0&elPhotoID='.$CSin.'" width="30" height="30" border="0" hspace="10" style="border:#000000 1px solid;"></td></tr><tr><td class="albumOwner" align="right" valign="top" style="padding-top:0px;"><b>'.$CSun.'</b></td></tr></table>
+					</div></td>
+				</tr>
+			</table>		
+		</td>
+      </tr>
+      <tr>
+        <td colspan="5"><div style="width:1px;height:5px;overflow:hidden;clip:rect(0px 1px 5px 0px);"></div></td>
+      </tr>
+      <tr>
+        <td colspan="5" background="nvi/horizontalDottie.gif"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+      </tr>
+      <tr>
+        <td colspan="5"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td>
+      </tr>
+      <tr>
+        <td colspan="5" background="nvi/horizontalDottie.gif"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+      </tr>
+      <tr> 
+        <td colspan="5">
+		
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+            	<tr valign="top"> 
+	              <td width="220" align="right" valign="top" style="padding-right:15px;padding-bottom:10px;padding-top:15px;">
+			  
+					<table width="165" border="0" cellspacing="0" cellpadding="0" style="background-image:url(\'nvi/manageAlbums_tableBack.gif\');background-repeat:repeat-y;">
+                        <tr>
+                          <td align="center" valign="top" height="8" style="height:8px;background-image:url(\'nvi/manageAlbums_tableTop.gif\');background-repeat:no-repeat;">
+
+							<table width="165" border="0" cellspacing="0" cellpadding="0">
+								<tr> 
+                          			<td align="left" valign="bottom" height="15" class="photoTitlesManage" style="padding-left:15px;padding-bottom:2px;" nowrap>your</td>
+                          			<td align="right" valign="bottom" height="15" style="padding-bottom:2px;padding-right:10px;"><font class="photoSmallest" nowrap>[ &nbsp;<a href="javascript:createAlbum();" style="color:#BF0000;font-size:10px;letter-spacing:1px;" title="Create new album for your gallery">add</a>&nbsp; ]</font></td>
+                        		</tr>
+								<tr>
+									<td colspan="2" align="center"><div style="background-image:url(\'nvi/horizontalDottie.gif\');width:156px;height:1px;overflow:hidden;clip:rect(0px 156px 1px 0px);"></div></td>
+								</tr>
+								<tr>
+									<td colspan="2" align="center"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+								</tr>
+								<tr>
+									<td colspan="2" align="center"><div style="background-image:url(\'nvi/horizontalDottie.gif\');width:156px;height:1px;overflow:hidden;clip:rect(0px 156px 1px 0px);"></div></td>
+								</tr>
+								<tr> 
+                          			<td colspan="2" align="left" valign="top" class="photoTitlesManage" style="padding-top:2px;color:#BF0000;padding-left:35px;" nowrap>albums</td>
+                        		</tr>
+							</table>
+							
+						  </td>
+                        </tr>
+                        <tr> 
+                          	<td colspan="2" align="center" height="20" valign="top" style="padding-bottom:10px;padding-top:10px;">
+								<div id="manageAlbums" class="flexcroll" style="height:380px;width:158px;overflow:hidden;clip:rect(0px 158px 380px 0px);">' . $myAlbums . '</div>
+							</td>
+                        </tr>
+                        <tr>
+                          <td align="center" valign="bottom" height="15"><img src="nvi/manageAlbums_tableBot.gif" width="165" height="15"></td>
+                        </tr>
+                      </table>
+			  
+			  </td>
+			  <td width="1" valign="bottom" style="background-image:url(\'nvi/verticalDottie.gif\');background-repeat:repeat-y;"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+              <td align="center" valign="top" style="padding-bottom:10px;padding-top:20px;">
+			  
+			  <div id="mainContent">
+				'.$myMainContent.'
+			  </div>
+		  	  <div id="overDiv"></div>
+			  <div id="divLinks"></div>
+			  <div id="divArrows"></div>
+			  <script language="JavaScript" src="js/pageload1.js"></script>
+				<!-- Copyright NetMedia Solutions AKA Louie Rd and USNV-->
+			  <script language="Javascript" src="js/pageload2.js"></script>
+
+			  </td>
+			  <td width="1" valign="bottom" style="background-image:url(\'nvi/verticalDottie.gif\');background-repeat:repeat-y;"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+              <td width="220" align="left" valign="top" style="padding-left:15px;padding-bottom:10px;padding-top:15px;">
+			  
+					<table width="165" border="0" cellspacing="0" cellpadding="0" style="background-image:url(\'nvi/managePhotos_tableBack.gif\');background-repeat:repeat-y;">
+                        <tr>
+                          <td align="center" valign="top" height="8" style="height:8px;background-image:url(\'nvi/managePhotos_tableTop.gif\');background-repeat:no-repeat;">
+
+							<table width="165" border="0" cellspacing="0" cellpadding="0">
+								<tr> 
+                          			<td align="left" valign="bottom" height="15" class="photoTitlesManage" style="padding-left:15px;padding-bottom:2px;" nowrap>your</td>
+                          			<td align="right" valign="bottom" height="15" style="padding-bottom:2px;padding-right:10px;"><font class="photoSmallest" nowrap>[ &nbsp;<a href="javascript:uploadPhoto();" style="color:#347702;font-size:10px;letter-spacing:1px;" title="Click to upload a photograph">upload</a>&nbsp; ]</font></td>
+                        		</tr>
+								<tr>
+									<td colspan="2" align="center"><div style="background-image:url(\'nvi/horizontalDottie.gif\');width:156px;height:1px;overflow:hidden;clip:rect(0px 156px 1px 0px);"></div></td>
+								</tr>
+								<tr>
+									<td colspan="2" align="center"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+								</tr>
+								<tr>
+									<td colspan="2" align="center"><div style="background-image:url(\'nvi/horizontalDottie.gif\');width:156px;height:1px;overflow:hidden;clip:rect(0px 156px 1px 0px);"></div></td>
+								</tr>
+								<tr> 
+                          			<td colspan="2" align="left" valign="top" class="photoTitlesManage" style="padding-top:2px;color:#347702;padding-left:35px;" nowrap>photos</td>
+                        		</tr>
+							</table>
+							
+						  </td>
+                        </tr>
+                        <tr>
+                          	<td colspan="2" align="center" height="20" valign="top" style="padding-bottom:10px;padding-top:10px;">
+								<div id="managePhotos" class="flexcroll" style="height:380px;width:158px;overflow:hidden;clip:rect(0px 158px 380px 0px);">'.$myPhotos.'</div>
+							</td>
+                        </tr>
+                        <tr>
+                          <td align="center" valign="bottom" height="15"><img src="nvi/managePhotos_tableBot.gif" width="165" height="15"></td>
+                        </tr>
+                      </table>              
+			  </td>
+      </tr>
+      <tr>
+        <td colspan="5" background="nvi/horizontalDottie.gif"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+      </tr>
+      <tr>
+        <td colspan="5"><div style="width:1px;height:2px;overflow:hidden;clip:rect(0px 1px 2px 0px);"></div></td>
+      </tr>
+      <tr>
+        <td colspan="5" background="nvi/horizontalDottie.gif"><div style="width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);"></div></td>
+      </tr>
+
+     %%HIDDEN_FIELDS%%
+  </table>
+</center>
+<br><br>
+
+';
+
+
+
+
+		if ($numberOfAlbums gt "0") {
+			&getalbumsUSER;
+			$losAlbums = "\n<select onChange=\"cambiameAlbums();\" name=\"albumChoice\" class=\"albumSelector\" style=\"border: #626062 1px solid; height:20px; background-color:#2F0000; color:#F7F7F7;\">\n";
+			my $tempcount = 0;
+			$losAlbums = $losAlbums . "<option value=\"BIGNULL\"> - - - - - - - - - - - - - - - - - - - </option>\n";
+			my $albumName;
+			foreach $albumName(@albumsUSER){
+				($name,$artID) = split(/-----/,$albumName);
+				my $display = $name;
+				$display =~ s/_/ /g;
+				$losAlbums = $losAlbums . "<option value=\"$albumName\">$display</option>\n";
+				$tempcount++; 
+			}
+			$losAlbums = $losAlbums . "</select>\n\n",
+	
+			### --->>> INSERT INTO PAGE
+			$PageContent =~ s/%%ALB_GAL_LIST%%/$losAlbums/gi;
+			$PageContent =~ s/%%PHOTO_GAL_LIST%%/$losPhotos/gi;
+
+		
+			use LWP::Simple;
+			$muaGRAP = get("http://www.nightvisiononline.com/getRandomAP.htm");
+		
+			$PageContent =~ s/%%GRAP%%/$muaGRAP/gi;	
+			$integPHOTOS = "integPhotos();";
+				
+			$formFields = $formFields . "<input type=hidden name=que value=showPics><input type=hidden name=startPic value=0><input type=hidden name='aop' value='10'>";
+
+		}
+
+		### --->>> INSERT INTO PAGE
+		$PageContent =~ s/%%HIDDEN_FIELDS%%/$formFields/gi;
+	
+		&endPage($thisPage);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+####-->> VIEW ALBUM
+##################################################################
+# Here we list the files in the directory chosen by the user, then
+# based on their preferences, show them in a table format, linking
+# to the file and if desired, showing the file (full size download
+# but shown smaller)  We take the filename and split it as needed
+# to get the date and the description separated.
+##################################################################
+sub showPics {
+### ONLY IF COMING FROM fbai.htm
+if ($CF eq "fbai") {
+
+
+	$PageContent = '
+<!--** AlbumMain **-->
+
+
+<link rel="stylesheet" href="commonStyles.css" type="text/css">
+
+<center>
+  <table width="300" border="0" cellspacing="0" cellpadding="0">
+    <form method="post" name="browseType">
+      <input type="hidden" name="browseType" value="1">
+    <tr> 
+    	<td colspan="2" style="padding-left:20px;padding-right:20px;" valign="top">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+				<tr height="30"> 
+              		<td align="center" valign="bottom" style="padding-left:10px;" class="titloAlbumBrowse"><font style="font-size:9px;letter-spacing:1px;"><em>ALBUM: </em></font> <b>%%ALBUM_NAME%%</b></td>
+				</tr>
+			</table>
+
+
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+      			  <tr>
+			        <td colspan="2"><img src="nvi/spacer.gif" width="1" height="10"></td>
+			      </tr>
+                  <tr> 
+                    <td height="1" colspan="2" style="background-image:url(\'nvi/horizontalDottie.gif\');background-repeat:repeat-x;"><img src="nvi/spacer.gif" width="225" height="1"></td>
+                  </tr>
+      			  <tr>
+			        <td colspan="2" align="center" style="padding-bottom:3px;padding-top:3px;">
+						  						<table cellpadding="0" cellspacing="0" border="0" width="100%">
+                									<tr valign="top"> 
+            	                    					<td nowrap align="center" class="resultsBreakdown" style="color:#000000" width="50%"><i>created</i> <strong>%%CREATED%%</strong></td>
+														<td width="1" background="nvi/verticalDottie.gif"><img src="nvi/spacer.gif" border="0" width="1" height="10"></td>
+            	                    					<td nowrap align="center" class="resultsBreakdown" style="color:#000000" width="50%"><i>updated</i> <strong>%%LAST_UPDATED%%</strong></td>
+                              						</tr>
+                            					</table>
+					</td>
+			      </tr>
+                  <tr> 
+                    <td height="1" colspan="2" style="background-image:url(\'nvi/horizontalDottie.gif\');background-repeat:repeat-x;"><img src="nvi/spacer.gif" width="225" height="1"></td>
+                  </tr>
+      			  <tr>
+			        <td colspan="2" align="center" style="padding-bottom:3px;padding-top:3px;">
+						  						<table cellpadding="0" cellspacing="0" border="0">
+                									<tr valign="top"> 
+            	                    					<td nowrap class="resultsBreakdown" style="padding-top:5px;padding-right:10px;">%%NUMITEMS_SHOWING%%</td>
+														%%PAGING%%
+                              						</tr>
+                            					</table>
+					</td>
+			      </tr>
+            <tr> 
+              <td width="1" valign="bottom" style="background-image:url(\'nvi/spacer.gif\');background-repeat:repeat-y;"><img src="nvi/whiteSpacer.gif" width="1" height="35"></td>
+              <td align="center" valign="top" style="padding-top:10px;padding-bottom:10px;">
+			  	<center>%%ALBUM_SPIT%%</center>
+			  </td>
+            </tr>
+                  <tr> 
+                    <td height="1" colspan="2" style="background-image:url(\'nvi/horizontalDottie.gif\');background-repeat:repeat-x;"><img src="nvi/spacer.gif" width="225" height="1"></td>
+                  </tr>
+      			  <tr>
+			        <td colspan="2"><img src="nvi/spacer.gif" width="1" height="1"></td>
+			      </tr>
+                  <tr> 
+                    <td height="1" colspan="2" style="background-image:url(\'nvi/horizontalDottie.gif\');background-repeat:repeat-x;"><img src="nvi/spacer.gif" width="225" height="1"></td>
+                  </tr>
+      			  <tr>
+			        <td colspan="2"><img src="nvi/spacer.gif" width="1" height="15"></td>
+			      </tr>
+
+          </table>
+
+		
+		</td>
+	</tr>
+	</form>
+</table>
+</center>
+<br><br>
+	
+	';
+	my $thisPage = "showPics";
+	&beginPage;
+
+	
+	my $albumChoice = param('albumChoice');
+	my $browseType = param('browseType');
+	my $selectedUser = param('ui');
+	
+	$FORM{'albumChoice'} = $albumChoice;
+
+	my @files;
+
+	if (!param('albumChoice')) { &error('You Must Choose an Album'); }
+	if ($albumChoice eq "Choose") { &error('You Must Choose an Album'); }
+
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n";
+	$dbh->{RaiseError} = 1;
+
+	$albumNombre = "$FORM{'albumChoice'}";
+
+	my $sth = $dbh->prepare("SELECT AlbumID, Items, AddedOn, Owner, LastUpdated FROM Albums where Title = '$albumNombre'");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$AID = $row[0]; 
+		$Is = $row[1]; 
+		$AO = $row[2];
+		$Owner = $row[3];
+		$LU = $row[4];
+	}
+	$sth->execute or die "Unable to execute query\n";	
+	$sth->finish;
+
+	($mdt1, $mtm1) = split(/ /,$AO);
+	($myr1, $mmt1, $mdy1) = split(/-/,$mdt1);
+	$miMES1 = $months[int($mmt1-1)];
+	$abvMes1 = substr($miMES1, 0, 3);
+	$AOSHORT =  $abvMes1 . " " . $mdy1 . ", " . $myr1;
+
+	($mdt2, $mtm2) = split(/ /,$LU);
+	($myr2, $mmt2, $mdy2) = split(/-/,$mdt2);
+	$miMES2 = $months[int($mmt2-1)];
+	$abvMes2 = substr($miMES2, 0, 3);
+	$LUSHORT =  $abvMes2 . " " . $mdy2 . ", " . $myr2;
+
+	
+	$Owner = int($Owner);
+	$sth = $dbh->prepare("SELECT * FROM vAcctsNew where AccountID = '$Owner';");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$UID = $row[0];
+		$UN = $row[1];
+		$FN = $row[2];
+		$LN = $row[3];
+		$LastPost = $row[5];
+		$GalleryDirectory = $row[30];
+	}
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+
+	@losItems = split(/,/,$Is);
+	
+	## -->  GET PAGE CONTENT
+	foreach $LI (@losItems) {
+		my $sth = $dbh->prepare("SELECT * FROM losPhotos where ImageID = '$LI'");
+		$sth->execute or die "Unable to execute query\n";
+		my @row;
+			while(@row = $sth->fetchrow_array) {
+				$FiNa = $row[2];
+				$estaF = "$parentDirectory" . "/" . "$GalleryDirectory" . "/" . "$FiNa";
+				if (-e $estaF) {
+					push(@files,"$FiNa");
+				}
+			}
+		$sth->execute or die "Unable to execute query\n";
+		$sth->finish;
+	}
+	$dbh->disconnect;
+
+	@files = sort { $b <=> $a } @files;
+	my $total = scalar(@files);
+	my $showPic = param('startPic');
+	if ($showPic<0) {$showPic=0;}
+		
+	my $startPic = $showPic;
+	my $quantity = param('aop');
+	my $endPic = $showPic + $quantity;	
+	my $prevPage = $showPic - $quantity;
+	my $nextPage = $endPic;
+	my $showDirName = $albumChoice;
+	$showDirName =~ s/_/ /g;
+
+
+	if ($total eq "1"){ $cualTword = "Photo"; }
+	else { $cualTword = "Photos"; }
+
+	$BreadC = "<div class=\"breadCrumb\"><a href=\"/FotoBlog.htm\" style=\"color:#000000\">FotoBlog Home</a> &gt; <a href=\"/FotoBlog.htm?browseType=1&albumChoice=random&PN=&que=showPics&startPic=0&aop=10\" style=\"color:#000000\" title=\"Album Browser [ random selection ]\">Browser</a> &gt; %%BREADCRUMBO%% &gt;</font>";
+	$numShowing = '<b>' . $total . '</b> ' . $cualTword . ' ( Showing <b>' . $startPic . '-' . $endPic . '</b> )';
+	if ($total > $quantity) {
+		$paging = "<td background=\"nvi/verticalDottie.gif\"><img src=\"nvi/spacer.gif\" border=\"0\" width=\"1\" height=\"20\"></td><td class=\"resultsBreakdown\" style=\"padding-top:5px;padding-left:10px;\">%%NUMPAGES%%</td>";
+	}
+	## $browseSlide = '<b>browse</b> | <a href="javascript:runSlideShow();" style="color:#337701;" title="Click to view this album as a SlideShow...">slideshow</a>';
+	$PageContent =~ s/%%BREADCRUMB%%/$BreadC/gi;
+	$PageContent =~ s/%%ALBUM_NAME%%/$showDirName/gi;
+	$PageContent =~ s/%%NUMITEMS_SHOWING%%/$numShowing/gi;
+	$PageContent =~ s/%%PAGING%%/$paging/gi;
+	$PageContent =~ s/%%BROWSE_SLIDESHOW%%/$browseSlide/gi;
+	$PageContent =~ s/%%CREATED%%/$AOSHORT/gi;
+	$PageContent =~ s/%%LAST_UPDATED%%/$LUSHORT/gi;
+	
+	
+#		if ($CSen eq "SI") { 
+			$myManage = "<a href=\"/FotoBlogManage.htm\" class=\"FotoMMLinksA\">manage</a>";
+			$PageContent =~ s/%%CUALUMANAGE%%/$myManage/gi; 
+#		}
+#		else { 
+#			$myManage = "<font class=\"FotoMMLinksA\" style=\"cursor:pointer;\" title=\"You must login to access this area.\">manage</font>";
+#			$PageContent =~ s/%%CUALUMANAGE%%/$myManage/gi; 
+#		}
+		$myShare = "<a href=\"/#\" class=\"FotoMMLinksA\" title=\"Share photography with your friends, family and colleagues quickly, easily and absolutely FREE!\">share</a>";
+		$PageContent =~ s/%%CUALUSHARE%%/$myShare/gi;	
+	
+
+	
+	if ($total ne "0") { 
+
+		my $thing;
+		$countTwos = 0;
+		foreach $thing (@files) {
+			if ($showPic < $endPic){
+				my $item = $files[$showPic];
+
+				my $itemPathname;
+
+				$itemPathname = "$parentDirectory" . "/" . "$GalleryDirectory" . "/" . "$item";
+
+				$showPic++;
+				if (-e $itemPathname) {
+				 	if (-d $itemPathname) {next;}
+					my $tempstring = $item;	# get name of file
+					my @DateDisplExt = split(/\./,$tempstring);
+					my $recordDate = $DateDisplExt[0];
+					my $display = $DateDisplExt[1];
+					$display =~ s/_/ /g;
+
+					use DBI;
+					my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+					$dbh->{RaiseError} = 1; 
+					$sth = $dbh->prepare("SELECT * FROM losPhotos where FileName='$item';");
+					$sth->execute or die "Unable to execute query\n";
+					my @row;
+					while(@row = $sth->fetchrow_array) { 
+						$MPID = int($row[0]);
+						$ImageType = $row[1];
+						$FileName = $row[2];
+						$Width = $row[3];
+						$Height = $row[4];
+						$ArtComment = $row[5];
+						$UserComment = $row[6];
+						$Equipment = $row[7];
+						$Rating = $row[8];
+						$RateSheet = $row[9];
+						$AddedOn = $row[10];
+						$Owner = $row[11];
+						$Keywords = $row[12];
+						$Views = $row[13];
+						$Private = $row[14];
+						$Albums = $row[15];
+						$Galleries = $row[16];
+						$Sets = $row[17];
+					}
+					$sth->execute or die "Unable to execute query\n";
+					$sth->finish;
+					$dbh->disconnect;
+
+					@losUC = split(/,/,$UserComment);
+					$countUC = scalar(@losUC);
+
+					$jpg = '.jpg';
+					$jpeg = '.jpeg';
+					$png = '.png';
+					$FileNameClean = substr($FileName, 9);
+					$FileNameClean =~ s/$jpg//gi;
+					$FileNameClean =~ s/$jpeg//gi;
+					$FileNameClean =~ s//$png/gi;
+					$FileNameClean =~ s/_/ /gi;
+					$FileNameClean =~ s/`/'/gi;
+
+					if ($Keywords =~ ",") { @splitKEYS = split(/,/,$Keywords); }
+					elsif (int($Keywords) > 0) { $splitKEYS[0] = $Keywords; }
+					$todosKeys = join(', ',@splitKEYS);
+
+					($mdt, $mtm) = split(/ /,$AddedOn);
+					($myr, $mmt, $mdy) = split(/-/,$mdt);
+					$miMES = $months[int($mmt-1)];
+					$abvMes = substr($miMES, 0, 3);
+					$AddedOnSHORT =  $abvMes . " " . $mdy . ", " . $myr;
+					
+					$countTwos++;
+					if ($countTwos eq "2") { $countTwos = 0; $CTs = '<td valign="top" align="center" class="resultsBreakdown" style="color:#000000;">'; $CTe = '</td></tr>'; } 
+					else { $CTs = '<tr><td valign="top" align="center" class="resultsBreakdown" style="color:#000000;">'; $CTe = '</td>'; }
+
+					$ATitC = $albumNombre;
+					$ATitC =~ s/_/ /gi;
+					$ATitC =~ s/`/'/gi;
+
+					$AID = int($AID);
+					push(@allPs,$CTs . "<div><em>uploaded</em><br><b>$AddedOnSHORT</b><br>$countUC blogs | <a href=\"javascript:parent.FROMalbumManage=1;parent.currPhoto='$MPID';parent.detachFromAlbum('$AID')\" style=\"color:#337701;\" title=\"Detach from album: $ATitC\">detach</a></div><a href=\"?PN=$MPID&que=SSP&cffbai=1\" title=\"Click to edit this photograph :: $FileNameClean\"><img src=\"$parentURL/$GalleryDirectory/$item\" style=\"margin:5px;border:#000000 1px solid;\" width=\"105\" align=\"top\"></a>$CTe");
+					push(@allLargePs,"$item");
+				}
+			}
+			else { last; }
+		}
+	}
+
+	if ($total eq "0") {
+		## print "Sorry, no photos have been posted here yet!!";
+	}
+
+	foreach $APS (@allPs) {
+		$allAPS =  $allAPS . $APS;
+	}
+
+	$allAPS = "<table>" . $allAPS . "</table>";
+	
+	
+
+	
+	
+	
+	
+	$PageContent =~ s/%%ALBUM_SPIT%%/$allAPS/gi;
+	$PageContent =~ s/%%LARGE_PHOTO%%/$thePhotoCall/gi;
+	$PageContent =~ s/%%EQUIPMENT%%/$Equipment/gi;
+	$PageContent =~ s/%%ART_COMMENTS%%/$ArtComment/gi;
+	$PageContent =~ s/%%RATING%%/$rateImage/gi;
+	$PageContent =~ s/%%USER_COMMENTS%%/$theUCs/gi;
+	$PageContent =~ s/%%ALBUM_OWNER%%/$aName/gi;
+	$PageContent =~ s/%%IMAGE_TITLE%%/$FileNameClean/gi;
+	$PageContent =~ s/%%INALBUMS%%/$todosAlbums/gi;
+	$PageContent =~ s/%%KEYWORDS%%/$todosKeys/gi;
+	$PageContent =~ s/%%BREADCRUMBO%%/$aNameBC/gi;
+	$PageContent =~ s/%%OWNERINFO%%/$miPile/gi;
+	$PageContent =~ s/%%ADDEDON%%/$AddedOnSHORT/gi;
+	$PageContent =~ s/%%ELUID%%/$Owner/gi;
+	$PageContent =~ s/%%ELACHOICE%%/$albumChoice/gi;
+	$PageContent =~ s/%%ELPID%%/$PID/gi;
+	
+
+	
+	
+	my $whatNow = "showPics";
+	my $tempcount = "0";
+	if ($startPic ne "0"){			
+		$tempcount++; 
+		$myPrev = "<a href=\"?que=$whatNow&albumChoice=$albumChoice&aop=$quantity&startPic=$prevPage\" style=\"color:#337701;\">&lt; Prev</a>";
+	}
+
+	if (($endPic < $total) && ($total ne "0")){		
+		$tempcount++; 
+		$myNext = "<a href=\"?que=$whatNow&albumChoice=$albumChoice&aop=$quantity&startPic=$nextPage\" style=\"color:#337701;\">Next &gt;</a>";
+	}
+
+	$PageContent =~ s/%%NUMPAGES%%/$myPrev $myNext/gi;
+
+	
+	print "
+	<script>
+		parent.cualAlbum = '$albumChoice';
+		parent.PID = '$PID';
+		parent.loggedIn = '$CSen';
+	</script>";
+}
+	&endPage($thisPage);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################
+# Here we take the input from the delete form (part of the
+# showPics routine) to delete the file specified.
+##################################################################
+sub SSP {
+### ONLY IF COMING FROM fbai.htm
+if ($CF eq "fbai") {
+	#my $thisPage = "showPics";
+	#&beginPage;
+	
+	my $PN = param('PN');
+	$PN = int($PN);
+	
+		use DBI;
+		my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+		$dbh->{RaiseError} = 1; 
+
+		$sth = $dbh->prepare("SELECT * FROM losPhotos where ImageID = '$PN';");
+		$sth->execute or die "Unable to execute query\n"; 
+			my @row;
+			while(@row = $sth->fetchrow_array) { 
+				$ImageType = $row[1];
+				$FileName = $row[2];
+				$Width = $row[3];
+				$Height = $row[4];
+				$ArtComment = $row[5];
+				$UserComment = $row[6];
+				$Equipment = $row[7];
+				$Rating = $row[8];
+				$RateSheet = $row[9];
+				$AddedOn = $row[10];
+				$Owner = $row[11];
+				$Keywords = $row[12];
+				$Views = $row[13];
+				$Private = $row[14];
+				$Albums = $row[15];
+				$Galleries = $row[16];
+				$Sets = $row[17];
+				$PCount++;
+			}
+		$sth->execute or die "Unable to execute query\n"; 
+		$sth->finish;	
+
+		
+		if (param('cffbai')) {
+			$myCancelAction = "javascript:history.go(-1);";
+		}
+		else {
+			$myCancelAction = "parent.location.href = 'FotoBlogManage.htm';";
+		}
+
+		
+$PageContent = "
+
+
+<style>
+body { overflow-x:hidden; overflow-y:auto; scrollbar-face-color:#CCCCCC; scrollbar-highlight-color:#000000; scrollbar-shadow-color:#CCCCCC; scrollbar-3dlight-color: #000000; scrollbar-arrow-color:#000000; scrollbar-track-color:#000000; scrollbar-darkshadow-color:#000000; }
+#overDiv,#divLinks,#divArrows, #bground, #divLoad, #divCont, #divIEText { position:relative;left:0px;top:-520px; z-index:100; visibility:hidden; width:1px; height:1px; overflow:hidden; }
+.formInput { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:20px; background-color:#101E06;color:#F7F7F7; padding: 3px; font-weight:normal; }
+.formTA { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:60px; background-color:#101E06; color:#F7F7F7; padding: 3px; font-weight:normal; }
+.formSelect { font-size: 10px; font-family:verdana,arial,helvetica; border: #626062 1px solid; height:20px; background-color:#101E06; color:#F7F7F7; padding: 3px; font-weight:normal; }
+</style>
+<link rel=\"stylesheet\" href=\"commonStyles.css\" type=\"text/css\">
+<script language=\"Javascript\" src=\"js/b4dom.js\"></script>
+<script language=\"Javascript\">
+// IMAGE PRELOADER
+check0 = new Image();
+check0.src = \"nvi/brochureCheckbox0.gif\";
+check1 = new Image();
+check1.src = \"nvi/brochureCheckbox1.gif\";
+
+
+function toggleCheckbox(incoming) {
+
+	var leNombre = incoming;
+	var elOtro = \"\";
+	
+	if (leNombre == \"NV\") { 
+		elOtro = \"Day\";
+	}
+	else { 
+		elOtro = \"NV\"; 
+	}
+
+	var muaField = document.editPhoto[leNombre];
+	var otroField = document.editPhoto[elOtro];
+	
+	if (muaField.checked == false) {
+		//for innerHTML remake
+		muaField.checked = 1;
+		document.images[leNombre].src = check1.src;
+		otroField.checked = 0;
+		document.images[elOtro].src = check0.src;
+	}
+	else {
+		//for innerHTML remake
+		muaField.checked = 0;
+		document.images[leNombre].src = check0.src;
+		otroField.checked = 1;
+		document.images[elOtro].src = check1.src;
+	}
+}
+
+
+function vUp() {
+	var md = \"\";
+	var tf = \"\";
+
+	cleanItUp();
+	
+	var elTitulo2 = document.editPhoto.PhotoTitle.value;
+	var susComentos2 = document.editPhoto.ArtComment.value;
+	var equipo2 = document.editPhoto.Equipment.value;
+	var Keywords2 = document.editPhoto.Keywords.value;
+
+	if (elTitulo2 == \"\" || elTitulo2 == \" \" || elTitulo2.length <= 0) {
+    	md += \"\\n     - Title is missing [a-z 0-9 (-) dash allowed]\";
+		if (tf == \"\") { tf = \"PhotoTitle\"; }
+	}else if (elTitulo2.length <= 10) {
+   		md += \"\\n     - Title should be at least 10 characters in length\";
+		if (tf == \"\") { tf = \"PhotoTitle\"; }
+	}	
+
+	if (Keywords2 == \"\" || Keywords2 == \" \" || Keywords2.length <= 0) {
+    	md += \"\\n     - Type at least one keyword [a-z 0-9 (, -) comma & dash allowed]\";
+		if (tf == \"\") { tf = \"Keywords\"; }
+	}else if (Keywords2.length <= 3) {
+   		md += \"\\n     - A keyword should be at least 3 characters in length\";
+		if (tf == \"\") { tf = \"Keywords\"; }
+	}	
+
+
+  
+
+	if (md != \"\") {
+    	md =\"___________________________________________                   \\n\\n\" + \"  Sorry, I cannot process your request because the\\n  following fields are either blank or filled incorrectly:\\n\" + \"___________________________________________                   \\n\\n\" +
+	    md + \"\\n\\n___________________________________________                   \" + \"\\n\\n   To continue, check fields and submit form again!\" + \"\\n___________________________________________\";
+    	alert(md);
+		if (tf != '') { 
+			document.editPhoto[tf].focus();
+		}
+    	return false;
+	} 
+	else {
+		return true;
+	}
+}
+
+function cleanItUp() {
+	var eT = document.editPhoto.PhotoTitle.value;
+	var eQ = document.editPhoto.Equipment.value;
+	var sC = document.editPhoto.ArtComment.value;
+	var Ks = document.editPhoto.Keywords.value;
+	eT = eT.replace(/\@/gi, \"\"); eT = eT.replace(/\~/gi, \"\"); eT = eT.replace(/\\\$/gi, \"\"); eT = eT.replace(/_/gi, \"\"); eT = eT.replace(/#/gi, \"\"); eT = eT.replace(/\&/gi, \"\"); eT = eT.replace(/\\^/gi, \"\"); eT = eT.replace(/\=/gi, \"\"); eT = eT.replace(/\\+/gi, \"\"); eT = eT.replace(/\\|/gi, \"\"); eT = eT.replace(/>/gi, \"\"); eT = eT.replace(/</gi, \"\"); eT = eT.replace(/\\n/gi, \"\"); eT = eT.replace(/%/gi, \"\"); eT = eT.replace(/\\*/gi, \"\"); eT = eT.replace(/\\(/gi, \"\"); eT = eT.replace(/\\)/gi, \"\"); eT = eT.replace(/\\[/gi, \"\"); eT = eT.replace(/\\]/gi, \"\"); eT = eT.replace(/}/gi, \"\"); eT = eT.replace(/{/gi, \"\"); eT = eT.replace(/;/gi, \"\"); eT = eT.replace(/:/gi, \"\"); eT = eT.replace(/\\./gi, \"\"); eT = eT.replace(/,/gi, \"\"); eT = eT.replace(/\\?/gi, \"\"); eT = eT.replace(/\\//gi, \"\"); eT = eT.replace(/’/gi, \"\"); eT = eT.replace(/'/gi, \"\"); eT = eT.replace(/\"/gi, \"\"); eT = eT.replace(/`/gi, \"\"); eT = eT.replace(/!/gi, \"\"); eT = eT.replace(/\\\\/gi, \"\"); 
+	document.editPhoto.PhotoTitle.value = eT;
+	eQ = eQ.replace(/\@/gi, \"\"); eQ = eQ.replace(/\~/gi, \"\"); eQ = eQ.replace(/\\\$/gi, \"\"); eQ = eQ.replace(/_/gi, \"\"); eQ = eQ.replace(/#/gi, \"\"); eQ = eQ.replace(/\&/gi, \"\"); eQ = eQ.replace(/\\^/gi, \"\"); eQ = eQ.replace(/\=/gi, \"\"); eQ = eQ.replace(/\\+/gi, \"\"); eQ = eQ.replace(/\\|/gi, \"\"); eQ = eQ.replace(/>/gi, \"\"); eQ = eQ.replace(/</gi, \"\"); eQ = eQ.replace(/%/gi, \"\"); eQ = eQ.replace(/\\*/gi, \"\"); eQ = eQ.replace(/\\(/gi, \"\"); eQ = eQ.replace(/\\)/gi, \"\"); eQ = eQ.replace(/\\[/gi, \"\"); eQ = eQ.replace(/\\]/gi, \"\"); eQ = eQ.replace(/}/gi, \"\"); eQ = eQ.replace(/{/gi, \"\"); eQ = eQ.replace(/;/gi, \"\"); eQ = eQ.replace(/\\//gi, \"\"); eQ = eQ.replace(/’/gi, \"\"); eQ = eQ.replace(/'/gi, \"\"); eQ = eQ.replace(/\"/gi, \"\"); eQ = eQ.replace(/`/gi, \"\"); eQ = eQ.replace(/\\\\/gi, \"\");
+	document.editPhoto.Equipment.value = eQ;
+	sC = sC.replace(/\@/gi, \"\"); sC = sC.replace(/\~/gi, \"\"); sC = sC.replace(/\\\$/gi, \"\"); sC = sC.replace(/_/gi, \"\"); sC = sC.replace(/#/gi, \"\"); sC = sC.replace(/\&/gi, \"\"); sC = sC.replace(/\\^/gi, \"\"); sC = sC.replace(/\=/gi, \"\"); sC = sC.replace(/\\+/gi, \"\"); sC = sC.replace(/\\|/gi, \"\"); sC = sC.replace(/>/gi, \"\"); sC = sC.replace(/</gi, \"\"); sC = sC.replace(/%/gi, \"\"); sC = sC.replace(/\\*/gi, \"\"); sC = sC.replace(/\\(/gi, \"\"); sC = sC.replace(/\\)/gi, \"\"); sC = sC.replace(/\\[/gi, \"\"); sC = sC.replace(/\\]/gi, \"\"); sC = sC.replace(/}/gi, \"\"); sC = sC.replace(/{/gi, \"\"); sC = sC.replace(/;/gi, \"\"); sC = sC.replace(/\\//gi, \"\"); sC = sC.replace(/’/gi, \"\"); sC = sC.replace(/'/gi, \"\"); sC = sC.replace(/\"/gi, \"\"); sC = sC.replace(/`/gi, \"\"); sC = sC.replace(/\\\\/gi, \"\");
+	document.editPhoto.ArtComment.value = sC;
+	Ks = Ks.replace(/\@/gi, \"\"); Ks = Ks.replace(/\~/gi, \"\"); Ks = Ks.replace(/\\\$/gi, \"\"); Ks = Ks.replace(/_/gi, \"\"); Ks = Ks.replace(/#/gi, \"\"); Ks = Ks.replace(/\&/gi, \"\"); Ks = Ks.replace(/\\^/gi, \"\"); Ks = Ks.replace(/\=/gi, \"\"); Ks = Ks.replace(/\\+/gi, \"\"); Ks = Ks.replace(/\\|/gi, \"\"); Ks = Ks.replace(/>/gi, \"\"); Ks = Ks.replace(/</gi, \"\"); Ks = Ks.replace(/\\n/gi, \"\"); Ks = Ks.replace(/%/gi, \"\"); Ks = Ks.replace(/\\*/gi, \"\"); Ks = Ks.replace(/\\(/gi, \"\"); Ks = Ks.replace(/\\)/gi, \"\"); Ks = Ks.replace(/\\[/gi, \"\"); Ks = Ks.replace(/\\]/gi, \"\"); Ks = Ks.replace(/}/gi, \"\"); Ks = Ks.replace(/{/gi, \"\"); Ks = Ks.replace(/;/gi, \"\"); Ks = Ks.replace(/:/gi, \"\"); Ks = Ks.replace(/\\./gi, \"\"); Ks = Ks.replace(/\\?/gi, \"\"); Ks = Ks.replace(/\\//gi, \"\"); Ks = Ks.replace(/’/gi, \"\"); Ks = Ks.replace(/'/gi, \"\"); Ks = Ks.replace(/\"/gi, \"\"); Ks = Ks.replace(/`/gi, \"\"); Ks = Ks.replace(/!/gi, \"\"); Ks = Ks.replace(/\\\\/gi, \"\"); 
+	document.editPhoto.Keywords.value = Ks;
+}
+</script>
+
+<center>$thePhotoCall</center>
+	<table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-image:url('nvi/uploadPhotos_tableBack.gif');background-repeat:repeat-y;\">
+    	<tr>
+        	<td align=\"center\" valign=\"top\" height=\"8\" style=\"height:8px;background-image:url('nvi/uploadPhotos_tableTop.gif');background-repeat:no-repeat;\">
+
+			
+				<table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
+					<tr> 
+						<td align=\"center\" valign=\"bottom\" height=\"30\" class=\"photoTitlesManage\" style=\"padding-bottom:6px;font-size:14px;letter-spacing:0px;font-family:verdana,arial,helevtica\" nowrap><font style=\"font-size:10px;\"><i>EDIT:</i></font> <b>Photo</b></td>
+					</tr>
+					<tr>
+						<td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td>
+					</tr>
+					<tr>
+						<td align=\"center\"><div style=\"width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);\"></div></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+       	<tr> 
+			<form method=\"post\" name=\"editPhoto\" onSubmit=\"return vUp();\">
+			<input type=\"hidden\" name=\"que\" value=\"editPhoto\">
+			<input type=\"hidden\" name=\"PN\" value=\"$PN\">
+        	<td align=\"center\" height=\"20\" valign=\"top\" style=\"padding-bottom:10px;\">
+			<table width=\"222\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
+				<tr><td align=\"center\" valign=\"top\" style=\"padding-top:2px;\">%%LARGE_PHOTO%%</td></tr>
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+
+				<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Photo Title</b> [ <a href=\"javascript:void(0);\" title=\"Maximum 100 characters allowed [ a-z 0-9 ] ( eg: 2nd Infantry Division Soldiers resting in HMWWV )\" style=\"color:#009900;\">what?</a> ]</td></tr>
+				<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><input name=\"PhotoTitle\" maxlength=\"100\" class=\"formInput\" style=\"width:214px;\" value=\"%%IMAGE_TITLE%%\"></td></tr>\n
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+				<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Artistic Commentary</b> [ <a href=\"javascript:void(0);\" title=\"Maximum 150 characters allowed [ a-z 0-9 ! ? . , () * ' newline ]\" style=\"color:#009900;\">what?</a> ]</td></tr>
+				<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><textarea name=\"ArtComment\" maxlength=\"150\" class=\"formTA\" style=\"width:214px;\">%%ART_COMMENTS%%</textarea></td></tr>
+
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+				<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>User Comment Blogs</b></td></tr>
+				<tr><td align=\"center\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap>%%USER_COMMENTS%%</td></tr>
+
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+				<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Current Rating</b></td></tr>
+				<tr><td align=\"center\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap>%%RATING%%</td></tr>
+				
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+				<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Equipment</b> [ <a href=\"javascript:void(0);\" title=\"Type of equipment utilized while this photograph was taken (eq: Sony DCR-CC20 with USNV-14 and O-Ring Adapter ).  Maximum 100 characters allowed [ a-z 0-9 ! ? . , () * ]\" style=\"color:#009900;\">what?</a> ]</td></tr>
+				<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><input name=\"Equipment\" maxlength=\"100\" class=\"formInput\" style=\"width:214px;\" value=\"%%EQUIPMENT%%\"></td></tr>
+	
+
+
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+				<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Indexing Keywords \"TAGS\"</b> [ <a href=\"javascript:void(0);\" title=\"Keywords, or Tags as known in the Blog communities throughout the internet, assist in indexing your photography to internet search engines, websites and makes it easier for users to locate your work. Type as many keywords or keyword phrases as you find necessary seperated by commas [,]. ONLY submit keywords that are truthfully relevant to the photograph your are uploading. Maximum 150 characters allowed [ a-z 0-9 ]\" style=\"color:#009900;\">what?</a> ]</td></tr>
+				<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><textarea name=\"Keywords\" maxlength=\"150\" class=\"formTA\" style=\"width:214px;\">%%KEYWORDS%%</textarea></td></tr>
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+
+			
+				<tr><td align=\"left\" valign=\"top\" style=\"padding-top:10px;padding-bottom:0px;\" nowrap>
+
+					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
+                        <tr align=\"center\">
+                          <td class=\"photoSmallFBM\"><a href=\"javascript:toggleCheckbox('NV');\" style=\"text-decoration:none;color:#F7F7F7;\" tabindex=\"5\" title=\"Select this option if your photograph WAS taken using an NVD (Night Vision Device)\"><b>Night Vision</b></a></td>
+                          <td class=\"photoSmallFBM\"><a href=\"javascript:toggleCheckbox('Day');\" style=\"text-decoration:none;color:#F7F7F7;\" tabindex=\"6\" title=\"Select this option if your photograph WAS NOT taken using an NVD (Night Vision Device)\"><b>Daytime/Other</b></a></td>
+                        </tr>
+                        <tr valign=\"top\">
+                          <td align=\"center\" style=\"padding-top:5px;padding-bottom:2px;\"><a href=\"javascript:toggleCheckbox('NV');\" id=\"NV\" tabindex=\"5\" title=\"Select this option if your photograph WAS taken using an NVD (Night Vision Device)\"><img src=\"nvi/%%NVCHECKBOX%%.gif\" border=\"0\" width=\"10\" height=\"12\" name=\"NV\"></a><input type=\"checkbox\" name=\"NV\" style=\"visibility:hidden;width:1px;height:1px;clip:rect(0px 1px 1px 0px);\" %%NVCHECKED%%></td>
+                          <td align=\"center\" style=\"padding-top:5px;padding-bottom:2px;\"><a href=\"javascript:toggleCheckbox('Day');\" id=\"Day\" tabindex=\"6\" title=\"Select this option if your photograph WAS NOT taken using an NVD (Night Vision Device)\"><img src=\"nvi/%%DAYCHECKBOX%%.gif\" border=\"0\" width=\"10\" height=\"12\" name=\"Day\"></a><input type=\"checkbox\" name=\"Day\" style=\"visibility:hidden;width:1px;height:1px;clip:rect(0px 1px 1px 0px);\" %%DAYCHECKED%%></td>
+                        </tr>
+					</table>
+				</td></tr>
+				<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>
+				<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"submit\" value=\"Save Changes\" class=\"Buttons\">&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\"Cancel\" onClick=\"$myCancelAction\" class=\"Buttons\"></td></tr>
+			</table>
+			
+			</td>
+			</form>
+		</tr>
+		<tr>
+        	<td align=\"center\" valign=\"bottom\" height=\"15\"><img src=\"nvi/uploadPhotos_tableBot.gif\" width=\"227\" height=\"15\"></td>
+        </tr>		
+		</table>
+		
+	
+";
+
+
+
+
+
+
+
+	$Owner = int($Owner);
+	$sth = $dbh->prepare("SELECT * FROM vAcctsNew where AccountID = '$Owner';");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$UID = $row[0];
+		$UN = $row[1];
+		$FN = $row[2];
+		$LN = $row[3];
+		$LastPost = $row[5];
+		$GalleryDirectory = $row[30];
+	}
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+	$dbh->disconnect;
+
+
+
+
+	
+	$ArtComment =~ s/'/"/gi;
+	
+	if ($Rating =~ "-----") {
+		@splitRating = split(/-----/,$Rating);
+		$rating = $splitRating[0];
+		$votes = $splitRating[1];
+	}
+	else { $rating = '0'; $votes = '0'; }
+
+	$PID = int($PID);
+	$currentRate = "starRate_blackBG_" . $rating . "star";	
+	$rateImage  = "<table><tr><td style=\"padding-bottom:3px;\" width=\"28\" width=\"69\" align=\"center\"><img src=\"nvi/" . $currentRate . ".gif\" height=\"13\" width=\"64\" border=\"0\" name=\"StarRatesBlack\" id=\"StarRates\" style=\"cursor:pointer;\"></td><td style=\"padding-bottom:3px;color:#ffffff;cursor:arrow;\" class=\"photoSmall\" align=\"center\" title=\"$votes total user votes\" nowrap>&nbsp; [<span title=\"$votes total user votes\">&nbsp;$votes Votes&nbsp;</span>]</td></tr></table>"; 
+
+	if ($UserComment ne "") {
+		if ($UserComment =~ "-----xxxxx-----"){ @allUCs = split(/-----xxxxx-----/,$UserComment); $eplur1 = 'entries'; $eplur2 = 'Entries'; }
+		else { $allUCs[0] = $UserComment; $eplur1 = 'entry'; $eplur2 = 'Entry'; }
+		$CUC = int(@allUCs);
+		$theUCs = "
+			<table>
+				<tr>
+					<td style=\"padding-bottom:3px;color:#FFFFFF\" align=\"center\" class=\"photoSmall\" title=\"$CUC user comment blog $eplur1\" nowrap>$CUC $eplur2</td>
+				</tr>
+				<tr>
+					<td colspan=\"2\" style=\"height:1px;\" align=\"center\"><div id=\"viewComments\"></div></td>
+				</tr>
+			</table>
+		";
+	}
+	else { 
+		$theUCs = "
+			<table>
+				<tr>
+					<td class=\"photoSmall\" style=\"padding-bottom:3px;color:#FFFFFF\" align=\"center\"  nowrap>no entries</td>
+				</tr>
+				<tr>
+					<td colspan=\"2\" style=\"height:1px;\" align=\"center\"><div id=\"viewComments\"></div></td>
+				</tr>
+			</table>"; }
+	
+	$aName = "<a href=\"/Slideshow.htm?galleryChoice=$UID\" title=\"Click to view $UN's Gallery of Albums\" style=\"color:#000000\">$UN</a>";
+	$aNameBC = "<a href=\"/FotoBlog.htm?browseType=2&albumChoice=user&ui=%%ELUID%%&PN=&que=showPics&startPic=0&aop=10\" title=\"" . $UN . "s' Albums [ random selection ]\" style=\"color:#000000\">$UN</a>";
+	
+	$jpg = '.jpg';
+	$jpeg = '.jpeg';
+	$png = '.png';
+	$FileNameClean = substr($FileName, 9);
+	$FileNameClean =~ s/$jpg//gi;
+	$FileNameClean =~ s/$jpeg//gi;
+	$FileNameClean =~ s//$png/gi;
+	$FileNameClean =~ s/_/ /gi;
+	$FileNameClean =~ s/`/'/gi;
+
+	
+	
+	if ($Keywords =~ ", ") { @splitKEYS = split(/, /,$Keywords); }
+	elsif (int($Keywords) > 0) { $splitKEYS[0] = $Keywords; }	
+	$todosKeys = join(', ',@splitKEYS);
+
+	$thePhotoCall = "<img src=\"$parentURL/$GalleryDirectory/$FileName\" width=\"222\">";
+
+	if ($ImageType eq "Day") { 
+		$DayChecked = 'checked'; 
+		$DayCheckbox = 'brochureCheckbox1';
+		$NVChecked = ''; 
+		$NVCheckbox = 'brochureCheckbox0';
+	}
+	else { 
+		$DayChecked = ''; 
+		$DayCheckbox = 'brochureCheckbox0';
+		$NVChecked = 'checked'; 
+		$NVCheckbox = 'brochureCheckbox1';
+	}
+	
+	$PageContent =~ s/%%ALBUM_SPIT%%/$allAPS/gi;
+	$PageContent =~ s/%%LARGE_PHOTO%%/$thePhotoCall/gi;
+	$PageContent =~ s/%%EQUIPMENT%%/$Equipment/gi;
+	$PageContent =~ s/%%ART_COMMENTS%%/$ArtComment/gi;
+	$PageContent =~ s/%%RATING%%/$rateImage/gi;
+	$PageContent =~ s/%%USER_COMMENTS%%/$theUCs/gi;
+	$PageContent =~ s/%%ALBUM_OWNER%%/$aName/gi;
+	$PageContent =~ s/%%IMAGE_TITLE%%/$FileNameClean/gi;
+	$PageContent =~ s/%%INALBUMS%%/$todosAlbums/gi;
+	$PageContent =~ s/%%KEYWORDS%%/$todosKeys/gi;
+	$PageContent =~ s/%%BREADCRUMBO%%/$aNameBC/gi;
+	$PageContent =~ s/%%OWNERINFO%%/$miPile/gi;
+	$PageContent =~ s/%%ADDEDON%%/$AddedOnSHORT/gi;
+	$PageContent =~ s/%%ELUID%%/$Owner/gi;
+	$PageContent =~ s/%%ELACHOICE%%/$albumChoice/gi;
+	$PageContent =~ s/%%ELPID%%/$PID/gi;
+
+	$PageContent =~ s/%%NVCHECKED%%/$NVChecked/gi;
+	$PageContent =~ s/%%DAYCHECKED%%/$DayChecked/gi;
+	$PageContent =~ s/%%NVCHECKBOX%%/$NVCheckbox/gi;
+	$PageContent =~ s/%%DAYCHECKBOX%%/$DayCheckbox/gi;
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+	&endPage($thisPage);
+}
+
+
+
+
+
+
+
+
+sub editPhoto {
+### ONLY IF COMING FROM fbai.htm
+	if ($CF eq "fbai") {
+	
+		my $PN = param('PN');
+		$PN = int($PN);
+	
+		use DBI;
+		my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+		$dbh->{RaiseError} = 1; 
+
+		$sth = $dbh->prepare("SELECT * FROM losPhotos where ImageID = '$PN';");
+		$sth->execute or die "Unable to execute query\n"; 
+			my @row;
+			while(@row = $sth->fetchrow_array) { 
+				$ImageType = $row[1];
+				$FileName = $row[2];
+				$Width = $row[3];
+				$Height = $row[4];
+				$ArtComment = $row[5];
+				$UserComment = $row[6];
+				$Equipment = $row[7];
+				$Rating = $row[8];
+				$RateSheet = $row[9];
+				$AddedOn = $row[10];
+				$Owner = $row[11];
+				$Keywords = $row[12];
+				$Views = $row[13];
+				$Private = $row[14];
+				$Albums = $row[15];
+				$Galleries = $row[16];
+				$Sets = $row[17];
+				$PCount++;
+			}
+		$sth->execute or die "Unable to execute query\n"; 
+		$sth->finish;	
+		$dbh->disconnect;
+
+		$jpg = '.jpg';
+		$jpeg = '.jpeg';
+		$png = '.png';
+		$FileNameClean = substr($FileName, 9);
+		$FileNameClean =~ s/$jpg//gi;
+		$FileNameClean =~ s/$jpeg//gi;
+		$FileNameClean =~ s//$png/gi;
+		$FileNameClean =~ s/_/ /gi;
+		
+		
+		my $thisPage = "postPics";
+
+		my $fileDecription = param('PhotoTitle');
+		if ($fileDecription eq '') {
+			print "<center><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-image:url('nvi/uploadPhotos_tableBack.gif');background-repeat:repeat-y;\"><tr><td align=\"center\" valign=\"top\" height=\"8\" style=\"height:8px;background-image:url('nvi/uploadPhotos_tableTop.gif');background-repeat:no-repeat;\"><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr><td align=\"center\" valign=\"bottom\" height=\"30\" class=\"photoTitlesManage\" style=\"padding-bottom:6px;font-size:14px;letter-spacing:0px;font-family:verdana,arial,helevtica\" nowrap><font style=\"font-size:10px;\"><i>EDIT:</i></font> <b>Photo</b></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);\"></div></td></tr></table></td></tr><tr><td align=\"center\" height=\"20\" valign=\"top\" style=\"padding-bottom:10px;padding-top:10px;\"><table width=\"222\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Photo Title is Missing</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\">Photography must have a Title, yours was blank.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+			print "</table></td></tr><tr><td align=\"center\" valign=\"bottom\" height=\"15\"><img src=\"nvi/uploadPhotos_tableBot.gif\" width=\"227\" height=\"15\"></td></tr></table></center>";
+		}
+		
+		##-- title changed
+		if ($fileDecription ne $FileNameClean) { $changedTitle = 1; }
+
+		my $albumChoice = param('albumChoice');	
+
+		$leQUOT = "\&quot;";
+
+		## clean up input, NO HTML / SCRIPT
+		use HTML::Strip;
+
+		my $ArtComment = param('ArtComment');
+		my $hs = HTML::Strip->new();
+		my $clean_text1 = $hs->parse( $ArtComment );
+		$hs->eof;
+		$ArtComment = $clean_text1;
+		$ArtComment =~ s/\@//gi;
+		$ArtComment =~ s/~//gi;
+		$ArtComment =~ s/\$//gi;
+		$ArtComment =~ s/\#//gi;
+		$ArtComment =~ s/\&//gi;
+		$ArtComment =~ s/^//gi;
+		$ArtComment =~ s/=//gi;
+		$ArtComment =~ s/\+//gi;
+		$ArtComment =~ s/|//gi;					
+		$ArtComment =~ s/<//gi;
+		$ArtComment =~ s/>//gi;
+		$ArtComment =~ s/'/’/gi;
+		$ArtComment =~ s/%%br%%/\n/gi;
+		$ArtComment =~ s/"/$leQUOT/gi;
+
+		my $Equipment = param('Equipment');
+		my $hs = HTML::Strip->new();
+		my $clean_text2 = $hs->parse( $Equipment );
+		$hs->eof;
+		$Equipment = $clean_text2;
+		$Equipment =~ s/\@//gi;
+		$Equipment =~ s/~//gi;
+		$Equipment =~ s/\$//gi;
+		$Equipment =~ s/\#//gi;
+		$Equipment =~ s/\&//gi;
+		$Equipment =~ s/^//gi;
+		$Equipment =~ s/=//gi;
+		$Equipment =~ s/\+//gi;
+		$Equipment =~ s/|//gi;					
+		$Equipment =~ s/<//gi;
+		$Equipment =~ s/>//gi;
+		$Equipment =~ s/'/’/gi;
+		$Equipment =~ s/%%br%%/\n/gi;
+		$Equipment =~ s/"/$leQUOT/gi;
+		$Equipment =~ s/  / /gi;
+
+		my $Keywords = param('Keywords');
+		my $hs = HTML::Strip->new();
+		my $clean_text3 = $hs->parse( $Keywords );
+		$hs->eof;
+		$Keywords = $clean_text3;
+		$Keywords =~ s/\@//gi;
+		$Keywords =~ s/~//gi;
+		$Keywords =~ s/\$//gi;
+		$Keywords =~ s/\#//gi;
+		$Keywords =~ s/\&//gi;
+		$Keywords =~ s/^//gi;
+		$Keywords =~ s/=//gi;
+		$Keywords =~ s/\+//gi;
+		$Keywords =~ s/|//gi;					
+		$Keywords =~ s/<//gi;
+		$Keywords =~ s/>//gi;
+		$Keywords =~ s/'/’/gi;
+		$Keywords =~ s/%%br%%/\n/gi;
+		$Keywords =~ s/"/$leQUOT/gi;
+		$Keywords =~ s/  / /gi;
+		
+		my $NV = param('NV');
+		my $Day = param('Day');
+		
+		if ($FileName =~ "jpg") { $fileExtension = 'jpg'; }
+		elsif ($FileName =~ "jpeg") { $fileExtension = 'jpeg'; }
+		elsif ($FileName =~ "png") { $fileExtension = 'png'; }
+		
+		my $newFileName = $fileDecription;
+		$newFileName =~ s/^\s+//g; ### remove leading spaces
+		$newFileName =~ s/\s+$//g; ### remove trailing spaces
+		$newFileName =~ s/..\//_/g;  
+		$newFileName =~ s/ /_/g;  
+		$newFileName =~ s/\//_/g;    
+		$newFileName =~ s/\"//g;
+		$newFileName =~ s/'//g;
+		$newFileName =~ s/\./_/g;
+		$newFileName =~ s/,/_/g;
+		$newFileName =~ s/:/_/g;
+		$newFileName =~ s/\;/_/g;
+		$newFileName =~ s/!/_/g;
+		$newFileName =~ s/\@/_/g;
+		$newFileName =~ s/\-/_/g;
+		$newFileName =~ s/\+/_/g;
+		$newFileName =~ s/\[/_/g;
+		$newFileName =~ s/\]/_/g;
+		$newFileName =~ s/\{/_/g;
+		$newFileName =~ s/\}/_/g;
+		$newFileName =~ s/\|/_/g;
+		$newFileName =~ s/\?/_/g;
+		$newFileName =~ s/</_/g;
+		$newFileName =~ s/>/_/g;
+		
+		if ($usedAsAdultGallery = "no") {
+			my $badword;
+			foreach $badword(@badwords) {
+				$newFileName =~ s/$badword//gi;
+			}
+		}
+		my $i;
+		for ($i=0, $i<10, $i++) {
+			$newFileName =~ s/__/_/g; 
+		}
+		$newFileName =~ s/^_//g;
+		$newFileName =~ s/_$//g;
+		my $localFileName = join (".", $date, $newFileName, $fileExtension);
+		my $testFileName = join (".", $newFileName, $fileExtension);
+		$EP = "0";
+
+		use DBI;
+		my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n";
+		$dbh->{RaiseError} = 1;
+
+		##-- check to see if this filename already exists for this owner: may not live in any album but exists
+		my $sth = $dbh->prepare("SELECT ImageID FROM losPhotos where FileName LIKE '%$testFileName' AND Owner = '$CSin'");
+		$sth->execute or die "Unable to execute query\n";
+		my @row;
+		while(@row = $sth->fetchrow_array) {
+			$EP = $row[0];
+			$EP = int($EP);
+		}
+		$sth->finish;
+		$dbh->disconnect;
+
+		## print "$testFileName<br>";
+		
+		##-- this filename already exists for this owner: may not live in any album but exists
+		if ($EP ne "0" && $changedTitle eq "1") { 
+			print "<center><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-image:url('nvi/uploadPhotos_tableBack.gif');background-repeat:repeat-y;\"><tr><td align=\"center\" valign=\"top\" height=\"8\" style=\"height:8px;background-image:url('nvi/uploadPhotos_tableTop.gif');background-repeat:no-repeat;\"><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr><td align=\"center\" valign=\"bottom\" height=\"30\" class=\"photoTitlesManage\" style=\"padding-bottom:6px;font-size:14px;letter-spacing:0px;font-family:verdana,arial,helevtica\" nowrap><font style=\"font-size:10px;\"><i>EDIT:</i></font> <b>Photo</b></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);\"></div></td></tr></table></td></tr><tr><td align=\"center\" height=\"20\" valign=\"top\" style=\"padding-bottom:10px;padding-top:10px;\"><table width=\"222\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Will Not Overwrite<font style=\"color:#BF0000;\"><br>$displayName</font></b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\">A photograph with the same filename already exists within one or more of your albums. Every photo within your gallery must have a unique name. Please try a slightly different name.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+			print "</table></td></tr><tr><td align=\"center\" valign=\"bottom\" height=\"15\"><img src=\"nvi/uploadPhotos_tableBot.gif\" width=\"227\" height=\"15\"></td></tr></table></center>";
+		}
+		##-- filename doesnt exist and filename is not blank
+		elsif ($newFileName ne ""){
+
+			$OLDfileTotalPath = "$parentDirectory/$aGalleryDir/$FileName";
+			$OLDthumbDName = "$parentDirectory/$aGalleryDir/thumb/$FileName";
+			$OLDoriginalDName = "$parentDirectory/$aGalleryDir/original/$FileName";
+			##-- only if it actual exists by this point do we update the DB
+			if (-e $OLDfileTotalPath) {
+
+
+				use DBI;
+				my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n";
+				$dbh->{RaiseError} = 1;
+
+				if ($Day eq "on") { $Tipo = 'Day'; }
+				else { $Tipo = 'NV'; }
+
+				##-- only update if new title
+				if ($changedTitle eq "1") {
+					$fileTotalNewPath = "$parentDirectory/$aGalleryDir/$localFileName";
+					$thumbDName = "$parentDirectory/$aGalleryDir/thumb/$localFileName";
+					$originalDName = "$parentDirectory/$aGalleryDir/original/$localFileName";
+
+					##-- copy the old files to new filenames
+					select(STDOUT); $| = 1;
+					$commandline = "cp $OLDfileTotalPath $fileTotalNewPath";
+					system($commandline);
+					select(STDOUT); $| = 1;
+					$commandline = "cp $OLDthumbDName $thumbDName";
+					system($commandline);
+					select(STDOUT); $| = 1;
+					$commandline = "cp $OLDoriginalDName $originalDName";
+					system($commandline);
+
+					select(STDOUT); $| = 1;
+					$commandline = "rm $OLDfileTotalPath";
+					system($commandline);
+					select(STDOUT); $| = 1;
+					$commandline = "rm $OLDthumbDName";
+					system($commandline);
+					select(STDOUT); $| = 1;
+					$commandline = "rm $OLDoriginalDName";
+					system($commandline);
+
+					
+
+					my $sth = $dbh->prepare("UPDATE LOW_PRIORITY losPhotos 
+											 SET Type='$Tipo',
+											 FileName='$localFileName',
+											 ArtComment='$ArtComment',
+											 Equipment='$Equipment',
+											 Keywords='$Keywords'
+											 WHERE ImageID = '$PN'");
+					$sth->execute or die "Unable to execute query\n"; 
+					$sth->finish;
+
+
+					## print "saved new<br>";
+				}
+				##-- only update params, not filename
+				else {
+					my $sth = $dbh->prepare("UPDATE LOW_PRIORITY losPhotos 
+											 SET Type='$Tipo',
+											 ArtComment='$ArtComment',
+											 Equipment='$Equipment',
+											 Keywords='$Keywords'
+											 WHERE ImageID = '$PN'");
+					$sth->execute or die "Unable to execute query\n"; 
+					$sth->finish;
+				}
+
+
+				
+
+
+
+				$dbh->disconnect;
+			}
+
+			my $displayPhoto = $newFileName;
+			$displayPhoto =~ s/_/ /g;
+			my $displayAlbum = $albumChoice;
+			$displayAlbum =~ s/_/ /g;
+
+			print "<center><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-image:url('nvi/uploadPhotos_tableBack.gif');background-repeat:repeat-y;\"><tr><td align=\"center\" valign=\"top\" height=\"8\" style=\"height:8px;background-image:url('nvi/uploadPhotos_tableTop.gif');background-repeat:no-repeat;\"><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr><td align=\"center\" valign=\"bottom\" height=\"30\" class=\"photoTitlesManage\" style=\"padding-bottom:6px;font-size:14px;letter-spacing:0px;font-family:verdana,arial,helevtica\" nowrap><font style=\"font-size:10px;\"><i>EDIT:</i></font> <b>Photo</b></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);\"></div></td></tr></table></td></tr><tr><td align=\"center\" height=\"20\" valign=\"top\" style=\"padding-bottom:10px;padding-top:10px;\"><table width=\"222\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Photograph Updated Successfully</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\"><b>$displayPhoto</b> changes are live and visible to all users.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Back to Manage Main\" onClick=\"parent.location.href = 'FotoBlogManage.htm';\" class=\"Buttons\"></td></tr>\n";
+			print "</table></td></tr><tr><td align=\"center\" valign=\"bottom\" height=\"15\"><img src=\"nvi/uploadPhotos_tableBot.gif\" width=\"227\" height=\"15\"></td></tr></table></center>";
+
+		}
+		else { 
+			print "<center><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"background-image:url('nvi/uploadPhotos_tableBack.gif');background-repeat:repeat-y;\"><tr><td align=\"center\" valign=\"top\" height=\"8\" style=\"height:8px;background-image:url('nvi/uploadPhotos_tableTop.gif');background-repeat:no-repeat;\"><table width=\"227\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr><td align=\"center\" valign=\"bottom\" height=\"30\" class=\"photoTitlesManage\" style=\"padding-bottom:6px;font-size:14px;letter-spacing:0px;font-family:verdana,arial,helevtica\" nowrap><font style=\"font-size:10px;\"><i>EDIT:</i></font> <b>Photo</b></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"width:1px;height:1px;overflow:hidden;clip:rect(0px 1px 1px 0px);\"></div></td></tr></table></td></tr><tr><td align=\"center\" height=\"20\" valign=\"top\" style=\"padding-bottom:10px;padding-top:10px;\"><table width=\"222\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Bad Photograph Title</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\">A photograph title must be submitted to continue.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+			print "</table></td></tr><tr><td align=\"center\" valign=\"bottom\" height=\"15\"><img src=\"nvi/uploadPhotos_tableBot.gif\" width=\"227\" height=\"15\"></td></tr></table></center>";
+		}
+	}
+
+
+	&endPage('$thisPage');
+}
+
+
+
+
+
+##################################################################
+# Heres the form that lets the user post files to the albums.
+# It lists the existing albums and if required, gets the password
+# from the user to allow posting.
+##################################################################
+sub postForm {
+	### ONLY IF COMING FROM fbup.htm
+	if ($CF eq "fbup") {
+		my $thisPage = "postForm";
+		my @albums = &getAlbums;				
+		my $numberOfAlbums = scalar(@albums);
+
+		if (param('album')) {
+			@albums = "";
+			$albums[0] = param('album');
+		}
+
+			##-- print start_form(-enctype=>'multipart/form-data');
+			my $localSize = $maximumFileSize;
+	    	$localSize = $localSize/1000;
+
+
+
+		if ($numberOfAlbums gt "0") {
+				print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:2px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Album Association</b> [ <a href=\"javascript:void(0);\" title=\"Select the default album you would like this photograph to be appended unto. If you need to append this photo to more than one album you will be able to do so after you have successfully uploaded this photo.\" style=\"color:#009900;\">what?</a> ]</td></tr>";
+				print "\n<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><select name=\"albumChoice\" class=\"formSelect\">\n";
+				my $tempcount = 0;
+				## print "<option value=\"Choose\">Choose an Album</option>\n";
+				my $albumName;
+				foreach $albumName(@albums){
+					my $display = $albumName;
+					$display =~ s/_/ /g;
+					print "<option value=\"$albumName\">$display</option>\n";
+					$tempcount++; 
+				}
+				print "</select></td></tr>\n\n"; 
+		}
+		else {
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:2px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Add An Album</b> [ <a href=\"javascript:void(0);\" title=\"You haven't yet created an album to place the photograph you are attempting to upload, do so now. Unlike the 'Photo Title' field, an Album Name doesn't need to be too specific, a general description of all photos it will contain will do fine. Maximum 50 characters allowed [ a-z 0-9 ] ( eg: US Army 2nd Infantry in Iraq )\" style=\"color:#BF0000;\">what?</a> ]</td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><input name=\"userAlbum\" maxlength=\"50\" class=\"formInput\" style=\"width:214px;background-color:#2F0000;\"></td></tr>\n";
+		}
+
+
+
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Select Photograph</b> [ <a href=\"javascript:void(0);\" title=\"Select a photograph file [ .jpg .jpeg .png ] from your computer to upload unto your gallery. Maximum filesize allowed is $maximumFileSize bytes. Don't worry about file names of your photos, we rename every file you upload systematically.\" style=\"color:#009900;\">what?</a> ]</td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><input type=\"file\" name=\"fileName\" maxlength=\"100\" class=\"formInput\" style=\"width:214px;\"></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Photo Title</b> [ <a href=\"javascript:void(0);\" title=\"Type a descriptive title for this photograph, maximum 100 characters allowed [ a-z 0-9 ] ( eg: 2nd Infantry Division Soldiers resting in HMWWV )\" style=\"color:#009900;\">what?</a> ]</td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><input name=\"PhotoTitle\" maxlength=\"100\" class=\"formInput\" style=\"width:214px;\"></td></tr>\n";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Artistic Commentary</b> [ <a href=\"javascript:void(0);\" title=\"Take the time to give a perspective comment on your photograph to give the user and insight of what was happening when the photograph was taken. Maximum 150 characters allowed [ a-z 0-9 ! ? . , () * ' newline ]\" style=\"color:#009900;\">what?</a> ]</td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><textarea name=\"ArtComment\" maxlength=\"150\" class=\"formTA\" style=\"width:214px;\"></textarea></td></tr>\n";
+
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Equipment</b> [ <a href=\"javascript:void(0);\" title=\"Type of equipment utilized while this photograph was taken (eq: Sony DCR-CC20 with USNV-14 and O-Ring Adapter ).  Maximum 100 characters allowed [ a-z 0-9 ! ? . , () * ]\" style=\"color:#009900;\">what?</a> ]</td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><input name=\"Equipment\" maxlength=\"100\" class=\"formInput\" style=\"width:214px;\"></td></tr>\n";
+
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>Indexing Keywords \"TAGS\"</b> [ <a href=\"javascript:void(0);\" title=\"Keywords, or Tags as known in the Blog communities throughout the internet, assist in indexing your photography to internet search engines, websites and makes it easier for users to locate your work. Type as many keywords or keyword phrases as you find necessary seperated by commas [,]. ONLY submit keywords that are truthfully relevant to the photograph your are uploading. Maximum 150 characters allowed [ a-z 0-9 ]\" style=\"color:#009900;\">what?</a> ]</td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><textarea name=\"Keywords\" maxlength=\"150\" class=\"formTA\" style=\"width:214px;\"></textarea></td></tr>\n";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+
+			
+			print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:10px;padding-bottom:0px;\" nowrap>
+
+					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
+                        <tr align=\"center\">
+                          <td class=\"photoSmallFBM\"><a href=\"javascript:toggleCheckbox('NV');\" style=\"text-decoration:none;color:#F7F7F7;\" tabindex=\"5\" title=\"Select this option if your photograph WAS taken using an NVD (Night Vision Device)\"><b>Night Vision</b></a></td>
+                          <td class=\"photoSmallFBM\"><a href=\"javascript:toggleCheckbox('Day');\" style=\"text-decoration:none;color:#F7F7F7;\" tabindex=\"6\" title=\"Select this option if your photograph WAS NOT taken using an NVD (Night Vision Device)\"><b>Daytime/Other</b></a></td>
+                        </tr>
+                        <tr valign=\"top\">
+                          <td align=\"center\" style=\"padding-top:5px;padding-bottom:2px;\"><a href=\"javascript:toggleCheckbox('NV');\" id=\"NV\" tabindex=\"5\" title=\"Select this option if your photograph WAS taken using an NVD (Night Vision Device)\"><img src=\"nvi/brochureCheckbox1.gif\" border=\"0\" width=\"10\" height=\"12\" name=\"NV\"></a><input type=\"checkbox\" name=\"NV\" style=\"visibility:hidden;width:1px;height:1px;clip:rect(0px 1px 1px 0px);\" checked></td>
+                          <td align=\"center\" style=\"padding-top:5px;padding-bottom:2px;\"><a href=\"javascript:toggleCheckbox('Day');\" id=\"Day\" tabindex=\"6\" title=\"Select this option if your photograph WAS NOT taken using an NVD (Night Vision Device)\"><img src=\"nvi/brochureCheckbox0.gif\" border=\"0\" width=\"10\" height=\"12\" name=\"Day\"></a><input type=\"checkbox\" name=\"Day\" style=\"visibility:hidden;width:1px;height:1px;clip:rect(0px 1px 1px 0px);\"></td>
+                        </tr>
+                        <!--
+						<tr align=\"center\">
+                          <td class=\"photoSmallFBM\">[ <a href=\"javascript:toggleCheckbox('NV');\" tabindex=\"5\" title=\"Select this option if your photograph WAS taken using an NVD (Night Vision Device)\" style=\"color:#009900;\">what?</a> ]</td>
+                          <td class=\"photoSmallFBM\">[ <a href=\"javascript:toggleCheckbox('Day');\" tabindex=\"6\" title=\"Select this option if your photograph WAS NOT taken while using an NVD (Night Vision Device)\" style=\"color:#009900;\">what?</a> ]</td>
+                        </tr>
+						-->
+					</table>
+			</td></tr>
+			";
+			
+			$myRules = "Simple Rules of Engagement: No copyright materials can be posted to our blog, unless you own the copyright to the works in question. No obscene materials will be allowed, violators will be banned indefinately. Any attempts at hacking, automated retrieval of images or content within our system will not be tolerated. Try to keep the photography you add to your gallery relative to the themes and content of our website, mainly Military, Law Enforcement, Security, Night Vision and Daytime Operations, Domestic, International, Optics, Weaponry, Technologies and Scientific Materials. Photography that is irrelevant to our website content is always welcome so long as it truly is a work of art that should be shared, otherwise simply keep your gallery photos as relevant to the website as possible. That's it! Have fun!";
+
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:10px;padding-left:10px;padding-right:10px;color:#F7F7F7;\">The photograph I am about to upload is my original work and is NOT used in any  copyrighted advertising, marketing or design material anywhere in the world.</td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:5px;padding-left:10px;padding-right:10px;color:#F7F7F7;\"><a href=\"javascript:agreeToRules('IAGREE');\" title=\"$myRules\" style=\"color:#FFFFFF;text-decoration:none;\"><b>I Agree</b></a></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-left:5px;padding-right:10px;color:#F7F7F7;\" nowrap>[ <a href=\"javascript:agreeToRules('IAGREE');\" title=\"$myRules\" style=\"color:#009900;\">FotoBlog Rules</a> ]</td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:5px;padding-left:5px;padding-right:10px;color:#F7F7F7;\" nowrap><a href=\"javascript:agreeToRules('IAGREE');\" id=\"IAGREE\" tabindex=\"5\" title=\"$myRules\"><img src=\"nvi/brochureCheckbox0.gif\" border=\"0\" width=\"10\" height=\"12\" name=\"IAGREE\"></a><input type=\"checkbox\" name=\"IAGREE\" style=\"visibility:hidden;width:1px;height:1px;clip:rect(0px 1px 1px 0px);\"></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"submit\" value=\"Upload & Save\" class=\"Buttons\">&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\"Cancel\" onClick=\"$myCancelAction\" class=\"Buttons\"></td></tr>\n";
+		}
+
+		&endPage('$thisPage');
+}
+
+
+
+
+
+
+
+##################################################################
+# Now to upload the pictures to the appropriate album.  Here, the
+# bulk of the work is to take the user's description and create a
+# new filename out of it, while editing the information to be 
+# appropriate for the album name
+##################################################################
+sub postPics {
+	### ONLY IF COMING FROM fbup.htm
+	if ($CF eq "fbup") {
+		my $thisPage = "postPics";
+		print "\n<!-- Begin action: $thisPage -->\n";
+	#	&beginPage;
+	#	my $password = param('pwd');
+		my $myMaximumPost = $maximumFileSize + 1000;
+		if ($ENV{'CONTENT_LENGTH'} > $myMaximumPost ) {
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>File Size Too Large</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\">We only accept photography files which are less than 1.5 MB [ $maximumFileSize bytes ] in size.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+		}
+		my $fileDecription = param('PhotoTitle');
+		if ($fileDecription eq '') {
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Photo Title is Missing</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\">Uploads of photography must be accompanied by a Photo Title, yours was blank.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+		}
+
+		my $albumChoice = param('albumChoice');	
+		my $firstAlbum = param('userAlbum');
+
+		##-- album selected from list
+		if ($albumChoice ne "") { $continue = 1; }
+
+		##-- first album passed
+		elsif ($albumChoice eq "" && $firstAlbum ne "") {
+			$internal = "1";
+			my $userAlbum = &addAlbumAction;
+			##-- if errorer on adding of album then we kick back error and end process
+			$checkTD = "$parentDirectory" . "/" . "$aGalleryDir";
+			##-- NO ERROR on FIRST album create
+			if (-e $checkTD && $err != 1) {
+				$albumChoice = $userAlbum;
+			}
+			##-- ERROR FINDING USER PHOTO STORE DIRECTORY
+			else {
+				print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Could Not Create <font style=\"color:#BF0000;\"><br>$firstAlbum</font></b></td></tr>";
+				print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+				print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\">Try slightly different album name</td></tr>";
+				print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+				print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+				##-- EOF
+				print "</td></tr><tr><td align=\"center\" valign=\"bottom\" height=\"15\"><img src=\"nvi/uploadPhotos_tableBot.gif\" width=\"227\" height=\"15\"></td></tr></table></center>";
+				exit;
+			}
+		}
+
+		##-- first album info not passed [no selection avail no albums exist] ---->>>> else ($albumChoice eq "" && $firstAlbum eq "")
+		else {
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Album Name Not Submitted</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\">When uploading photography for the first time, you must also type in an Album Name so we can create a photography placeholder for your startup gallery.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+		}
+
+		$leQUOT = "\&quot;";
+
+		## clean up input, NO HTML / SCRIPT
+		use HTML::Strip;
+
+		my $ArtComment = param('ArtComment');
+		my $hs = HTML::Strip->new();
+		my $clean_text1 = $hs->parse( $ArtComment );
+		$hs->eof;
+		$ArtComment = $clean_text1;
+		$ArtComment =~ s/\@//gi;
+		$ArtComment =~ s/~//gi;
+		$ArtComment =~ s/\$//gi;
+		$ArtComment =~ s/\#//gi;
+		$ArtComment =~ s/\&//gi;
+		$ArtComment =~ s/^//gi;
+		$ArtComment =~ s/=//gi;
+		$ArtComment =~ s/\+//gi;
+		$ArtComment =~ s/|//gi;					
+		$ArtComment =~ s/<//gi;
+		$ArtComment =~ s/>//gi;
+		$ArtComment =~ s/'/’/gi;
+		$ArtComment =~ s/%%br%%/\n/gi;
+		$ArtComment =~ s/"/$leQUOT/gi;
+
+		my $Equipment = param('Equipment');
+		my $hs = HTML::Strip->new();
+		my $clean_text2 = $hs->parse( $Equipment );
+		$hs->eof;
+		$Equipment = $clean_text2;
+		$Equipment =~ s/\@//gi;
+		$Equipment =~ s/~//gi;
+		$Equipment =~ s/\$//gi;
+		$Equipment =~ s/\#//gi;
+		$Equipment =~ s/\&//gi;
+		$Equipment =~ s/^//gi;
+		$Equipment =~ s/=//gi;
+		$Equipment =~ s/\+//gi;
+		$Equipment =~ s/|//gi;					
+		$Equipment =~ s/<//gi;
+		$Equipment =~ s/>//gi;
+		$Equipment =~ s/'/’/gi;
+		$Equipment =~ s/%%br%%/\n/gi;
+		$Equipment =~ s/"/$leQUOT/gi;
+
+
+		my $Keywords = param('Keywords');
+		my $hs = HTML::Strip->new();
+		my $clean_text3 = $hs->parse( $Keywords );
+		$hs->eof;
+		$Keywords = $clean_text3;
+		$Keywords =~ s/\@//gi;
+		$Keywords =~ s/~//gi;
+		$Keywords =~ s/\$//gi;
+		$Keywords =~ s/\#//gi;
+		$Keywords =~ s/\&//gi;
+		$Keywords =~ s/^//gi;
+		$Keywords =~ s/=//gi;
+		$Keywords =~ s/\+//gi;
+		$Keywords =~ s/|//gi;					
+		$Keywords =~ s/<//gi;
+		$Keywords =~ s/>//gi;
+		$Keywords =~ s/'/’/gi;
+		$Keywords =~ s/%%br%%/\n/gi;
+		$Keywords =~ s/"/$leQUOT/gi;
+
+		my $NV = param('NV');
+		my $Day = param('Day');
+		
+
+
+		my $file = param('fileName');
+		my @fileNameParts = split(/\//,$file);
+		$file = pop(@fileNameParts);
+	
+		@fileNameParts = split(/\\/,$file);
+		$file = pop(@fileNameParts);
+	
+		my $name = $file;
+		my $tempFileExtension = $file;
+		my @fileNameInfo = split(/\./,$tempFileExtension);
+		my $fileExtension = pop (@fileNameInfo);
+	
+	
+		## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
+		## This will be updated, check back at the website
+		## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+		if ($useMimeTypeDetection = "yes") {
+			$file = param('fileName');
+			my $info = uploadInfo ($file);
+			my $realMimeType = $info -> {'Content-Type'};
+			my $newExtension;
+	
+			if ($realMimeType =~ m/^image/i) {
+				if ($realMimeType =~ m/gif$/i)  { $newExtension = "gif";  }
+				if ($realMimeType =~ m/jpg$/i)  { $newExtension = "jpg";  }
+				if ($realMimeType =~ m/jpeg$/i) { $newExtension = "jpg"; }
+				if ($realMimeType =~ m/bmp$/i)  { $newExtension = "bmp";  }
+				if ($realMimeType =~ m/png$/i)  { $newExtension = "png";  }
+#				if ( $fileExtension ne $newExtension ) { 
+#					print "Not a $fileExtension, but a $newExtension"; 
+#				}
+				if (!$newExtension) { 
+					$fileExtension eq $newExtension; 
+				}
+			}
+#			else { 
+#				print "\n<br>This Mime Type: $realMimeType<br>",
+#				"cannot be verified as an image file<br>\n"; 
+#			}
+		}	
+		## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+
+		my $goodFileType = "no";
+		my $extension;
+		foreach $extension(@allowedFileExtensions) {
+			if ($extension eq $fileExtension) {
+				$goodFileType = "yes";
+				last;
+			}
+		}
+		if ($goodFileType eq "no") { 
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>File Type Not Accepted</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\">We only accept uploads of photography files which are JPG, PNG and JPEG only.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+		}
+		my $newFileName = $fileDecription;
+		$newFileName =~ s/^\s+//g; ### remove leading spaces
+		$newFileName =~ s/\s+$//g; ### remove trailing spaces
+		$newFileName =~ s/..\//_/g;  
+		$newFileName =~ s/ /_/g;  
+		$newFileName =~ s/\//_/g;    
+		$newFileName =~ s/\"//g;
+		$newFileName =~ s/'//g;
+		$newFileName =~ s/\./_/g;
+		$newFileName =~ s/,/_/g;
+		$newFileName =~ s/:/_/g;
+		$newFileName =~ s/\;/_/g;
+		$newFileName =~ s/!/_/g;
+		$newFileName =~ s/\@/_/g;
+		$newFileName =~ s/\-/_/g;
+		$newFileName =~ s/\+/_/g;
+		$newFileName =~ s/\[/_/g;
+		$newFileName =~ s/\]/_/g;
+		$newFileName =~ s/\{/_/g;
+		$newFileName =~ s/\}/_/g;
+		$newFileName =~ s/\|/_/g;
+		$newFileName =~ s/\?/_/g;
+		$newFileName =~ s/</_/g;
+		$newFileName =~ s/>/_/g;
+		
+		if ($usedAsAdultGallery = "no") {
+			my $badword;
+			foreach $badword(@badwords) {
+				$newFileName =~ s/$badword//gi;
+			}
+		}
+		my $i;
+		for ($i=0, $i<10, $i++) {
+			$newFileName =~ s/__/_/g; 
+		}
+		$newFileName =~ s/^_//g;
+		$newFileName =~ s/_$//g;
+		my $localFileName = join (".", $date, $newFileName, $fileExtension);
+		my $testFileName = join (".", $newFileName, $fileExtension);
+		$EP = "0";
+
+		use DBI;
+		my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n";
+		$dbh->{RaiseError} = 1;
+
+		##-- check to see if this filename already exists for this owner: may not live in any album but exists
+		my $sth = $dbh->prepare("SELECT ImageID FROM losPhotos where FileName LIKE '%$testFileName' AND Owner = '$CSin'");
+		$sth->execute or die "Unable to execute query\n";
+		my @row;
+		while(@row = $sth->fetchrow_array) {
+			$EP = $row[0];
+			$EP = int($EP);
+		}
+		$sth->finish;
+		$dbh->disconnect;
+
+		##-- this filename already exists for this owner: may not live in any album but exists
+		if ($EP ne "0") { 
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Will Not Overwrite<font style=\"color:#BF0000;\"><br>$displayName</font></b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\">A photograph with the same filename already exists within one or more of your albums, only upload photography once please. If you want to update or overwrite this photograph you can use the 'Manage Photo' feature.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+		}
+		##-- filename doesnt exist and filename is not blank
+		elsif ($newFileName ne ""){
+			my $fileTotalPath; my $fileTotalNewPath;
+			$fileTotalPath = "$parentDirectory/$aGalleryDir/$name";
+			$fileTotalNewPath = "$parentDirectory/$aGalleryDir/$localFileName";
+			
+			open(LOCAL, ">$fileTotalPath") or &error('Cannot Open New File');
+			if ($servertype ne "unix") { binmode LOCAL; }
+			while(<$file>) {
+			   print LOCAL $_;
+			}
+			close LOCAL or &error('Cannot Close New File');
+			rename("$fileTotalPath","$fileTotalNewPath");
+			# IF YOU ARE HAVING PERMISSIONS PROBLEMS, TRY UNCOMMENTING THE NEXT LINES
+			chmod(644, "$fileTotalNewPath");
+
+			##-- only if it actual exists by this point do we add to DB
+			if (-e $fileTotalNewPath) {
+
+				use Imager;
+				my $img = Imager->new;
+				$img->read(file => $fileTotalNewPath);
+
+				$OGwidth = $img->getwidth();
+				$OGheight = $img->getheight();
+
+				## -- 
+				## -- 				
+				## -- GALLERY: 1st resize to 660w 2nd if h larger than 340 crop at 340h
+				## -- THUMB: resize to 80h and crop at middle to 80w
+				## -- 
+				## -- 
+				if ($OGwidth > 660) {
+					$MOGW = $OGwidth;
+					$MOGH = $OGheight;
+					$newimg = $img->copy();
+					$newimg = $newimg->scale(xpixels=>660);
+					$NIW = $newimg->getwidth();
+					$NIH = $newimg->getheight();
+#					if ($NIH > 340) {
+#						##-- crop at middle of vertical oversize
+#						$diff = int($NIH - 340);
+#						$halfOfDiff = int($diff / 2);
+#						$newimg = $newimg->crop(left=>0, top=>$halfOfDiff, width=>660, height=>340);
+#						$FINALEW = $newimg->getwidth();
+#						$FINALEH = $newimg->getheight();
+#					}
+					$FINALEW = $newimg->getwidth();
+					$FINALEH = $newimg->getheight();
+				}
+				##-- we know that the width is not larger than 660 so no need to resize anything, we simply crop height if too large
+				elsif ($OGheight > 340) {
+					$MOGW = $OGwidth;
+					$MOGH = $OGheight;
+					$newimg = $img->copy();
+					##-- crop at middle of vertical oversize
+					$diff = int($MOGH - 340);
+					$halfOfDiff = int($diff / 2);
+					$newimg = $newimg->crop(left=>0, top=>$halfOfDiff, width=>$MOGW, height=>340);
+					$FINALEW = $newimg->getwidth();
+					$FINALEH = $newimg->getheight();
+				}
+				else {
+					$ERROR = 'TOO SMALL';
+					$FINALEW = $OGwidth; 
+					$FINALEH = $OGheight;
+					$newimg = $img->copy();
+				}
+				
+				###-- IF WE DID INDEED GET GOOD IMAGE THEN WE SAVE IT
+				if ($FINALEW && $FINALEH) {
+					$thumbimg = $newimg->copy();
+					$thumbimg = $thumbimg->scale(xpixels=>80, ypixels=>80, type=>'nonprop');
+					$THUMBW = $thumbimg->getwidth();
+					$THUMBH = $thumbimg->getheight();
+
+					$thumbDName = "$parentDirectory/$aGalleryDir/thumb/$localFileName";
+					$originalDName = "$parentDirectory/$aGalleryDir/original/$localFileName";
+
+					##-- copy the original to original dir
+					select(STDOUT); $| = 1;
+					$commandline = "cp $fileTotalNewPath $originalDName";
+					system($commandline);
+
+
+					$newimg->write(file=>$fileTotalNewPath, type=>$type)
+						or die "Cannot write: ",$newimg->errstr;
+
+					$thumbimg->write(file=>$thumbDName, type=>$type)
+						or die "Cannot write: ",$thumbimg->errstr;
+
+				}
+
+				
+				
+				
+#				if ($FINALEW > 80 && $FINALEH > 80) {
+#					$thumbimg = $newimg->copy();
+#					$TIW = $thumbimg->getwidth();
+#					$TIH = $thumbimg->getheight();
+#					if ($TIH > $TIW) { $thumbimg = $thumbimg->scale(ypixels=>80); }
+#					else { $thumbimg = $thumbimg->scale(xpixels=>80); }
+#					$THUMBW = $thumbimg->getwidth(); 
+#					$THUMBH = $thumbimg->getheight(); 
+#				}
+#				elsif ($FINALEH > 80) {
+#					$thumbimg = $newimg->copy();
+#					$TIW = $thumbimg->getwidth();
+#					$TIH = $thumbimg->getheight();
+#					##-- crop at middle of vertical oversize
+#					$diff = int($TIH - 80);
+#					$halfOfDiff = int($diff / 2);
+#					$thumbimg = $thumbimg->crop(left=>0, top=>$halfOfDiff, width=>$TIW, height=>80);
+#					$THUMBW = $thumbimg->getwidth();
+#					$THUMBH = $thumbimg->getheight();
+#				}
+#				elsif ($FINALEW > 80) {
+#					$thumbimg = $newimg->copy();
+#					$TIW = $thumbimg->getwidth();
+#					$TIH = $thumbimg->getheight();
+#					##-- crop at middle of vertical oversize
+#					$diff = int($TIH - 80);
+#					$halfOfDiff = int($diff / 2);
+#					$thumbimg = $thumbimg->crop(left=>0, top=>$halfOfDiff, width=>$TIW, height=>80);
+#					$THUMBW = $thumbimg->getwidth();
+#					$THUMBH = $thumbimg->getheight();
+##				else {
+#					$thumbimg = $newimg->copy();
+##					$THUMBW = $thumbimg->getwidth();
+##					$THUMBH = $thumbimg->getheight();
+#				}
+#				
+#				###--- ADD CHECK AND ERROR CONTROL [ deletes uploaded file then tells user of error, history.go(-1) ]
+#				if (!$THUMBW && !$THUMBH) {
+#					$myERROR = 'IMAGE TOO SMALL';
+#				}
+
+				use DBI;
+				my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n";
+				$dbh->{RaiseError} = 1;
+
+				##-- get album's current photo Items, count and ID
+				$newAIC = 0;
+				my $sth = $dbh->prepare("SELECT AlbumID, ItemCount, Items FROM Albums where Title = '$albumChoice'");
+				$sth->execute or die "Unable to execute query\n";
+				my @row;
+				while(@row = $sth->fetchrow_array) {
+					$eaID = $row[0];
+					$AICount = $row[1];
+					$ACItems = $row[2];
+					$AICount = int($AICount);
+					$eaID = int($eaID);
+				}
+				$sth->finish;
+			
+				
+				if ($Day eq "on") { $Tipo = 'Day'; }
+				else { $Tipo = 'NV'; }
+
+				##--> INSERT NEW PHOTO
+				my $sth = $dbh->prepare("INSERT INTO losPhotos (ImageID, Type, FileName, Width, Height, ArtComment, Equipment, AddedOn, Owner, Keywords, Albums)
+										 VALUES (Null, '$Tipo', '$localFileName', '$OGwidth', '$OGheight', '$ArtComment', '$Equipment', '$datetime', '$CSin', '$Keywords', '$eaID')");
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+				
+				
+				##-- get album's current photo Items, count and ID
+				$newPIC = 0;
+				my $sth = $dbh->prepare("SELECT ImageID FROM losPhotos where FileName = '$localFileName'");
+				$sth->execute or die "Unable to execute query\n";
+				my @row;
+				while(@row = $sth->fetchrow_array) {
+					$pcID = $row[0];
+					$pcID = int($pcID);
+				}
+				$sth->finish;
+
+				##-- set albums new properties including new photo addition to its items and count
+				$newAICount = int($AICount + 1);
+				if($newAICount > 1) {
+					$newAItems = $pcID . ',' . $ACItems;
+				}
+				else {
+					$newAItems = $pcID;
+				}
+
+				my $sth = $dbh->prepare("UPDATE LOW_PRIORITY Albums 
+										 SET ItemCount='$newAICount', 
+										 Items='$newAItems',
+										 LastUpdated = '$datetime'
+										 WHERE Title = '$albumChoice'");
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+				
+				my $displayPhoto = $newFileName;
+				$displayPhoto =~ s/_/ /g;
+				my $displayAlbum = $albumChoice;
+				$displayAlbum =~ s/_/ /g;
+
+				print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>File Uploaded Successfully</b></td></tr>";
+				print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+				print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:15px;padding-right:15px;color:#F7F7F7;\"><b>$displayPhoto</b> is now posted in the <b>$displayAlbum</b> album and visible to all users.</td></tr>";
+				print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+				print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Back to Manage Main\" onClick=\"parent.location.href = 'FotoBlogManage.htm';\" class=\"Buttons\"></td></tr>\n";
+
+				$dbh->disconnect;
+			}
+
+		}
+		else { 
+			print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Bad Photograph Title</b></td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\">A photograph title must be submitted to continue.</td></tr>";
+			print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+			print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:history.go(-1);\" class=\"Buttons\"></td></tr>\n";
+		}
+
+	}
+	&endPage('$thisPage');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################################################################
+# Here we provide a form that lets the user create their own album
+# (if allowed) or to delete an album (if allowed).  If you have
+# not allowed either of these functions, they shouldn't be able
+# to get here anyway.
+##################################################################
+sub albumManagement {
+	### ONLY IF COMING FROM fbaa.htm
+	if ($CF eq "fbaa") {
+		my $thisPage = "albumManagement";
+		# &beginPage;
+		my @albums = &getAlbums;
+		my $numberOfAlbums = scalar(@albums);
+
+		print "<tr><td align=\"left\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\" nowrap><b>New Album Name</b> [ <a href=\"javascript:void(0);\" title=\"Unlike 'Photography Titles', an 'Album Name' doesnt need to be too specific, a general description of all photos it will contain will do fine. Maximum 50 characters allowed [ a-z 0-9 ] ( eg: US Army 2nd Infantry in Iraq )\" style=\"color:#BF0000;\">what?</a> ]</td></tr>";
+		print "<tr><td align=\"left\" valign=\"top\" style=\"padding-top:2px;padding-left:5px;\" nowrap><input name=\"userAlbum\" maxlength=\"50\" class=\"formInput\" style=\"width:214px;background-color:#2F0000;\"></td></tr>\n";
+		print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+		print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"submit\" value=\"Save New Album\" class=\"Buttons\">&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\"Cancel\" onClick=\"parent.location.href = 'FotoBlogManage.htm';\" class=\"Buttons\"></td></tr>\n";
+	}
+	&endPage($thisPage);
+}
+
+
+
+
+
+
+
+
+##################################################################
+# This takes the user's input (if allowed) and removes any special
+# characters and directory changes, removes bad words, and then
+# creates the album inside the PhotoAlbums folder
+##################################################################
+sub addAlbumAction {
+	### ONLY IF COMING FROM fbaa.htm
+	### -->> OR INTERNAL CALL
+	if ($CF eq "fbaa" || $internal eq "1") {
+		my $thisPage = "addAlbumAction";
+		# &beginPage;
+		# my $addAlbumPass = param('addAlbumPassword');
+
+		my $userAlbum = param('userAlbum');
+		my $displayName = $userAlbum;
+		$userAlbum =~ s/^\s+//g; ### remove leading spaces
+		$userAlbum =~ s/\s+$//g; ### remove trailing spaces
+		$userAlbum =~ s/..\//_/g;  
+		$userAlbum =~ s/^\s+//;
+		$userAlbum =~ s/ /_/g;  
+		$userAlbum =~ s/\//_/g;    
+		$userAlbum =~ s/\"/_/g;
+		$userAlbum =~ s/'//g;
+		$userAlbum =~ s/\./_/g;
+		$userAlbum =~ s/,/_/g;
+		$userAlbum =~ s/:/_/g;
+		$userAlbum =~ s/\;/_/g;
+		$userAlbum =~ s/!/_/g;
+		$userAlbum =~ s/\@/_/g;
+		$userAlbum =~ s/\-/_/g;
+		$userAlbum =~ s/\+/_/g;
+		$userAlbum =~ s/\[/_/g;
+		$userAlbum =~ s/\]/_/g;
+		$userAlbum =~ s/\{/_/g;
+		$userAlbum =~ s/\}/_/g;
+		$userAlbum =~ s/\|/_/g;
+		$userAlbum =~ s/\?/_/g;
+		$userAlbum =~ s/</_/g;
+		$userAlbum =~ s/>/_/g;
+		if ($usedAsAdultGallery = "no") {
+			my $badword;
+			foreach $badword(@badwords) {
+				$userAlbum =~ s/$badword//gi;
+			}
+		}
+		my $i;
+		for ($i=0, $i<10, $i++) { $userAlbum =~ s/__/_/g; }
+		$userAlbum =~ s/^_//g;
+		$userAlbum =~ s/_$//g;
+
+
+	##-- NEW WAY
+	## -->  CONNECT TO DB
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n"; 
+	$dbh->{RaiseError} = 1;
+
+	my $sth = $dbh->prepare("SELECT AlbumID FROM Albums WHERE Title='$userAlbum'");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$miAT = $row[0];
+		$miAT = int($miAT);
+	}
+	$sth->execute or die "Unable to execute query\n";
+	$dbh->disconnect;
+
+	if ($miAT > 0) {
+		$err = 1;
+	}
+
+##--> WE NO LONGER USER DIRECTORIES FOR ALBUMS
+#		my $makeThisAlbum;
+#		$makeThisAlbum = "$parentDirectory" . "/" . "$aGalleryDir";
+#		my $makeThisAlbumThumbs;
+#		$makeThisAlbumThumbs = "$parentDirectory" . "/" . "$aGalleryDir" . "/" . "thumb";
+#		my $makeThisAlbumOG;
+#		$makeThisAlbumOG = "$parentDirectory" . "/" . "$aGalleryDir" . "/" . "original";
+#		if ($userAlbum ne ""){
+#
+#			if (-e $makeThisAlbum) { $err = 1; }
+#			else { $err = opendir(DIR,"$makeThisAlbum"); }
+#
+#			if ($err == 1) { $err = 1; }
+#			else { 
+#				`mkdir $makeThisAlbum`;
+#				opendir(DIR,"$makeThisAlbum");
+#				chmod(0757, $makeThisAlbum);
+#			}
+#			close DIR;
+#
+#			if ($err != 1) {
+#				`mkdir $makeThisAlbumThumbs`;
+#				opendir(DIR2,"$makeThisAlbumThumbs");
+#				chmod(0757, $makeThisAlbumThumbs);
+#				close DIR2;
+#
+#				`mkdir $makeThisAlbumOG`;
+#				opendir(DIR3,"$makeThisAlbumOG");
+#				chmod(0757, $makeThisAlbumOG);
+#				close DIR3;
+#			}
+			my @albums = &getAlbums;
+			my $numberOfAlbums = scalar(@albums);
+
+			if ($err == 1){ 
+				# if error
+				##-- NO NEED, if internal we dont need to tell em of good status, handled elsewhere
+				if ($internal ne "1") {
+					print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\"><b>Could Not Create <font style=\"color:#BF0000;\"><br>$displayName</font></b></td></tr>";
+					print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+					print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;padding-left:5px;color:#F7F7F7;\">Try slightly different album name</td></tr>";
+					print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+					print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Try Again\" onClick=\"javascript:parent.createAlbum();\" class=\"Buttons\"></td></tr>\n";
+				}
+				else {
+					return($userAlbum);
+				}
+			}
+			else {			
+				# if albums, list
+				##-- NO NEED, if internal we dont need to tell em of good status, handled elsewhere
+				use DBI;
+				my $dbh = DBI->connect("DBI:mysql:NVF".$thyHost,$thyRU,$thyRP) or die "Unable to connect to database: <b>$elDB</b>\n";
+				$dbh->{RaiseError} = 1;
+
+				##--> INSERT NEW USER TO ACCT
+				my $sth = $dbh->prepare("INSERT INTO Albums (AlbumID, Title, ItemCount, AddedOn, Owner, LastUpdated)
+										 VALUES (Null, '$userAlbum', '0', '$datetime', '$CSin', '$datetime')");
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+
+				$dbh->disconnect;
+
+				if ($internal ne "1") {
+					print "<tr><td align=\"center\" valign=\"top\" class=\"photoSmallFBM\" style=\"padding-top:14px;color:#F7F7F7;\" nowrap><b>Album Created Successfully!</b></td></tr>";
+					print "<tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:1px;height:8px;overflow:hidden;clip:rect(0px 1px 8px 0px);\"></div></td></tr><tr><td align=\"center\"><div style=\"background-image:url('nvi/horizontalDottie.gif');width:222px;height:1px;overflow:hidden;clip:rect(0px 222px 1px 0px);\"></div></td></tr>";
+					print "<tr><td align=\"center\" valign=\"top\" style=\"padding-top:15px;padding-left:5px;\" nowrap><input type=\"button\" value=\"Back to Manage Main\" onClick=\"parent.location.href = 'FotoBlogManage.htm';\" class=\"Buttons\"></td></tr>\n";
+				}
+				else {
+					return($userAlbum);
+				}
+
+				
+
+
+		}	
+	}
+	##-- NO END, for internal calls, handled elsewhere
+	if ($internal ne "1") {
+		&endPage($thisPage);
+	}
+}
+
+
+
+
+
+
+
+
+##################################################################
+# This generates the error message and then ends the html page
+##################################################################
+sub error {
+	my $thisPage = "Error";
+	print "<h3>An error occurred:", br;
+	print @_;
+	print "</h3>";
+	print "<center><hr width=400>\n";
+	&endPage($thisPage);
+	1;
+}

@@ -1,0 +1,72 @@
+body { background-color: #FFFFFF; scrollbar-face-color:#CCCCCC; scrollbar-highlight-color:#000000; scrollbar-shadow-color:#CCCCCC; scrollbar-3dlight-color: #000000; scrollbar-arrow-color:#000000; scrollbar-track-color:#000000; scrollbar-darkshadow-color:#000000; }
+table.mainTitle { margin-top: 0px; margin-bottom: 5px; }
+td.titleMid { background-color:#304483; border-top:1px solid #ffffff; border-bottom:1px solid #ffffff; }
+font.statsTitle { color:#FFFFFF; font-family:verdana,arial,helvetica; font-size:10px; font-weight:bold; text-decoration:none; }
+font.statsText1 { color:#CCCCCC; font-family:verdana,arial,helvetica; font-size:12px; font-weight:bold; text-decoration:none; }
+font.statsText2 { color:#CCCCCC; font-family:verdana,arial,helvetica; font-size:9px; text-decoration:none; }
+font.slogan { color:#CCCCCC; font-family:verdana,arial,helvetica; font-size:9px; text-decoration:none; }
+#adverMaster { color:#CCCCCC; font-family:verdana; font-weight:bold; position:absolute; top:250px; z-index:3; width:10px; line-height:25px; font-size:7px; text-decoration:none;  margin-left:-169px; }
+#adverSpecial { color:#CCCCCC; font-family:verdana; font-weight:bold; z-index:3; font-size:7px; text-decoration:none; letter-spacing: 5px; margin-top:5px; }
+#adverSpecial2 { color:#CCCCCC; font-family:verdana; font-weight:bold; z-index:3; font-size:7px; text-decoration:none; letter-spacing: 5px; margin-bottom:5px; }
+#adverEconomical { color:#CCCCCC; font-family:verdana; font-weight:bold; z-index:3; font-size:7px; text-decoration:none; letter-spacing: 5px; margin-top:5px; }
+table.masterBacker { background-color:transparent; border-top:1px solid #02341E; border-bottom:1px solid #02341E; border-left:1px solid #02341E; border-right:1px solid #02341E; }
+table.traditionalBacker { background-color:transparent; border-top:1px solid #02341E; border-bottom:1px solid #02341E; border-left:1px solid #02341E; border-right:1px solid #02341E; }
+table.economicalBacker { background-color:transparent; border-top:1px solid #D7A368; border-bottom:1px solid #D7A368; border-left:1px solid #D7A368; border-right:1px solid #D7A368; }
+font.adverHomeTradi { color:#CCCCCC; font-family:verdana; font-weight:bold; line-height:14px; letter-spacing: 10px; font-size:7px; text-decoration:none; }
+font.adverEconoVmessages { color:#D7A368; font-family:verdana; font-weight:bold; line-height:14px; letter-spacing: 10px; font-size:7px; text-decoration:none; }
+table.specialBacker { background-color:transparent; border-top:1px solid #02341E; border-bottom:1px solid #02341E; border-left:1px solid #02341E; border-right:1px solid #02341E; }
+font.adverHomeEcono { color:#999999; font-family:verdana; font-weight:bold; line-height:14px; letter-spacing: 10px; font-size:7px; text-decoration:none; }
+.numPages { color:#000000; background-color: #D7A368; border: 1px solid #D7A368; font-size: 10px; height:18px; font-family:verdana,arial,helvetica; 2px; }
+.search { padding-left:5px; padding-top:3px; color:#000000; background-color: #D7A368; border: 1px solid #CCCCCC; font-size: 10px; height:20px; font-family:verdana,arial,helvetica; 2px; }
+td.fmenu { cursor:hand; background-color:#FFFFFFF; border-top:1px solid #000000; border-bottom:1px solid #000000; }
+table.fmenulineTop { background-color:#000000; margin-bottom: 1px; }
+table.fmenulineBot { background-color:#000000; margin-top: 1px; }
+font.fmenu { color:#FFFFFF; font-family:verdana,arial,helvetica; font-size:10px; font-weight:bold; text-decoration:none; }
+td.commonTable1 { border-left:1px solid #EBEEF5; border-right:1px solid #EBEEF5; border-top:1px solid #EBEEF5; border-bottom:1px solid #EBEEF5; }
+input.commonInput { background-color: #CCCCCC; border: 1px solid #D7A368; height:20px; width:200px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+textarea.commonArea { background-color: #CCCCCC; border: 1px solid #D7A368; width:405px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+.instruct { color: #D7A368; font-size: 9px; font-family:verdana,arial,helvetica; }
+input.IP { background-color: #ffffff; border: 1px solid #2F4382; height:20px; width:50px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+.leButton { background-color:#CCCCCC;  border: 1px solid #D7A368; font-family:Verdana, Arial, Helvetica; font-size:10px;font-weight:bold }
+font.commonLabel { font-size:10px; font-weight:bold; font-family:verdana,arial,helvetica; color: #CCCCCC; }
+.sortedLabel { font-size:10px; font-weight:bold; font-family:verdana,arial,helvetica; color: #D7A368; }
+.commonText { font-size:10px; font-family:verdana,arial,helvetica; color: #CCCCCC; }
+a:visited { color:#AB702E; }
+.forumText { font-size:9px; font-family:verdana,arial,helvetica; color: #FFFFFF; }
+font.pollTitle { font-weight:bold; font-size:9px; font-family:verdana,arial,helvetica; color: #CCCCCC; }
+font.pollSubject { font-weight:bold; font-size:10px; font-family:verdana,arial,helvetica; color: #CCCCCC; }
+font.pollPrompt { font-size:9px; line-height:11px; font-family:verdana,arial,helvetica; color: #CCCCCC; }
+.votePrompt { color:#33530F; font-family:verdana,arial,helvetica; font-size:11px; }
+.pollSmall { color:#33530F; font-family:verdana,arial,helvetica; font-size:9px; line-height:10px;}
+input.pollEmail { color:#33530F; background-color: #CCCCCC; border: 1px solid #33530F; width:200px; font-size: 9px; height:18px; font-family:verdana,arial,helvetica; 2px; }
+.star1 { color:#D7A368; font-family:verdana,arial,helvetica; font-size:11px; font-weight:bold; }
+a.pageCount { font-size:11px; font-family:verdana,arial,helvetica; color: #ffffff;  }
+font.pageCount { font-size:11px; font-family:verdana,arial,helvetica; color: #D7A368;  }
+font.mainLabel { font-size:11px; font-weight:bold; font-family:verdana,arial,helvetica; color: #000000; }
+table.border1 { border-top:2px solid #304483; border-bottom:2px solid #304483; border-left:2px solid #304483; border-right:2px solid #304483; }
+font.pollYesNoTitle { color:#ffffff; font-family:verdana,arial,helvetica; font-size:11px; text-decoration:none; }
+.castVote { color:#33530F; font-family:verdana,arial,helvetica; font-weight:bold;  font-size:12px; text-decoration:underline; }
+.pollYesNoText { color:#33530F; font-family:verdana,arial,helvetica; font-size:12px; }
+td.lePollTop { border-top:1px solid #02341E; }
+td.lePollBot { border-bottom:1px solid #02341E; }
+td.lePollLeftRight { border-left:1px solid #02341E; border-right:1px solid #02341E; }
+td.leForumTop { border-top:1px solid #02341E; }
+td.leForumBot { border-bottom:1px solid #02341E; }
+td.leForumLeftRight { border-left:1px solid #02341E; border-right:1px solid #02341E; }
+table.leForumWrap { background-color:transparent; border-top:1px solid #02341E; border-bottom:1px solid #02341E; border-left:1px solid #02341E; border-right:1px solid #02341E; }
+table.leForumWrap2 { background-color:transparent; border-top:1px solid #D7A368; border-bottom:1px solid #D7A368; border-left:1px solid #D7A368; border-right:1px solid #D7A368; }
+table.leForumWrap3 { background-color:transparent; border-top:1px solid #999999; border-bottom:1px solid #999999; border-left:1px solid #999999; border-right:1px solid #999999; }
+td.forumPadding { padding:4px; }
+radio.radio { height:20px; }
+select.commonSelect { background-color: #EBEEF5; border: 1px solid #2F4382; color:#304483; font-weight:bold; height:20px; width:100px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+table.topLeftBG { background-image: url(http://www.nightvisiononline.com/images/topright_bg.jpg); background-repeat: no-repeat; background-position: right top; }
+table.menubg { background-image: url(http://www.nightvisiononline.com/images/menubg.jpg); background-repeat: repeat y; }
+table.botFrameTopper { background-image: url(http://www.nightvisiononline.com/http://www.nightvisiononline.com/images/forum_illus_extender.jpg); background-repeat: repeat y; background-position: left top; }
+.UL1 { list-style-image: url(http://www.nightvisiononline.com/images/UL1.png); }
+.UL2 { list-style-image: url(http://www.nightvisiononline.com/images/UL2.png) }
+.pollTopLinks { text-decoration:none; font-size:9px; font-family:verdana,arial,helvetica; color: #FFFFFF; }
+.pollMainTitle { color: #CCCCCC; text-decoration:none; font-size:13px; font-weight:bold; font-family:verdana,arial,helvetica; }
+.pollSubTitle1 { color: #CCCCCC; text-decoration:none; font-size:10px; font-weight:bold; font-family:verdana,arial,helvetica; }
+.pollExplain { color: #CCCCCC; text-decoration:none; font-size:12px; line-height:20px; font-family:verdana,arial,helvetica; }
+.pollMore { text-decoration:none; font-size:11px; font-weight:bold; font-family:verdana,arial,helvetica; color: #33530F; }
+.pollSelect { background-color: #ffffff; border: 1px solid #33530F; color:#33530F; height:20px; font-size: 11px; font-family:verdana,arial,helvetica; padding: 2px; }

@@ -1,0 +1,563 @@
+#!/usr/bin/perl5 -s
+
+#	GNU GPL Copyright 2002 - Gavin Laking
+#
+#	This file is part of Daisy.
+#
+#	Daisy is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; either version 2 of the License, or
+#	(at your option) any later version.
+#
+#	Daisy is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with Daisy; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+$| = 1;
+
+require 'common2005.htm';
+
+## Snif cookie, if present test for username, fname, lname info...
+require ("bcookiesnif.nsp");
+
+
+
+sub postMessage {
+	&checkBan;
+
+	$messageStatus = 'VeRiFiEd';
+	
+	if ($INFO{'follow'}) { $follow = $INFO{'follow'}; }
+	else { $follow = $FORM{'follow'}; }
+	$name		= $FORM{'name'};
+	$email		= $FORM{'email'};
+	$subject	= $FORM{'subject'};
+	$message	= $FORM{'message'};
+	$resource	= $FORM{'resource'};
+	$url		= $FORM{'url'};
+
+	###--> CHECK 1 :: QUICK AND RAW CHECK
+	&checkInput;
+
+	
+	if ($FORM{'gesicht'} eq "Esel" && $FORM{'challenger'}) {
+		&challenger;
+	}
+	else {
+		print "Content-type: text/html\n\n";
+		print "<script>alert('No Challenge Code = No Post! Please try again.');history.go(-1)</script>";
+		exit;
+	}
+
+
+	
+	
+	
+
+	### QUERY DB
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF","root","32GCC5E7TSjqQ") or die "Unable to connect to database\n"; 
+	$dbh->{RaiseError} = 1; 	
+
+
+
+	&errorMessage("$text{'018'}") unless($name);
+	&errorMessage("$text{'019'}") unless($email);
+	&errorMessage("$text{'020'}") unless($subject);
+
+	$name =~ s/\\//g;
+	$email =~ s/\\//g;
+
+	$appendIP = 0;
+	$saveMessage = 1;
+
+	###-->> ACCOUNT VALIDATION
+if ($ENV{'REMOTE_ADDR'} eq "76.175.3.161") {
+
+	$saveMessage = 0;
+
+	$email = lc($email);
+
+
+	my $sth = $dbh->prepare("SELECT UserName, IP, AccountStatus FROM VerifiedAccounts WHERE Email='$email'");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) {
+		$uNAME = $row[0];
+		$acctST = $row[1];
+		$uIP = $row[2];
+		##-- PENDING = save but NO SHOW until VERIFY EMAIL
+		if ($acctST eq "PeNdInG") {
+			$saveMessage = 1;
+			$messageStatus = "PeNdInG";
+			$myCheckie = "<script>alert('None of your posted messages will be visible to the general public until you verify your account. You can verify your email address and unlock all your posted messages by following the instructions in the email we have just re-sent to your $email email address.');</script>"; 
+		}
+		##-- ACTIVE = save this effortlessly
+		elsif ($acctST eq "AcTiVe") {
+			##--passed username check
+			if (lc($uNAME) eq lc($name)) {
+				if ($uIP !~ "$ENV{REMOTE_ADDR}") { $appendIP = 1; }
+				$saveMessage = 1;
+				$messageStatus = "VeRiFiEd";
+			}
+			##--failed username / ip check
+			elsif (lc($uNAME) ne lc($name) && $uIP =~ "$ENV{REMOTE_ADDR}") { 
+				$saveMessage = 0;
+				$myCheckie = "<script>alert('That username does not match the one associated with $email. Please try again.');history.go(-1);</script>"; 
+			}
+			##--failed username check
+			else {
+				$saveMessage = 0;
+				$myCheckie = "<script>alert('That username does not match that email address within our system. Please try again.');history.go(-1);</script>";
+			}
+		}
+		##-- DEACTIVATED = dont save message >> alert user of status
+		elsif ($acctST eq "InAcTiVe") {
+			$saveMessage = 0;
+			$myCheckie = "<script>alert('Your account has been suspended due to inactivity or an administrative action, please contact accounts@nightvisiononline.com to request re-activation of your account. Thank you.');</script>"; 
+		}
+		##-- REVOKED = no error just dont save message
+		elsif ($acctST eq "ReVoKeD") { $saveMessage = 0; }
+		##-- NO ACCOUNT WITH THIS EMAIL [NO PROMPT! AUTO START ACCOUNT AND THEN NOTIFY]
+		else {
+			$saveMessage = 1;
+			$messageStatus = "PeNdInG";
+		}
+	}
+	$sth->finish;
+
+	##--$myCheckie = "<script>alert('$messageStatus - $acctST')</script>";
+
+
+}
+	
+	
+	
+	
+	
+	
+	
+	
+##-- SAVE MESSAGE	
+if ($saveMessage == 1) {
+	
+	if ($protectEmailAddresses == 1) { $email =~ s/\@/\[AT\]/g; }
+
+	$subject =~ s/\\//g;
+	$url =~ s/  / \%20/g;
+	$url =~ s/\\//g;
+	$message =~ s/\\//g;
+
+	open ('FILE', "$numfile") || &errorMessage("$text{'006'}");
+	&lockFile('FILE');
+	@info = <FILE>;
+	&unlockFile('FILE');
+	close('FILE');
+
+	($postnum,$chop) = split(/``/,$info[0]);
+	$postnum++;
+
+	open ('FILE', ">$numfile") || &errorMessage("$text{'006'}");
+	&lockFile('FILE');
+	print FILE "$postnum";
+	print FILE "``xx";
+	&unlockFile('FILE');
+	close ('FILE');
+
+	&openDatabase;
+
+	open ('FILE', ">$datafile") || &errorMessage("$text{'007'}");
+	&lockFile('FILE');
+
+	if ($follow eq 'no') {
+		print FILE "$postnum``$subject``1``$name``$email``$date``$ENV{REMOTE_ADDR}``$ENV{HTTP_USER_AGENT}``$url``xx\n";
+		print FILE @messages;
+	}
+	else {
+		$followto = $FORM{'followto'};
+		$level = $FORM{'level'} + 1;
+		for ($a = 0; $a < @messages; $a++)
+			{
+			($checknum,@junk) = split(/``/,$messages[$a]);
+			print FILE "$messages[$a]";
+			if ($checknum == $followto)
+				{
+				$level = $junk[1] + 1;
+				print FILE "$postnum``$subject``$level``$name``$email``$date``$ENV{REMOTE_ADDR}``$ENV{HTTP_USER_AGENT}``$url``xx\n";
+				}
+			}
+	}
+
+
+
+	##--> INSERT NEW POST TO DB
+	my $sth = $dbh->prepare("INSERT INTO leForu (InternalID, PostadoID, Subject, 
+							 Body, Url, Email, DateTime, IP, Browser, Thread, UID, MessageStatus)
+
+							 VALUES (Null, '$postnum', '$subject', '$message', '$url', 
+							 '$email', '$date', '$ENV{REMOTE_ADDR}', '$ENV{HTTP_USER_AGENT}', 
+							 '$level', '$name', '$messageStatus')");
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+
+
+	&openMessageFile;
+
+	# Print headers with only one \n 
+	print "Content-type: text/html\n";
+		&SetCookies('Entrado','YES');
+		&SetCookies('Boozer',$name);
+		&SetCookies('Amil',$email);
+		&SetCookies('LP',$date);
+		&SetCookies('LPID',$postnum);
+    # End the headers by laying last \n
+   	print "\n";
+}
+##-- DONT SAVE MESSAGE
+else {
+	# Print headers for non posters
+	print "Content-type: text/html\n\n";
+	print $myCheckie;
+}	
+
+
+	$dbh->disconnect;
+
+
+
+
+
+	&thyHeader;
+	&topPart;
+
+	if ($url =~ "://") { $myURL = "<a href=\"#\" onClick=\"javascript:window.open('$url','PostedURL');\" class=\"instruct\"><i>$url</i></a>"; }
+	else { $myURL = "No URL was submitted"; }
+
+	print qq~
+		<ol type="circle">
+			<li><b>Username/Nickname</b><ul> $name</ul></li>
+			<li><b>Email Address</b><ul> <A href="mailto:$email" class="instruct">$email</A></ul></li>
+			<li><b>Subject</b><ul> $subject</ul></li>
+			<li><b>URL/Link</b><ul> $myURL</ul></li>
+			<li><b>Message</b><ul>$FORM{'message'}</ul></li>
+		</ol>
+	~;
+
+	&botPart;
+	print "</body></html>";
+	
+	exit;
+}
+
+
+
+
+
+
+
+sub topPart {
+$AppTitle = "Night Vision Online Forum";
+
+
+print qq~
+$myCheckie
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript" src="js/mousetable.js"></script>
+<LINK REL="STYLESHEET" HREF="common_css2005.css" Type="text/css">
+<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="100%" align="right" valign="top" height="94"><img src="images2005/newTopper_left.jpg" width="396" height="94"></td>
+    <td width="333" align="left" valign="top" height="94"><img src="images2005/newTopper_mid_messageposted.jpg" width="333" height="94"></td>
+  </tr>
+</table>
+<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
+				<tr valign="top">
+					<td height="20" colspan="5"><img src="images2005/spacer.gif" border="0" height="20"></td>
+				</tr>
+	<tr>
+		<td width="15"><img src="images2005/spacer.gif" width="15" height="10" border="0"></td>
+		<td width="100%" align="center" valign="top">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#000000">
+  				<tr align="center">
+    				<td width="12" height="12" valign="top"><img src="images2005/topleftcorner_forum.gif" width="12" height="12"></td>
+					<td valign="bottom" height="12" width="325" class="leForumTop" bgcolor="#02341E"><img src="images2005/spacer.gif" border="0" height="1" width="325"></td>
+					<td valign="bottom" height="12" width="100%" class="leForumTop"><img src="images2005/spacer.gif" border="0" height="1" width="1"></td>
+					<td width="12" height="12" valign="top"><img src="images2005/toprightcorner_forum.gif" width="12" height="12"></td>
+  				</tr>
+				<tr valign="top">
+					<td width="100%" align="center" colspan="4" class="leForumLeftRight" valign="top">
+
+
+<TABLE width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000">
+        <TR>
+      <TD width="100%" valign="top" align="center">
+      <TABLE align="center" border="0" cellpadding="10" cellspacing="0" id="ignore" class="leftRightBorder" width="100%">
+
+<tr><td valign="top" width="316" bgcolor="#02341E"><font class="commonText"><b>Message Successfully Posted</b><br><br>
+Your message has been posted to the forum. If you are a new user, your username and email address will be automatically saved for your convenience. Therefore, next time you post a message to the forum, these fields will be automatically filled in for you.<br><br><br><br><div align=\"right\"><b>Parameters of your post > ></b></div><br><br><br><center>Please <a href="index2005.htm" class="instruct">click here</a> to return to the forum.</center></font>
+</td><td align="left" valign="top"><font class="commonText">
+
+~;
+
+}
+
+sub botPart {
+
+print qq~
+
+</font></td>
+
+
+
+</td></tr></table>
+</td></tr>
+</table>
+					</td>
+				</tr>
+  				<tr align="center">
+    				<td width="12" height="12" valign="top"><img src="images2005/botleftcorner_forum.gif" width="12" height="12"></td>
+					<td valign="top" height="12" width="325" class="leForumBot" bgcolor="#02341E"><img src="images2005/spacer.gif" height="1" width="325" border="0"></td>
+					<td valign="top" height="12" width="100%" class="leForumBot"><img src="images2005/spacer.gif" height="1" width="1" border="0"></td>
+					<td width="12" height="12" valign="top"><img src="images2005/botrightcorner_forum.gif" width="12" height="12"></td>
+  				</tr>
+
+			</table>
+		<td width="15"><img src="images2005/spacer.gif" width="15" height="10" border="0"></td>
+		<td width="275" align="right" valign="top">
+<!--
+			<table width="100%" align="center" border="0" cellpadding="10" cellspacing="0">
+				<tr>
+					<td width="100%" valign="top" align="right">
+						<table width="100%" align="center" border="0" cellpadding="14" cellspacing="0" class="masterBacker">
+							<tr>
+								<td width="100%">
+~;
+#require 'getBanner.nsp';
+#&dropBanner('Master');
+#print "<div id=\"adverMaster\">A<br>D<br>V<br>E<br>R<br>T<br>I<br>S<br>E<br>M<br>E<br>N<br>T</div>";
+
+print qq~
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+-->			
+		</td>
+		<td width="15"><img src="images2005/spacer.gif" width="15" height="10" border="0"></td>
+	</tr>
+</table>
+~;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##-- START CHECKERS
+##-- I WIN
+
+sub checkInput {
+	##-- SAME CHECK AS THIS RE-MADE AT [error: 7] another check
+	if ($name =~ "http"  || $name =~ "<" || $name =~ ">" || $name =~ "{" || $name =~ "}" || $name =~ "ftp" || $name =~ "://" || $name =~ "html") { $erroredOut = 1; $miError = 'invalid username was submitted.'; }
+	### if ($email =~ "http" || $email =~ "ftp" || $email =~ "://" || $email =~ "html") { $erroredOut = 1; $miError = 'invalid email address was submitted.'; }
+	if ($url =~ "<" || $url =~ ">" || $url =~ "{" || $url =~ "}") { $erroredOut = 1; $miError = 'invalid url was submitted.'; }
+	if ($message =~ "http" || $message =~ "<" || $message =~ ">" || $message =~ "{" || $message =~ "}" || $message =~ "ftp" || $message =~ "://" || $message =~ "html" || $message =~ "url") { $erroredOut = 1; $miError = 'invalid message was submitted.'; }
+	if ($subject =~ "http" || $subject =~ "<" || $subject =~ ">" || $subject =~ "{" || $subject =~ "}" || $subject =~ "ftp" || $subject =~ "://" || $subject =~ "html" || $subject =~ "url") {  $erroredOut = 1; $miError = 'invalid subject was submitted.'; }
+
+	
+	##-- ERRORED AT THIS STEP SPIT IT!
+	if ($erroredOut eq "1") {
+		print "Content-type: text/html\n\n";
+		print "<script>alert('There was an error saving your post. Error: \\'$miError\\'');history.go(-1)</script>";
+		exit;	
+	}
+}
+
+
+
+##-- REMOTE EMAIL CHECK
+##--->>  0 - The email address appears to be valid.
+##--->>  1 - No email address was supplied.
+##--->>  2 - There is a syntaxical error in the email address.
+##--->>  3 - There are no DNS entries for the host in question (no MX records or A records).
+##--->>  4 - There are no live SMTP servers accepting connections for this email address.
+##--->>  >> 5 - Secondary syntaxical check failed on email.
+##--->>  >> >> >> 
+##--->>  >> >> >> 
+##--->>  >> >> >> 6 - EXTREME CODE TAMPER FLAG -->> MAYBE SOMEONE TRYING TO MANIPULATE THIS CONNECTION BETWEEN THIS TOOL AND CLIENT
+##--->>  >> >> >> 		NEXT CODE REVERSE CODE EMAIL FOR BEST ENCRYPTION OF CONNECTION + PORT BINDING
+##--->>  >> >> >> 		THIS WAY NO UNWANTED PLAYERS TO OUR FUNCTIONS
+
+
+sub challenger {
+	use locale;
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:NVF","root","32GCC5E7TSjqQ") or die "Unable to connect to database\n"; 
+	$dbh->{RaiseError} = 1;
+
+	$myV = "" . lc($FORM{'challenger'}) . "";
+	my $sth = $dbh->prepare("SELECT ENCRYPT('$myV','nVo')");
+	$sth->execute;
+	my $row = $sth->fetchrow_arrayref;
+	my $elCrypto = $row->[0];
+	$sth->finish;
+	
+	$dieStorung = 0;
+	
+	###-->> BAD
+	if ($elCrypto ne "$FORM{'simple'}") {
+		print "Content-type: text/html\n\n";
+		print "<script>alert('The \\'challenge code\\' you entered was incorrect! Try again.');history.go(-1)</script>";
+		exit;
+	}
+	###-->> GOOD --> CONTINUE
+	else {
+
+		##-- THIS SCRIPT
+		##-- 7 = dirty check upon all fields [size or keyword flagged]
+		##-- real catch = email
+		if (
+			(length($name) > 16) || $name =~ "http" || $name =~ "href" || $name =~ "url" || $name =~ "ftp" || 
+			(length($subject) > 75) || $subject =~ "http" || $subject =~ "href" || $subject =~ "url" || $subject =~ "ftp" ||
+			### (length($message) > 1000) || 
+			$message =~ "http" || $message =~ "href" || $message =~ "url" || $message =~ "ftp" ||
+			(length($url) > 150)  || $url =~ "href" || $url =~ "url"
+		) {
+			$dieStorung = "7";
+		}
+		else{
+				use HTTP::Request;
+				use LWP::UserAgent;
+				use LWP::Simple;
+				use URI::URL;
+		
+				##-->> check email remotely STRONG [0 = good / OTHER = erroneous]
+				$checkEmail = get("http://76.175.3.161/sEaMaIl.htm?RPyyc4dBe4tWE=$email");
+			
+				##-->> passed [0] = process email 
+				if ($checkEmail eq "0") {
+					## --> EMAIL PASSED
+					$dieStorung = 0;
+				}
+				##-->> errored [!= 0] = kill email, act like nothing went wrong >> only give client error number as info
+				else {
+					$dieStorung = int($checkEmail);
+				}
+		}
+
+		###-->> ERROR CAUGHT (relay to user)
+		if ($dieStorung != 0) {
+			if (int($dieStorung) <= 6) {
+				#print "Content-type: text/html\n\n";
+				#print "<script>alert('Invalid email submitted! Please try again.');history.go(-1)</script>";
+				#exit;
+				$messageStatus = 'PeNdInG';
+			}
+			elsif (int($dieStorung) == 7) {
+				print "Content-type: text/html\n\n";
+				print "<script>alert('Invalid information submitted! Please try again.');history.go(-1)</script>";
+				exit;
+				## $messageStatus = 'PeNdInG';
+			}
+		}
+		## --> PASSED ALL CHECKS NOW WE DEAL WITH ACCOUNTING CHECK
+		else {
+			$messageStatus = 'VeRiFiEd';
+		}
+		
+		&cleanMyInput;
+		
+	}
+	$dbh->disconnect;
+}
+
+
+
+sub cleanMyInput {
+
+	use HTML::Strip;
+	my $hs = HTML::Strip->new();
+	$clean_n = $hs->parse( $name );
+	$clean_sub = $hs->parse( $subject );
+	$clean_url = $hs->parse( $url );
+	$hs->eof;
+
+    $clean_n =~ tr/+/ /;
+    $clean_n =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+    # Strip out any bad, bad characters
+    $clean_n =~ s/;/ /g; $clean_n =~ s/\\/ /g; $clean_n =~ s/\// /g; $clean_n =~ s/\)/ /g; $clean_n =~ s/\(/ /g; $clean_n =~ s/:/ /g; $clean_n =~ s/"/ /g; $clean_n =~ s/'/ /g; $clean_n =~ s/\&/ /g; $clean_n =~ s/\*/ /g; 
+	$clean_n =~ s/^!/ /g;      #### Allow in sentences 
+	$clean_n =~ s/[\cM\n]/ /g; #### Mainly for textareas
+	$clean_n =~ s/  //gi; #### remove all double spacing created by replaced characters
+
+    $clean_sub =~ tr/+/ /;
+    $clean_sub =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+    # Strip out any bad, bad characters
+    $clean_sub =~ s/;/ /g; $clean_sub =~ s/\\/ /g; $clean_sub =~ s/\// /g; $clean_sub =~ s/\)/ /g; $clean_sub =~ s/\(/ /g; $clean_sub =~ s/:/ /g; $clean_sub =~ s/"/ /g; $clean_sub =~ s/'/ /g; $clean_sub =~ s/\&/ /g; $clean_sub =~ s/\*/ /g; 
+	$clean_sub =~ s/^!/ /g;      #### Allow in sentences 
+	$clean_sub =~ s/[\cM\n]/ /g; #### Mainly for textareas
+	$clean_sub =~ s/  //gi; #### remove all double spacing created by replaced characters
+
+    $clean_url =~ tr/+/ /;
+    $clean_url =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+    # Strip out any bad, bad characters
+    $clean_url =~ s/;/ /g; $clean_url =~ s/\)/ /g; $clean_url =~ s/\(/ /g; $clean_url =~ s/:/ /g; $clean_url =~ s/"/ /g; $clean_url =~ s/'/ /g; $clean_url =~ s/\*/ /g; $clean_url =~ s/!/ /g;
+	$clean_url =~ s/[\cM\n]/ /g; #### Mainly for textareas
+	$clean_url =~ s/  //gi; #### remove all double spacing created by replaced characters
+	
+	$name = $clean_n;
+	$subject = $clean_sub;
+	$url = $clean_url;
+	
+}
+
+
+##-- END CHECKERS
+##-- I WIN
+
+
+
+
+
+
+
+
+#sub dropBanner ($incoming) {
+## request and then parse banner as needed
+#	my ($incoming) = @_;
+#	$leAdType = $incoming;
+#	require 'require_ad.nsp';
+#	$leAdType = "";
+#}
+
+&getDate;
+&readFormFields;
+
+&postMessage		if ($action eq 'postMessage');
+
+print "Content-type: text/html\n\n";
+&errorMessage("$text{'021'}");

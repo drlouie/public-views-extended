@@ -1,0 +1,8 @@
+Dave, with all due respect, I've seen slower performance as well. &nbsp;Hopefully, people will settle down about it, because it isn't that big of a deal in the grand scheme.<br>
+<br>
+For your reference:<br>
+PC #1: &nbsp;Notebook on a 802.11b wireless network over cable modem. &nbsp;Old forum was much faster over same connection. &nbsp;Using IE6.<br>
+<br>
+PC #2. &nbsp;Dual Xeon workstation over corporate network. &nbsp;I believe IE5 is the browser. &nbsp;<br>
+<br>
+Best of luck!

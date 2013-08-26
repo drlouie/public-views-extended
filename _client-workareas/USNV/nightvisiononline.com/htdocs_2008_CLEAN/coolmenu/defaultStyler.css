@@ -1,0 +1,22 @@
+/*BODY, TD, TH, A, P,H1,H2,H3{*/
+
+BODY, A, P,H1,H2,H3{
+	font-family:Tahoma, Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color:#000000;
+	text-decoration:none;
+	line-height:18px;
+
+  scrollbar-FACE-color: #F3EEE9;
+  scrollbar-ARROW-color: #000000;
+  scrollbar-HIGHLIGHT-color: #ffffff;
+  scrollbar-SHADOW-color: #ffffff;
+  scrollbar-3DLIGHT-color: #aaaaaa;
+  scrollbar-TRACK-color: #F5F2EB;
+  scrollbar-DARKSHADOW-color: #aaaaaa;
+}
+#importDataView { border:#000000 1px solid; overflow-x: hidden; overflow-y: scroll; width:600px; height:100px; clip: rect(0px, 600px, 100px, 0px); margin-top:5px; margin-bottom:5px;}
+#mainTableBottom { background-color:#F7F7F7; layer-background-color:#F7F7F7; padding:3px; }
+.panelBGborder { border:#000000 1px solid; }
+#TopRightTitleBar1 { font-size:13px; padding-left:10px; }
+#TopRightTitleBar2 { font-size:11px; padding-right:10px; }

@@ -1,0 +1,27 @@
+body { background-color: #889DB9; }
+a { color:#304483; }
+a.redText { font-size:9px; font-family:verdana,arial,helvetica; color: #EB0000; }
+table.mainTitle { margin-top: 5px; margin-bottom: 5px; }
+td.titleMid { background-color:#D1D9E9; border-top:1px solid #304483; border-bottom:1px solid #304483; }
+font.titleText { color:#304483; font-family:verdana,arial,helvetica; font-size:11px; font-weight:bold; text-decoration:none; }
+table.fmenu { background-color:#D1D9E9; border-top:1px solid #304483; border-bottom:1px solid #304483; }
+table.fmenulineTop { background-color:#304483; margin-bottom: 3px; }
+table.fmenulineBot { background-color:#304483; margin-top: 3px; }
+font.fmenu { color:#304483; font-family:verdana,arial,helvetica; font-size:10px; font-weight:bold; text-decoration:none; }
+td.commonTable1 { border-left:1px solid #2F4382; border-right:1px solid #2F4382; border-top:1px solid #2F4382; border-bottom:1px solid #2F4382; }
+input.commonInput { background-color: #ffffff; border: 1px solid #2F4382; height:20px; width:120px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+input.IP { background-color: #ffffff; border: 1px solid #2F4382; height:20px; width:50px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+input.UP { background-color: #ffffff; border: 1px solid #2F4382; height:20px; width:100px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+input.AreaCode { margin-right:12px; background-color: #ffffff; border: 1px solid #2F4382; height:20px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+input.Phone { background-color: #ffffff; border: 1px solid #2F4382; height:20px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+input.Longest { background-color: #ffffff; width:275px; border: 1px solid #2F4382; height:20px; font-size: 9px; font-family:verdana,arial,helvetica; padding: 3px; }
+select.longestSelect { background-color: #ffffff; width:275px; border: 1px solid #2F4382; height:20px; font-size: 9px; font-family:verdana,arial,helvetica; padding: 3px; }
+font.commonLabel { font-size:10px; font-weight:bold; font-family:verdana,arial,helvetica; color: #304483; }
+font.whiteLabel { font-size:10px; font-weight:bold; font-family:verdana,arial,helvetica; color: #ffffff; }
+font.commonText { font-size:10px; font-family:verdana,arial,helvetica; color: #304483; }
+font.redText { font-size:9px; font-family:verdana,arial,helvetica; color: #EB0000; }
+pre.pre { text-align:left; font-size:9px; font-family:verdana,arial,helvetica; color: #304483; }
+table.border1 { border-top:2px solid #304483; border-bottom:2px solid #304483; border-left:2px solid #304483; border-right:2px solid #304483; }
+radio.radio { height:20px; }
+table.leftRightBorder { border-left:1px solid #304483; border-right:1px solid #304483; }
+select.commonSelect { background-color: #D1D9E9; border: 1px solid #2F4382; color:#304483; font-weight:bold; height:20px; width:100px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
