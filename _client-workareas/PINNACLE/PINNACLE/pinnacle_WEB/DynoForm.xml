@@ -1,0 +1,42 @@
+<dynaForm>
+<requestType>
+	<artist>
+		<name>David Rhomberg</name>
+		<email>david@pinnacle-artists.com</email>
+	</artist>
+	<artist>
+		<name>Paul Tapia</name>
+		<email>paultapia@pinnacle-artists.com</email>
+	</artist>
+	<artist>
+		<name>Mike Sullivan</name>
+		<email>mikesullivan@pinnacle-artists.com</email>
+	</artist>
+	<artist>
+		<name>Jennifer Main</name>
+		<email>jennifermain@pinnacle-artists.com</email>
+	</artist>
+	<artist>
+		<name>Louis Cantillo</name>
+		<email>louiscantillo@pinnacle-artists.com</email>
+	</artist>
+	<artist>
+		<name>Jenifer Rhomberg</name>
+		<email>jenifer@pinnacle-artists.com</email>
+	</artist>
+</requestType>
+<requestSubject>
+	<subject>
+		<name>Commission Artwork</name>
+	</subject>
+	<subject>
+		<name>Purchase Artwork</name>
+	</subject>
+	<subject>
+		<name>Sell Artwork</name>
+	</subject>
+	<subject>
+		<name>Other Reason</name>
+	</subject>
+</requestSubject>
+</dynaForm>

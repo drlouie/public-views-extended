@@ -1,0 +1,17 @@
+
+@referers = ('www.pacificoneresidential.com','pacificoneresidential.com','216.122.58.116','ngen.dynalias.com');
+
+&check_referee;
+
+sub check_referee {
+}
+
+sub bad_referee {
+}
+
+#######################
+## End Check Referee ##
+#######################
+## return =true
+
+1;

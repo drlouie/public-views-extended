@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<featuredProjects>
+	<proj>
+		<label>22 Breakers Isle</label>
+		<city>Dana Point</city>
+		<zip>92629</zip>
+		<state>CA</state>
+		<price>$8,900,000</price>
+		<title>Breakers Isle Smiles</title>
+		<fourFeatures>Own Your Peace of Ocean,Tantalizing Coastal Breezes,Clean Sandy Beaches,Oceanfront Paradise Estate</fourFeatures>
+		<thumb>Showcases/OC1/thumbs/L22996_9.jpg</thumb>
+		<allPhotos>Showcases/OC1/xml/L22996.xml</allPhotos>
+		<description>Single Family Property, Area: Monarch Beach, County: Orange, Lot is 8777 sq. ft., Year Built: 1999, Ocean view, View, Waterview, Community swimming pool(s), Community spa/hot tub(s), Fireplace(s) and Dining room.</description>
+		<bedroom>4</bedroom>
+		<bathroom>4.5</bathroom>
+		<floorplan>5,529 sqft</floorplan>
+		<lotsize>0.2 Acres</lotsize>
+		<yearbuilt>1999</yearbuilt>
+		<garage>3</garage>
+		<lat>33.4718</lat>
+		<lon>-117.71888</lon>
+	</proj>
+	<proj>
+		<label>10 Shadowcast</label>
+		<city>Newport Coast</city>
+		<zip>92657</zip>
+		<state>CA</state>
+		<price>$3,895,000</price>
+		<title>Relaxation Intensified</title>
+		<fourFeatures>Contemporary Hot Tub,Spanish Tile Laced,Bountiful Granite Surfaces,Personal Mood Lighting</fourFeatures>
+		<thumb>Showcases/OC1/thumbs/S491574_5.jpg</thumb>
+		<allPhotos>Showcases/OC1/xml/S491574.xml</allPhotos>
+		<description>Single Family Property, County: Orange, Lot is 9300 sq. ft., Year Built: 2005, View, Community swimming pool(s), Community spa/hot tub(s), Fireplace(s), Dining room, Hardwood floors.</description>
+		<bedroom>4</bedroom>
+		<bathroom>4.5</bathroom>
+		<floorplan>3,800 sqft</floorplan>
+		<lotsize>0.21 Acres</lotsize>
+		<yearbuilt>2005</yearbuilt>
+		<garage>2</garage>
+		<lat>33.60</lat>
+		<lon>-117.81</lon>
+	</proj>
+	<proj>
+		<label>10 Winged Foot Lane</label>
+		<city>Newport Beach</city>
+		<zip>92660</zip>
+		<state>CA</state>
+		<price>$3,850,000</price>
+		<title>Brick Embracing Nature</title>
+		<fourFeatures>Private Coastal Views & Areas,Spectacular Spanish Villa, Views & More Views,Serenity Infused Gardens</fourFeatures>
+		<thumb>Showcases/OC1/thumbs/U7001237_12.jpg</thumb>
+		<allPhotos>Showcases/OC1/xml/U7001237.xml</allPhotos>
+		<description>Single Family Property, Area: East Bluff - Harbor View, County: Orange, Approximately 0.43 acre(s), Lot is 18819 sq. ft., Year Built: 1973, City view, Hill/mountain view, View, Fireplace(s), Dining room, Hardwood floors.</description>
+		<bedroom>4</bedroom>
+		<bathroom>3.5</bathroom>
+		<floorplan>4,500 sqft</floorplan>
+		<lotsize>0.43 Acres</lotsize>
+		<yearbuilt>1973</yearbuilt>
+		<garage>3</garage>
+		<lat>33.6261</lat>
+		<lon>-117.8702</lon>
+	</proj>
+	<proj>
+		<label>6 Cherry Hills Lane</label>
+		<city>Newport Beach</city>
+		<zip>92660</zip>
+		<state>CA</state>
+		<price>$5,495,000</price>
+		<title>Cherry Hills is Calling</title>
+		<fourFeatures>Luxury Gated Community,Top Luxury Accomodations,Single Family Luxury Living,3+</fourFeatures>
+		<thumb>Showcases/OC1/thumbs/U7001608_1.jpg</thumb>
+		<allPhotos>Showcases/OC1/xml/U7001608.xml</allPhotos>
+		<description>Enjoy the tranquil setting of this spectacular French style home located on a cul-de-sac and situated on the 7th hole of Newport Beach prestigious Big Canyon Country Club. Quality finishes and craftsmanship abound in this beautiful custom home. Amenities include 5 bedroom (master downstairs), 5.5 baths, sauna, elevator, outdoor barbeque and putting green.</description>
+		<bedroom>5</bedroom>
+		<bathroom>5.5</bathroom>
+		<floorplan>6,479 sqft</floorplan>
+		<lotsize>0.21 Acres</lotsize>
+		<yearbuilt>1990</yearbuilt>
+		<garage>3</garage>
+		<lat>33.62542</lat>
+		<lon>-117.86675</lon>
+	</proj>
+	<proj>
+		<label>8 Morning View</label>
+		<city>Newport Coast</city>
+		<zip>92657</zip>
+		<state>CA</state>
+		<price>$4,995,000</price>
+		<title>Extraordinary Panoramic Views</title>
+		<fourFeatures>Nature-Lovers Paradise,Masterful Architectural Design,Ultra-Modern Lighting Design,Beautiful Vistas Abundant</fourFeatures>
+		<thumb>Showcases/OC1/thumbs/U7001952_10.jpg</thumb>
+		<allPhotos>Showcases/OC1/xml/U7001952.xml</allPhotos>
+		<description>Single Family Property, County: Orange, Lot is 16869 sq. ft., Year Built: 1999, View, Community swimming pool(s), Community spa/hot tub(s), Fireplace(s), Dining room and Hardwood floors.</description>
+		<bedroom>5</bedroom>
+		<bathroom>5.5</bathroom>
+		<floorplan>5,800 sqft</floorplan>
+		<lotsize>0.39 Acres</lotsize>
+		<yearbuilt>1999</yearbuilt>
+		<garage>4+</garage>
+		<lat>33.5967</lat>
+		<lon>-117.8308</lon>
+	</proj>
+	<proj>
+		<label>6 Sandy Cove</label>
+		<city>Newport Coast</city>
+		<zip>92657</zip>
+		<state>CA</state>
+		<price>$3,599,900</price>
+		<title>Majestic Luminocity</title>
+		<fourFeatures>Views & More Views,Pristine Pool & Private Spa,Beautiful Vistas Abundant,Carefully Positioned Stonework</fourFeatures>
+		<thumb>Showcases/OC1/thumbs/U7003223_7.jpg</thumb>
+		<allPhotos>Showcases/OC1/xml/U7003223.xml</allPhotos>
+		<description>Casual elegance and resort living abound in this beautifully upgraded $$$ Crystal Cove home. This 4 or 5 bedroom home features Travertine flooring, dark wood cabinetry, plantation shutters, custom wood built-ins, Library/office,crown moldings,lush landscaping and extensive hardscape. Largest Seabourn floorplan over 4,000 SQ.FT. Entertainers delight with pool, spa, waterfall and BBQ. Four houses from beach access to Crystal Cove beach and walking trails.</description>
+		<bedroom>4</bedroom>
+		<bathroom>5.5</bathroom>
+		<floorplan>4,000 sqft</floorplan>
+		<lotsize>0.17 Acres</lotsize>
+		<yearbuilt>2001</yearbuilt>
+		<garage>2</garage>
+		<lat>33.5760</lat>
+		<lon>-117.8389</lon>
+	</proj>
+	<proj>
+		<label>26 Gondoliers Bluff</label>
+		<city>Newport Coast</city>
+		<zip>92657</zip>
+		<state>CA</state>
+		<price>$6,395,000</price>
+		<title>The Pacific is Yours</title>
+		<fourFeatures>Catalina Island View,Bluffs Beneath Your Footstep,Stunning Coastline Vistas,Breeezy Panoramic Views</fourFeatures>
+		<thumb>Showcases/OC1/thumbs/U7003934_1.jpg</thumb>
+		<allPhotos>Showcases/OC1/xml/U7003934.xml</allPhotos>
+		<description>Single Family Property, Area: Crystal Cove, County: Orange, Lot is 13250 sq. ft., Year Built: 2004, City view, Ocean view, View, Waterview, Swimming pool(s), Community swimming pool(s), Community spa/hot tub(s), Fireplace(s) and Den.</description>
+		<bedroom>4</bedroom>
+		<bathroom>4.5</bathroom>
+		<floorplan>5,800 sqft</floorplan>
+		<lotsize>0.30 Acres</lotsize>
+		<yearbuilt>2004</yearbuilt>
+		<garage>3</garage>
+		<lat>33.57</lat>
+		<lon>-117.83</lon>
+	</proj>
+</featuredProjects>

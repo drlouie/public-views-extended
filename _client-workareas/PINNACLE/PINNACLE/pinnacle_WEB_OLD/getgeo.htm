@@ -1,0 +1,22 @@
+#!/usr/bin/perl5 -s
+
+require("pq.nsp");
+
+print "Content-type:  text/html\n\n";
+use LWP::Simple;
+my $content = get("http://rpc.geocoder.us/service/csv?address=$FORM{'a'}");
+
+my @splitC = split(/,/,$content);
+
+$level = '17';
+if (int(@splitC) != 0) {
+	$lat = $splitC[0];
+	$lon = $splitC[1];
+	print "$content";
+}
+else {
+	$lat = '34.062813';
+	$lon = '-117.176856';
+}
+
+exit;

@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Pinnacle Artists & Acts</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-7">
+<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<script language="JavaScript" src="Pinnacle_Scripts/b4dom.js"></script>
+<script language="JavaScript" src="Pinnacle_Scripts/radioControl.js"></script>
+<script language="JavaScript" src="Pinnacle_Scripts/fade.js"></script>
+<script language="JavaScript" src="Pinnacle_Scripts/dynlayer.js"></script>
+<script language="JavaScript" src="Pinnacle_Scripts/casita.js"></script>
+<script language="JavaScript" src="Pinnacle_Scripts/itrans.js"></script>
+<script>
+	var showcaseXML = '';
+	var theCB = 0;
+	var countT = 0;
+	function trigger(myurl) {
+		if (myurl == 1) { myurl = "http://www.google.com/"; }
+		frame.loadpage(myurl);
+		countT++;
+	}
+	var showingMap = 0;
+	var showingPDF = 0;
+	function parseMap(la,lo) {
+		showingMap = 1;
+		document.getElementById('divLoad').style.visibility = 'visible';
+		trigger('gmap.htm?la='+la+'&lo='+lo+'');
+	}
+	function closeMap() {
+		showingMap = 0;
+		document.getElementById('divLoad').style.visibility = 'hidden';
+	}
+	function castPDF(sid,pid) {
+		showingPDF = 1;
+		document.getElementById('divLoad').style.visibility = 'visible';
+		trigger('pdfer.htm?sid='+sid+'&pid='+pid+'&pdf=1');
+	}
+	function closePDF() {
+		showingPDF = 1;
+		document.getElementById('divLoad').style.visibility = 'hidden';
+	}
+// you know what for -ςφ-
+function hidestatus(){
+window.status=''
+return true
+}
+if (document.layers)
+document.captureEvents(Event.MOUSEOVER | Event.MOUSEOUT)
+document.onmouseover=hidestatus
+document.onmouseout=hidestatus
+</script>
+<style>
+	body { overflow:hidden; }
+	#blockDiv { filter:alpha(opacity=10);-moz-opacity:.10; visibility:visible; z-index:105; }
+	.topIndex { background-image: url(Pinnacle_Images/topIndex.gif); background-repeat: no-repeat; background-position: center top; }
+	.paper1 { background-image: url(Pinnacle_Images/paper1.png); background-repeat: no-repeat; background-position: center top; }
+	#musplLay { visibility:visible; }
+	#tree { filter:alpha(opacity=90);-moz-opacity:.90; }
+	#samplersBack  { filter:alpha(opacity=80);-moz-opacity:.80; }
+	#t1 { filter:alpha(opacity=70);-moz-opacity:0.70; }
+	#t2 { filter:alpha(opacity=60);-moz-opacity:0.60; }
+	#t3 { filter:alpha(opacity=50);-moz-opacity:0.50; }
+	#t4 { filter:alpha(opacity=40);-moz-opacity:0.40; }
+	#t5 { filter:alpha(opacity=30);-moz-opacity:0.30; }
+	#t6 { filter:alpha(opacity=20);-moz-opacity:0.20; }
+	#t7 { filter:alpha(opacity=10);-moz-opacity:0.10; }
+	#divLoad { visibility: hidden; border-top:#B8A27F 1px solid; border-left:#B8A27F 1px solid;  border-right:#B8A27F 1px solid; position:relative; z-index:103; top:-841px; left:-86px; width:600px; height:328px; clip:rect(0px 600px 328px 0px); }
+	#overDiv, #divLinks,#divArrows, #bground, #divCont, #divIEText, #addCommentForm { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; }
+</style>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="runit();InitializeHomeTransients();">
+<div style="position:absolute;left:-100px;top:-100px;z-index:-1000;width:0px;height:0px;overflow:hidden;clip:rect(0px 0px 0px 0px);"><img src="/Pinnacle_Images/artistry/1.gif"><img src="/Pinnacle_Images/artistry/2.gif"><img src="/Pinnacle_Images/artistry/3.gif"><img src="/Pinnacle_Images/artistry/4.gif"><img src="/Pinnacle_Images/artistry/5.gif"><img src="/Pinnacle_Images/artistry/6.gif"><img src="/Pinnacle_Images/artistry/7.gif"></div>
+<center>
+<div id="mainLayer" style="width:790px;height:360px;overflow:hidden;">
+<table width="790" border="0" cellpadding="0" cellspacing="0" style="background-image: url(Pinnacle_Images/backerIndex.jpg); background-repeat: repeat-y; background-position: left top;" id="MainTable">
+    <tr> 
+      <td height="1" colspan="3" align="center" valign="top"><img src="Pinnacle_Images/spacer.gif" width="790" height="1"></td>
+    </tr>
+    <tr>
+      	<td height="180" colspan="3" align="left" valign="top"><div style="position:relative; z-index:102; top:34px; left:454px; visibility:visible;"><img src="Pinnacle_Images/pinnacleLogoHome.jpg" width="125" height="81"></div></td>
+    </tr>
+    <tr>
+      <td height="30" colspan="3" align="center" valign="top"><img src="Pinnacle_Images/spacer.gif" width="790" height="30"></td>
+    </tr>
+    <tr>
+      <td align="right" valign="top" width="50%" height="32"><div style="position:relative; z-index:101; top:-50px; left:120px; visibility:visible;"><a href="javascript:showShowcase();" onMouseOver="document.images.but2Index.src = b2on.src;" onMouseOut="document.images.but2Index.src = b2off.src;"><img src="Pinnacle_Images/but2Index.gif" name="but2Index" width="134" height="32" hspace="20" border="0"></a></div></td>
+      <td height="32" width="1"><img src="Pinnacle_Images/spacer.gif" width="1" height="32"></td>
+      <td align="right" valign="top" width="50%" height="32"><div style="position:relative; z-index:101; top:-50px; left:-110px; visibility:visible;"><a href="javascript:toggleForm1();" onMouseOver="toggleMousieF1('on');" onMouseOut="toggleMousieF1('off');"><img src="Pinnacle_Images/but1Index.gif" name="but1Index" width="134" height="30" hspace="20" border="0"></a></div></td>
+    </tr>
+    <tr>
+      <td height="34" colspan="3" align="center" valign="top"><img src="Pinnacle_Images/spacer.gif" width="790" height="34"></td>
+    </tr>
+    <tr>
+      <td height="92" colspan="3" align="center" valign="top"><div STYLE="position:relative; z-index:102; top:0px; left:0px; visibility:visible;"><img src="Pinnacle_Images/bottomIndex.gif" width="776" height="92" id="samplersBack"></div></td>
+    </tr>
+  </table>
+<div STYLE="position:relative;top:-368px;left:-12px;width:799px;height:359px;z-index:100;clip:rect(0px 799px 359px 0px);overflow:hidden;"><table cellpadding="0" cellspacing="0" border="0" id="tree" STYLE="filter:alpha(opacity=90);-moz-opacity:.90; "><tr><td width="776"><img src="Pinnacle_Images/trees.jpg" width="774" height="359" hspace="20" border="0"></td></tr></table></div>
+<div id="samplers" STYLE="position:relative; z-index:102; top:-442px; left:0px; visibility:visible; height:92px; width:776px; clip:rect(0px 92px 776px 0px); ">
+<table width="777" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td align="center" id="t1" style="filter:alpha(opacity=98);-moz-opacity:0.98;"><DIV id="blenddiv1" style="BACKGROUND-IMAGE: url(Pinnacle_Images/sampleProperties/blankie.gif); WIDTH: 104px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 64px"><IMG id="blendimage1" style="BORDER-RIGHT: 0px; BORDER-TOP: 0px; FILTER: alpha(opacity=0); BORDER-LEFT: 0px; WIDTH: 104px; BORDER-BOTTOM: 0px; HEIGHT: 64px; opacity: 0; moz-opacity: 0; khtml-opacity: 0" alt="" border="0" src="/Pinnacle_Images/spacer.gif"></DIV></td>
+		<td align="center" id="t2" style="filter:alpha(opacity=96);-moz-opacity:0.96;"><DIV id="blenddiv2" style="BACKGROUND-IMAGE: url(Pinnacle_Images/sampleProperties/blankie.gif); WIDTH: 104px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 64px"><IMG id="blendimage2" style="BORDER-RIGHT: 0px; BORDER-TOP: 0px; FILTER: alpha(opacity=0); BORDER-LEFT: 0px; WIDTH: 104px; BORDER-BOTTOM: 0px; HEIGHT: 64px; opacity: 0; moz-opacity: 0; khtml-opacity: 0" alt="" border="0" src="/Pinnacle_Images/spacer.gif"></DIV></td>
+		<td align="center" id="t3" style="filter:alpha(opacity=94);-moz-opacity:0.94;"><DIV id="blenddiv3" style="BACKGROUND-IMAGE: url(Pinnacle_Images/sampleProperties/blankie.gif); WIDTH: 104px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 64px"><IMG id="blendimage3" style="BORDER-RIGHT: 0px; BORDER-TOP: 0px; FILTER: alpha(opacity=0); BORDER-LEFT: 0px; WIDTH: 104px; BORDER-BOTTOM: 0px; HEIGHT: 64px; opacity: 0; moz-opacity: 0; khtml-opacity: 0" alt="" border="0" src="/Pinnacle_Images/spacer.gif"></DIV></td>
+		<td align="center" id="t4" style="filter:alpha(opacity=92);-moz-opacity:0.92;"><DIV id="blenddiv4" style="BACKGROUND-IMAGE: url(Pinnacle_Images/sampleProperties/blankie.gif); WIDTH: 104px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 64px"><IMG id="blendimage4" style="BORDER-RIGHT: 0px; BORDER-TOP: 0px; FILTER: alpha(opacity=0); BORDER-LEFT: 0px; WIDTH: 104px; BORDER-BOTTOM: 0px; HEIGHT: 64px; opacity: 0; moz-opacity: 0; khtml-opacity: 0" alt="" border="0" src="/Pinnacle_Images/spacer.gif"></DIV></td>
+		<td align="center" id="t5" style="filter:alpha(opacity=90);-moz-opacity:0.90;"><DIV id="blenddiv5" style="BACKGROUND-IMAGE: url(Pinnacle_Images/sampleProperties/blankie.gif); WIDTH: 104px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 64px"><IMG id="blendimage5" style="BORDER-RIGHT: 0px; BORDER-TOP: 0px; FILTER: alpha(opacity=0); BORDER-LEFT: 0px; WIDTH: 104px; BORDER-BOTTOM: 0px; HEIGHT: 64px; opacity: 0; moz-opacity: 0; khtml-opacity: 0" alt="" border="0" src="/Pinnacle_Images/spacer.gif"></DIV></td>
+		<td align="center" id="t6" style="filter:alpha(opacity=88);-moz-opacity:0.88;"><DIV id="blenddiv6" style="BACKGROUND-IMAGE: url(Pinnacle_Images/sampleProperties/blankie.gif); WIDTH: 104px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 64px"><IMG id="blendimage6" style="BORDER-RIGHT: 0px; BORDER-TOP: 0px; FILTER: alpha(opacity=0); BORDER-LEFT: 0px; WIDTH: 104px; BORDER-BOTTOM: 0px; HEIGHT: 64px; opacity: 0; moz-opacity: 0; khtml-opacity: 0" alt="" border="0" src="/Pinnacle_Images/spacer.gif"></DIV></td>
+		<td align="center" id="t6" style="filter:alpha(opacity=86);-moz-opacity:0.86;"><DIV id="blenddiv7" style="BACKGROUND-IMAGE: url(Pinnacle_Images/sampleProperties/blankie.gif); WIDTH: 104px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 64px"><IMG id="blendimage7" style="BORDER-RIGHT: 0px; BORDER-TOP: 0px; FILTER: alpha(opacity=0); BORDER-LEFT: 0px; WIDTH: 104px; BORDER-BOTTOM: 0px; HEIGHT: 64px; opacity: 0; moz-opacity: 0; khtml-opacity: 0" alt="" border="0" src="/Pinnacle_Images/spacer.gif"></DIV></td>
+	</tr>
+</table>
+</div>
+<div id="topIndex" STYLE="position:relative; z-index:102; top:-825px; left:0px; visibility:visible; height:30px; width:776px; clip:rect(0px 92px 776px 0px); "><table><tr><td class="topIndex"><img src="Pinnacle_Images/spacer.gif" width="774" height="99" border="0"></td></tr></table></div>
+<!--<div id="paper1" STYLE="position:absolute; z-index:102; top:0px; left:0px; visibility:visible; height:298px; width:251px; clip:rect(0px 251px 298px 0px); "><table><tr><td class="paper1"><img src="Pinnacle_Images/spacer.gif" width="251" height="298" border="0"></td></tr></table></div>-->
+</div>
+
+<div id="lowestLevel">
+  <table width="790" border="0" cellpadding="0" cellspacing="0" id="footer">
+    <tr>
+      <td height="20" align="center"><img src="Pinnacle_Images/backerBottom.jpg" height="20" width="790"></td>
+    </tr>
+    <tr>
+      <td height="30" align="center"><a href="javascript:goBackHome();"><img src="Pinnacle_Images/spacer.gif" height="30" width="776" border="0"></a></td>
+    </tr>
+  </table>
+</div>
+</center>
+
+<div id="reldiv">
+<DIV ID="blockDiv" STYLE="position:absolute; left:-230px; top:175px; width:250px; height:50px; clip:rect(0px 250px 50px 0px); filter:alpha(opacity=10);-moz-opacity:.10;">
+<!--
+<table width="250" cellpadding="0" cellspacing="0" align="right" border="0">
+<tr height="50">
+<td align="right" width="230"><div id="musplLay" bgcolor="#E8EADD" style="background-color:#E8EADD;"><script language="JavaScript" src="Pinnacle_Scripts/swf_mplay.js"></script></div></td>
+<td align="left" width="20"><a href="javascript:void(0);" OnMouseOver="javascript:checkPos();"><img src="Pinnacle_Images/show_radio.gif" name="radiobar" border="0" width="20" height="50"></a></td>
+</tr>
+</table>
+-->
+</DIV>
+</div>
+
+
+<div id="showcaseMovie" style="visibility:hidden;width:1px;height:1px;overflow:hidden;"><table width="790" border="0" cellpadding="0" cellspacing="0" style="background-image: url(Pinnacle_Images/backerIndex.jpg); background-repeat: repeat-y; background-position: left top;"><tr><td align="center"><script language="JavaScript" src="Pinnacle_Scripts/swf_showc.js"></script></td></tr></table></div>
+<div id="backHome" style="visibility:hidden;width:1px;height:1px;overflow:hidden;"></div>
+<div id="form1" STYLE="visibility: hidden; width:1px; height:1px;overflow:hidden;"><table><tr><td><script language="JavaScript" src="Pinnacle_Scripts/swf_form1.js"></script></td></tr></table></div>
+
+<center><div id="paper1" STYLE="visibility: hidden; position:relative; z-index:130; top:-410px; left:-230px; width:261px; height:307px; clip:rect(0px 261px 307px 0px); "><table><tr><td><script language="JavaScript" src="Pinnacle_Scripts/swf_form1.js"></script></td></tr></table></div></center>
+
+<center>
+<div id="overDiv"></div><div id="divLinks"></div><div id="divArrows"></div>
+<script language="Javascript" type="text/javascript" src="Pinnacle_Scripts/pageload1.js"></script>
+<script language="Javascript" type="text/javascript" src="Pinnacle_Scripts/pageload2.js"></script>
+<script>
+	ifrinit();
+</script>
+<style>
+	#divLoad { visibility: hidden; border-top:#B8A27F 1px solid; border-left:#B8A27F 1px solid;  border-right:#B8A27F 1px solid; position:relative; z-index:103; top:-841px; left:-86px; width:600px; height:328px; clip:rect(0px 600px 328px 0px); }
+	#overDiv, #divLinks,#divArrows, #bground, #divCont, #divIEText, #addCommentForm { visibility: hidden; position:absolute;left:0px;top:0px;z-index:-100;width:1px; height:1px; clip:rect(0px 1px 1px 0px); overflow:hidden; }
+</style>
+<script>
+		document.getElementById('divLoad').style.visibility = 'hidden';
+		
+</script>
+</center>
+</body>
+</html>

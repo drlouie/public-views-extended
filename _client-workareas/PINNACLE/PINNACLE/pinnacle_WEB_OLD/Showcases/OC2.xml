@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<featuredProjects>
+	<proj>
+		<label>34335 Green Lantern</label>
+		<city>Dana Point</city>
+		<zip>92629</zip>
+		<state>CA</state>
+		<price>$3,190,000</price>
+		<title>Ocean Lovers' Fantasy</title>
+		<fourFeatures>Tantalizing Coastal Breezes,Extraordinary Panoramic Views,Angelic View of Marina,Walk Down to Public Beach</fourFeatures>
+		<thumb>Showcases/OC2/thumbs/L23958_8.jpg</thumb>
+		<allPhotos>Showcases/OC2/xml/L23958.xml</allPhotos>
+		<description>Condo/Townhome/Coop Property, Area: Lantern Village, County: Orange, Year Built: 1981, City view, Hill/mountain view, Ocean view, View, Waterview, Fireplace(s) and Den.</description>
+		<bedroom>3</bedroom>
+		<bathroom>2.5</bathroom>
+		<floorplan>2,637 sqft</floorplan>
+		<lotsize>Acres: n/a</lotsize>
+		<yearbuilt>1981</yearbuilt>
+		<garage>2</garage>
+		<lat>33.46375</lat>
+		<lon>-117.70689</lon>
+	</proj>
+	<proj>
+		<label>30 Monarch Beach</label>
+		<city>Dana Point</city>
+		<zip>92629</zip>
+		<state>CA</state>
+		<price>$3,500,000</price>
+		<title>Drifting in Luxury</title>
+		<fourFeatures>Luxury Gated Community,Nature-Lovers Paradise,Masterful Architectural Design,Dreamy Vistas Throughout</fourFeatures>
+		<thumb>Showcases/OC2/thumbs/S476460_7.jpg</thumb>
+		<allPhotos>Showcases/OC2/xml/S476460.xml</allPhotos>
+		<description>Single Family Property, Area: Monarch Beach, County: Orange, Year Built: 2006, Golf course view, View, Swimming pool(s) and Fireplace(s).</description>
+		<bedroom>3</bedroom>
+		<bathroom>3.5</bathroom>
+		<floorplan>3,318 sqft</floorplan>
+		<lotsize>Acres: n/a</lotsize>
+		<yearbuilt>2006</yearbuilt>
+		<garage>2</garage>
+		<lat>33.48</lat>
+		<lon>-117.71</lon>
+	</proj>
+	<proj>
+		<label>35181 El Camino Capistrano</label>
+		<city>Dana Point</city>
+		<zip>92624</zip>
+		<state>CA</state>
+		<price>$3,495,000</price>
+		<title>Panoramic Pacific Views</title>
+		<fourFeatures>Own Your Peace of Ocean,Tantalizing Coastal Breezes,Clean Sandy Beaches,Oceanfront Paradise Estate</fourFeatures>
+		<thumb>Showcases/OC2/thumbs/S492412_3.jpg</thumb>
+		<allPhotos>Showcases/OC2/xml/S492412.xml</allPhotos>
+		<description>Mediterranean Villa on An Ocean Front Bluff. Imagine the romance of enjoying each and every day with an Up Close, Unobstructed, Ocean, Coastline and Whitewater View, from Every Single Room in Your Home! A Double Wide Lot on a Single Loaded Street Offers Unparalleled Privacy. Combine This with Over 5,000 Sqft of elegant living spaces (est. 3,800 under roof & over 1,200 of Decks) and neither you nor your guests will ever want to leave. Motivated Seller Relocated Out of State...Act Fast.</description>
+		<bedroom>3</bedroom>
+		<bathroom>4</bathroom>
+		<floorplan>3,801 sqft</floorplan>
+		<lotsize>0.24 Acres</lotsize>
+		<yearbuilt>1992 </yearbuilt>
+		<garage>3</garage>
+		<lat>33.4632</lat>
+		<lon>-117.69984</lon>
+	</proj>
+	<proj>
+		<label>83 Ritz Cove Drive</label>
+		<city>Dana Point</city>
+		<zip>92629</zip>
+		<state>CA</state>
+		<price>$3,395,000</price>
+		<title>Nature Privatized</title>
+		<fourFeatures>Magnificance an Understatement,The Pacific is Yours,Remarkable Views Abundant,Country Club Luxuries,Distinguished Community</fourFeatures>
+		<thumb>Showcases/OC2/thumbs/S496381_8.jpg</thumb>
+		<allPhotos>Showcases/OC2/xml/S496381.xml</allPhotos>
+		<description>An exceptional opportunity located in the prestigious gated 'ocean front' community of Ritz Cove! Custom built contemporary/meditteranean residence! 5 bed/4.5 baths! Open & spacious with cathedral ceilings! Light & bright! Extensive use of marble & granite! Center island kitchen w/ breakfast nook, 72' Sub-zero fridge/freezer! 3! 24 hour guard gated! Walking distance to the Ritz Carlton & St. Regis resorts! Walk to the beach via private gated access! Won't last long!</description>
+		<bedroom>5</bedroom>
+		<bathroom>4.5</bathroom>
+		<floorplan>4,400 sqft</floorplan>
+		<lotsize>0.22 Acres</lotsize>
+		<yearbuilt>1990</yearbuilt>
+		<garage>3</garage>
+		<lat>33.48</lat>
+		<lon>-117.72</lon>
+	</proj>
+	<proj>
+		<label>22802 Via Orvieto</label>
+		<city>Dana Point</city>
+		<zip>92629</zip>
+		<state>CA</state>
+		<price>$3,299,000</price>
+		<title>Enliven Your Future</title>
+		<fourFeatures>Magnificent Coastal Vistas,Walk Down to Private Beach, Hypnotizing Ocean Living,Tantalizing Coastal Breezes</fourFeatures>
+		<thumb>Showcases/OC2/thumbs/S506658_1.jpg</thumb>
+		<allPhotos>Showcases/OC2/xml/S506658.xml</allPhotos>
+		<description>Single Family Property, Area: Monarch Beach, County: Orange, Approximately 0.21 acre(s), Lot is 9240 sq. ft., Year Built: 1985, Ocean view, View, Waterview, Fireplace(s), Dining room, Den and Hardwood floors.</description>
+		<bedroom>4</bedroom>
+		<bathroom>3.5</bathroom>
+		<floorplan>3,623 sqft</floorplan>
+		<lotsize>0.21 Acres</lotsize>
+		<yearbuilt>1985</yearbuilt>
+		<garage>3</garage>
+		<lat>33.49</lat>
+		<lon>-117.73</lon>
+	</proj>
+	<proj>
+		<label>1729 Port Abbey Place</label>
+		<city>Newport Beach</city>
+		<zip>92660</zip>
+		<state>CA</state>
+		<price>$3,585,000</price>
+		<title>Sunnyside Up</title>
+		<fourFeatures>Luxury Gated Community,Top Luxury Accomodations,Single Family Luxury Living,Single Family Residence</fourFeatures>
+		<thumb>Showcases/OC2/thumbs/U7003064_3.jpg</thumb>
+		<allPhotos>Showcases/OC2/xml/U7003064.xml</allPhotos>
+		<description>Single Family Property, Area: East Bluff - Harbor View, County: Orange, Approximately 0.23 acre(s), Lot is 9935 sq. ft., Year Built: 1968, Swimming pool(s), Community swimming pool(s), Fireplace(s), Dining room and Hardwood floors.</description>
+		<bedroom>5</bedroom>
+		<bathroom>3</bathroom>
+		<floorplan>2,437 sqft</floorplan>
+		<lotsize>0.23 Acres</lotsize>
+		<yearbuilt>1968</yearbuilt>
+		<garage>3</garage>
+		<lat>33.63</lat>
+		<lon>-117.86</lon>
+	</proj>
+</featuredProjects>

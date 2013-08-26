@@ -1,0 +1,87 @@
+b1off= new Image(); b1off.src="Pinnacle_Images/but1Index.gif";
+b1on= new Image(); b1on.src="Pinnacle_Images/but1Index_ov.gif";
+b2off= new Image(); b2off.src="Pinnacle_Images/but2Index.gif";
+b2on= new Image(); b2on.src="Pinnacle_Images/but2Index_ov.gif";
+
+//radioControl
+on = new Image(); on.src = "Pinnacle_Images/show_radio.gif"; 
+off = new Image(); off.src = "Pinnacle_Images/hide_radio.gif";
+
+//bottomLogosIndex.gif
+BLI = new Image(); BLI.src = "Pinnacle_Images/bottomLogosIndex.gif";
+BB = new Image(); BB.src = "Pinnacle_Images/backerBottom.jpg";
+BI = new Image(); BI.src = "Pinnacle_Images/bottomIndex.jpg";
+BI2 = new Image(); BI2.src = "Pinnacle_Images/backerIndex.jpg";
+TI = new Image(); TI.src = "Pinnacle_Images/topIndex.jpg";
+
+var pageStates = new Array();
+var pSC = '';
+var lSC = '';
+
+// from home
+function showShowcase() {
+	// always maintain states (only 3 page states MAX)
+	pageStates["homeContents"] = document.getElementById("mainLayer").innerHTML;
+	//-- STEP 1: shortenMainLayer
+	compressIt('mainLayer',10);
+	// timeout for LOADING sequence
+	if (pSC.thisTimeout) { window.clearTimeout(pSC.thisTimeout); }
+	pSC.thisTimeout = window.setTimeout('prepareShowcase()',2000);
+	
+}
+function prepareShowcase() {
+	// this gets called within the flash movie (called whenever needed, including loadtime)
+	stretchIt('mainLayer',30);
+	// save lastPageSeen before overwritting
+	pageStates["lastPageSeen"] = document.getElementById("mainLayer").innerHTML;
+	flashCom('expand','mainLayer','30');
+	document.getElementById("mainLayer").innerHTML = "<img src='Pinnacle_Images/spacer.gif' border='0' width='790' height='360'>";
+	if (document.getElementById) {
+		if (lSC.thisTimeout) { window.clearTimeout(lSC.thisTimeout); }
+		lSC.thisTimeout = window.setTimeout('loadShowcase()',100);
+	}
+}
+
+function loadShowcase() {
+	flashCom('expand','mainLayer','500');
+	// now place showcaseMovie into mainLayer
+	document.getElementById("mainLayer").innerHTML = document.getElementById("showcaseMovie").innerHTML;
+}
+
+// internal flash script connection
+function flashCom (com, who, arg) {
+//	alert(com);
+ 	if (com == "expand") {
+		stretchIt(who,arg);
+  	}
+//	return false;
+}
+
+function goBackHome() {
+	// if not already home with homepage contents in place make it so and show it
+	if (pageStates["homeContents"]) {
+		if (pageStates["homeContents"] != document.getElementById("mainLayer").innerHTML) {
+			// save lastPageSeen before overwritting
+			pageStates["lastPageSeen"] = document.getElementById("mainLayer").innerHTML;
+			// now place homeContents back into mainLayer
+			document.getElementById("mainLayer").innerHTML = pageStates["homeContents"];
+		}
+		// then show it
+		stretchIt('mainLayer',360);
+	}
+}
+
+// makeRadio
+var doneNOW = 0;
+function playM() {
+//	plM();
+	doneNOW++;
+}
+function plM() {
+//	if (document.musplPla || window.musplPla) {
+//	if (document.musplPla) {
+//		document.musplPla.Rewind();
+//		document.musplPla.Play();
+//	}
+}
+

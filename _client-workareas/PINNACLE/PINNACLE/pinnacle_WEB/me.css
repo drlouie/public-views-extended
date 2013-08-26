@@ -1,0 +1,10 @@
+body, table {
+	font-family: Arial;
+	font-size: 9px;
+
+	color: #3399FF;
+	background-color: #33FF33;
+}
+.title {
+	font-size: 1.5em;
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sarah's Fading Panels</title>
+<meta name='author' content='Mike Foster (Cross-Browser.com)'>
+<meta name='description' content="Cross-Browser Javascript Libraries and Applications">
+<meta name='keywords' content='javascript,dhtml,crossbrowser,animation,tooltips,menu,collapsible,dhtml drag drop,downgradeable layout,dynamic select,image rollover,dhtml layout,css,dom,api,library,dhtml demos,lgpl code,unobtrusive dhtml,dom2 events,dynamic forms,animation,ellipse,parametric equation,object-oriented javascript'>
+<meta name='license' content='Distributed under the terms of the GNU LGPL (gnu.org)'>
+<link rel='stylesheet' type='text/css' href='css.css'>
+<style type='text/css'> #leftColumn { width:94%; }</style>
+<style type='text/css'>
+img {
+  border:1px dotted blue;
+  display:block;
+  float:left;
+  width:176px;
+  height:225px;
+  margin:4px;
+}
+#boxContainer {
+  position:relative;
+  overflow:visible;
+  height:200px;
+}
+#box0, #box1, #box2, #box3, #box4 {
+  position:absolute;
+  left:0;
+  top:0;
+  width:60%;
+  border-style: none;
+  color: black;
+  background-color: white;
+  padding: 0px;
+}
+#box1, #box2, #box3, #box4 {
+  display:none;
+}
+</style>
+<script type='text/javascript' src='PacificOne_Scripts/fading_panels.js'></script>
+</head>
+<body>
+
+<div>
+  <a id='lnk1' href="test1.html" title="test1"><img src="test1.jpg" width="176" height="225" border="0"></a>
+  <a id='lnk2' href="test2.html" title="test2"><img src="test2.jpg" width="176" height="225" border="0"></a>
+  <a id='lnk3' href="test3.html" title="test3"><img src="test3.jpg" width="176" height="225" border="0"></a>
+  <a id='lnk4' href="test4.html" title="test4"><img src="test4.jpg" width="176" height="225" border="0"></a>
+  <p style='clear:both'></p>
+</div>
+
+<div id='boxContainer'>
+  <div id="box0">
+    <h3>box0</h3>
+    <p>Lorem ipsum dolor sit amet, consectetaur adipisicing elit, sed do eiusmod tempor</p>
+    <p>This was 'mainbox'.</p>
+  </div>
+  <div id="box1">
+    <h3>box1</h3>
+    <p>incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud</p>
+    <p>Sarah, we really appreciate everything you do (and have done) for the forums!</p>
+  </div>
+  <div id="box2">
+    <h3>box2</h3>
+    <p>exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure</p>
+    <p>The animation of opacity in this demo is quite simple compared to <a href='http://cross-browser.com/x/examples/xanimation.opacity.php'>xAnimation.opacity</a>.</p>
+  </div>
+  <div id="box3">
+    <h3>box3</h3>
+    <p>dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+    <p>This demo uses 4 functions from the X Library: <a href='http://cross-browser.com/x/lib/view.php?s=xOpacity'>xOpacity</a>, <a href='http://cross-browser.com/x/lib/view.php?s=xGetElementById'>xGetElementById</a>, <a href='http://cross-browser.com/x/lib/view.php?s=xDef'>xDef</a> and <a href='http://cross-browser.com/x/lib/view.php?s=xStr'>xStr</a>. It doesn't <i>require</i> functions from X, you can use your own equivalents.</p>
+  </div>
+  <div id="box4">
+    <h3>box4</h3>
+    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>The dang tooltip causes mouseout/mouseover events!</p>
+  </div>
+</div>
+
+</body>
+</html>

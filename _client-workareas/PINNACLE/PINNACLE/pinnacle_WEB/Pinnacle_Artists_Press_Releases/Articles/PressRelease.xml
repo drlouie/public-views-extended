@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+	<channel>
+		<title>Pinnacle Artists - Latest News</title>
+		<link>http://www.pinnacle-artists.com/</link> 
+		<description>The latest news from Pinnacle Artists, our most recent press releases for Business and Artistic Associations</description>
+		<language>en-us</language>
+		<pubDate>Wed, 14 Feb 2008 01:09:54 GMT</pubDate>
+		<lastBuildDate>Wed, 14 Feb 2008 01:09:54 GMT</lastBuildDate>
+		<generator>LouieRd - DrLouie - (NMS) NetMedia Solutions XML Generator</generator>
+
+		<!--pressRelease 1 start-->
+		<item>
+			<title>Jennifer Main has become one of the most prominent artists of Las Vegas</title>
+			<link>02142008-1</link>
+			<description>February 14, 2008 - Jennifer Main has become one of the most prominent artists of Las Vegas. She began selling her work in galleries at the young age of 17 and has continued as a full-time artist with much success and recognition for the past 8 years showing her work in galleries nationally and has a growing respectable list of collectors worldwide.</description>
+		</item>
+
+		<!--pressRelease 2 start-->
+		<item>
+			<title>Mike Sullivan was born outside of Buffalo, NY and from an early age showed a penchant for drawing and painting</title>
+			<link>02142008-2</link>
+			<description>February 14, 2008 - When Mike Sullivan was in 5th grade his family moved to Syracuse, NY where he began taking weekly art classes at the Everson Museum and began his focus on figure drawing.</description>
+		</item>
+
+		<!--pressRelease 3 start-->
+		<item>
+			<title>Paul Tapia was born in San Francisco on August 14, 1940, he is of Spanish, German and Greek descent</title>
+			<link>02142008-3</link>
+			<description>February 14, 2008 - Tapia's most enjoyable pastimes include traveling the world with his art, doing professional archeology, the San Francisco 49ers and being alone with his Julie.</description>
+		</item>
+
+		<!--pressRelease 4 start-->
+		<item>
+			<title>Louis Cantillo is best known for his vibrant landscape photography and his collection of doors and windows of the world</title>
+			<link>02142008-4</link>
+			<description>February 14, 2008 - Louis has a gift for capturing unique perspectives on the familiar, through careful composition and use of color, texture, and contrast.</description>
+		</item>
+		
+	</channel>
+</rss>

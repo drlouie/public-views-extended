@@ -1,0 +1,8 @@
+Product,Type,Price:FLOAT,Features,Image
+Accordian,horn,249.90,Charry Wood Case,<IMG SRC="accordian.gif">
+Zooory,apple,2000.90,Charry Wood Case,<IMG SRC="accordian.gif">
+Nastian,horn,126.90,Charry Wood Case,<IMG SRC="accordian.gif">
+Mestorpat,apple,23.90,Charry Wood Case,<IMG SRC="accordian.gif">
+Greatinfant,horn,1.90,Charry Wood Case,<IMG SRC="accordian.gif">
+Morron,apple,6320.90,Charry Wood Case,<IMG SRC="accordian.gif">
+Cradle,horn,10000.90,Charry Wood Case,<IMG SRC="accordian.gif">

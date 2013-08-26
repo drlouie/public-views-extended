@@ -1,0 +1,29 @@
+
+		DynoForm is simply a flash form that is fed information by DynoForm.xml into the flash forms' internal lists of recipients and subjects.
+
+		WARNINGS:
+			- Always add new data to a CLEAN LINE, a NEW LINE
+			- Dont add HTML or MARKUP data for this will break the flash scripting internally, for this is simply made to be a quick and simple form.
+			- ALWAYS make a backup of this file before making changes, if you mess up you can always start all over again from the backup
+	
+
+
+
+		The XML DATASET consists of two types:
+
+
+
+		First: <requestType> will fill in the <artist> select list in the flash form
+				- TO ADD ARTIST: You would add these lines following 4 lines right before the line containing </requestType>
+			<artist>
+				<name>Artist Name</name>
+				<email>artists@emailaddress.com</email>
+			</artist>		
+	
+
+
+		Second: <requestSubject> will fill in the <subject> select list in the flash form
+				- TO ADD SUBJECT: You would add these lines following 4 lines right before the line containing </requestSubject>
+			<subject>
+				<name>New Subject Name</name>
+			</subject>	

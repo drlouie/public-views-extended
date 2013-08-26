@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Pacific 1 Residential - Prestigious Real Estate</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-7">
+<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<script language="JavaScript" src="PacificOne_Scripts/b4dom.js"></script>
+<script language="JavaScript" src="PacificOne_Scripts/dynlayer.js"></SCRIPT>
+<script language="JavaScript" src="PacificOne_Scripts/casita.js"></script>
+<script language="JavaScript" src="PacificOne_Scripts/radioControl.js"></SCRIPT>
+<style>
+	#blockDiv { filter:alpha(opacity=50);-moz-opacity:.50; visibility:visible; }
+	.topIndex{ background-image: url(PacificOne_Residential_Images/topIndex.jpg); background-repeat: no-repeat; background-position: center top; }
+</style>
+<script>
+
+var cual = '';
+var vis = '';
+var sop = '';
+var fop = '';
+var currOpacity = '';
+function slowFadeOut(cual) {
+	cual = cual;
+	fader(cual,"hide","59","0","60");
+}
+function slowFadeIn(cual) {
+//	cual = cual;
+//	fader(cual,"show","01","60","00");
+}
+
+function fader(cual, vis, sop, fop, currOpacity) {
+
+	currOpacity = Number(currOpacity);
+	if (vis == 'show') {
+		if (fop > currOpacity) { 
+			newOpacity = Number(currOpacity + 1);
+			currOpacity = newOpacity;
+		}
+	}
+	else if (vis == 'hide') {
+		if (fop < currOpacity) { 
+			newOpacity = Number(currOpacity - 1);
+			currOpacity = newOpacity;
+		}
+
+	}
+
+
+	myLayer = document.getElementById(""+cual+"").style;
+ 	if (myLayer.MozOpacity)
+		myLayer.MozOpacity="." + currOpacity + "";
+	else if (myLayer.filter)
+   		myLayer.filter = "Alpha(Opacity=" + currOpacity + ");";
+
+	//alert("" + cual + "," + vis + "," + sop + "," + fop + "," + currOpacity + "");
+	window.setTimeout("fader('" + cual + "','" + sop + "','" + fop + "','" + vis + "','" + currOpacity + "')", 10);
+
+
+
+}
+</script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="runit();slowFadeIn('blockDiv');">
+<center>
+<div id="mainLayer" style="width:790px;height:360px;overflow:hidden;" class="MainTable" style="background-image: url(PacificOne_Residential_Images/backerIndex.jpg); background-repeat: repeat-y; background-position: left top;">
+  <table width="790" border="0" cellpadding="0" cellspacing="0" class="topIndex">
+    <tr> 
+      <td height="1" colspan="2" align="center" valign="top"><img src="PacificOne_Residential_Images/spacer.gif" width="790" height="1"></td>
+    </tr>
+    <tr>
+      	<td height="180" colspan="2" align="center" valign="top"><script language="JavaScript" src="PacificOne_Scripts/swf_p1logo.js"></script></td>
+    </tr>
+    <tr>
+      <td height="15" colspan="2" align="center" valign="top"><img src="PacificOne_Residential_Images/spacer.gif" width="790" height="15"></td>
+    </tr>
+    <tr>
+      <td align="right" valign="top" width="50%" height="32"><a href="javascript:showShowcase();" onMouseOver="document.images.but2Index.src = b2on.src;" onMouseOut="document.images.but2Index.src = b2off.src;"><img src="PacificOne_Residential_Images/but2Index.gif" name="but2Index" width="134" height="32" hspace="20" border="0"></a></td>
+      <td align="left" valign="top" width="50%" height="32"><a href="javascript:contactPac1();" onMouseOver="document.images.but1Index.src = b1on.src;" onMouseOut="document.images.but1Index.src = b1off.src;"><img src="PacificOne_Residential_Images/but1Index.gif" name="but1Index" width="134" height="30" hspace="20" border="0"></a></td>
+    </tr>
+    <tr>
+      <td height="5" colspan="2" align="center" valign="top"><img src="PacificOne_Residential_Images/spacer.gif" width="790" height="5"></td>
+    </tr>
+    <tr>
+      <td height="92" colspan="2" align="center" valign="top"><img src="PacificOne_Residential_Images/bottomIndex.jpg" width="776" height="92"></td>
+    </tr>
+    <tr>
+      <td height="40" colspan="2" align="center" valign="top"><img src="PacificOne_Residential_Images/spacer.gif" width="790" height="40"></td>
+    </tr>
+  </table>
+</div>
+<div id="lowestLevel">
+  <table width="790" border="0" cellpadding="0" cellspacing="0" class="footer">
+    <tr>
+      <td height="36" align="center"><img src="PacificOne_Residential_Images/backerBottom.jpg" height="36" width="790"></td>
+    </tr>
+    <tr>
+      <td height="30" align="center"><a href="javascript:goBackHome();"><img src="PacificOne_Residential_Images/bottomLogosIndex.gif" height="30" width="735" border="0"></a></td>
+    </tr>
+  </table>
+</div>
+</center>
+
+<div id="reldiv">
+<DIV ID="blockDiv" STYLE="position:absolute; left:-230px; top:100px; width:250px; height:50px; clip:rect(0px 250px 50px 0px); filter:alpha(opacity=50);-moz-opacity:.50;">
+<table width="250" cellpadding="0" cellspacing="0" align="right" border="0">
+<tr height="50">
+<td align="right" width="230"><div id="musplLay"><script language="JavaScript" src="PacificOne_Scripts/swf_mplay.js"></script></div></td>
+<td align="left" width="20"><a href="javascript:void(0);" OnMouseOver="javascript:checkPos();"><img src="PacificOne_Residential_Images/show_radio.gif" name="radiobar" border="0" width="20" height="50"></a></td>
+</tr>
+</table>
+</DIV>
+</div>
+
+<div id="showcaseMovie" style="visibility:hidden;width:1px;height:1px;overflow:hidden;"><!--<script language="JavaScript" src="PacificOne_Scripts/swf_showc.js"></script>--></div>
+</body>
+</html>

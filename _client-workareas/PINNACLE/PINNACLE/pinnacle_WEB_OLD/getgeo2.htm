@@ -1,0 +1,16 @@
+#!/usr/bin/perl5 -s
+##-->> latlon best from maporama.com
+
+print "Content-type:  text/html\n\n";
+use CGI; 
+use LWP::Simple; 
+  
+my $cgi = new CGI(); 
+my $a = $cgi->param('a'); 
+my $d = get( "http://rpc.geocoder.us/service/rest?address=$a" ); 
+  
+$d =~ /geo:long>([^< ]*).*?geo:lat>([^< ]*)/is; 
+print "Content-type: text/plain\n\n"; 
+print "$1,$2"; 
+
+exit;
