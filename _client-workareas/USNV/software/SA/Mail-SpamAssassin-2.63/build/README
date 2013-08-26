@@ -1,0 +1,117 @@
+
+SPAMASSASSIN DEVELOPMENT SNAPSHOT PROCEDURE
+===========================================
+
+- cd to the directory for the codebase you want the devel tree to
+  come from
+
+- run "./build/update_devel" to build the tar.gz files
+
+- by default, they're written to ~/spamassassin.taint.org/devel/ .  This
+  Works For Me (tm), as it's my local cvs checkout of the SpamAssassin
+  website.  Copy them to wherever you want, yourself.
+
+
+SPAMASSASSIN RELEASE PROCEDURE
+==============================
+
+- cd to the directory for the codebase you want the release to
+  come from
+
+- edit lib/Mail/SpamAssassin.pm and comment the $IS_DEVEL_BUILD
+  line.
+
+- create the Changes file
+
+	TZ=UTC svn log --non-interactive --stop-on-copy
+
+  This will output all of the changes since the .0 release in the current
+  branch.
+
+- run "make disttest" to ensure all tests pass once the distribution
+  is fully packaged.
+
+- run "./build/update_stable" to build the tar.gz files.
+
+- by default, they're written to ~/spamassassin.taint.org/released/ .
+  This Works For Me (tm), as it's my local cvs checkout of the
+  SpamAssassin website.  Copy them to wherever you want, yourself.
+
+- take a copy of the MD5sum line output.
+
+- test the tar.gz and zip files!  redo until they work!! ;)
+
+- SVN commit the release files, including 'Changes':
+
+	svn commit -m "X.YZ RELEASED"
+
+- SVN tag the release files.  This is done using "svn copy", ie:
+
+  svn copy https://svn.apache.org/repos/asf/incubator/spamassassin/branches/b2_6_0 \
+           https://svn.apache.org/repos/asf/incubator/spamassassin/tags/spamassassin_release_2_6_1
+
+  This will do a completely server-side tagging (which is the same as
+  a branch really) of whatever the latest branch revision to be the new
+  base of the tag release.
+
+- Now, start the new development codebase.  For minor updates of a 2.x
+  tree (e.g. 2.x1, 2.x2), you don't need to branch; for major updates
+  (2.x0) you should use a new development branch, off HEAD.
+
+  svn copy https://svn.apache.org/repos/asf/incubator/spamassassin/trunk \
+           https://svn.apache.org/repos/asf/incubator/spamassassin/branches/b2_6_0
+
+  "trunk" is SVN's concept of head.  Typically, our branches are named
+  for their minor version number.  In the example above, b2_6_0 is the
+  branch for the stable 2.6x releases.  b3_0_0 would be the branch for
+  the stable 3.0.x releases, etc.
+
+- In the new development codeline, edit lib/Mail/SpamAssassin.pm, bump the
+  $VERSION line to the correct version, and uncomment the $IS_DEVEL_BUILD
+  line.
+
+- then, commit the new version number to the new branch:
+
+        svn commit -m "X.YN devel cycle started"
+
+	(where X.YN is the new version number)
+
+- edit SpamAssassin site through WebMake, change released_version item
+  at top of file to be X.YZ, then run "webmake" or hit "Build Fully"
+  in the Web interface
+
+- run this to update the mirrors:
+
+  ~/lib/html_spamassassin_put.rsync
+
+- upload to CPAN at http://pause.cpan.org/
+
+  ( https://pause.perl.org/pause/authenquery?ACTION=add_uri )
+
+- Before doing the next step, run through the Changes file, and write up a
+  quick summary of the important changes in human-readable format.  This
+  should be less than 600 chars to fit into Freshmeat's format, and
+  to be easily understandable.
+
+- announce to Freshmeat at http://freshmeat.net/
+
+  ( http://freshmeat.net/add-release/14876/ may work )
+
+- announce on SpamAssassin news site: http://news.spamassassin.org/
+
+  ( http://news.spamassassin.org/modules.php?op=modload&name=Submit_News&file=index )
+
+- announce on Sourceforge.net: http://www.sourceforge.net/ 
+
+  ( http://sourceforge.net/news/submit.php?group_id=25457 )
+
+- announce on SpamAssassin-Talk, SpamAssassin-Devel, and
+  SpamAssassin-Announce.  Be sure to include the MD5 checksums
+  in this mail, so paranoid folks can check the tarball's integrity.
+
+- Approve the posting to SpamAssassin-Announce (the list admins
+  will get a mail indicating how to do this.)
+
+lastmod: Jan 17 2004 tvd
+
+// vim:tw=74:
