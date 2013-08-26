@@ -1,0 +1,46 @@
+/* template master */
+.tmenu { font-family: verdana,arial,helvetica; font-size:9px; font-weight:bold; color:#000000; text-decoration:underline; padding-right:1px; padding-left:1px; }
+.menuIcon { padding-left:4px; padding-right:4px; }
+.quickStat {  padding-right:10px; }
+.qsFont { font-family: arial,verdana,helvetica; font-size:11px; font-weight:bold; color:#000000; }
+.secMenuSpacer { font-family: verdana,arial,helvetica; font-size:10px; color:#999999; }
+.secMenuLink { font-family: arial,verdana,helvetica; font-size:11px; color:#000000; padding-right:1px; padding-left:1px; }
+.welcomeMessage { font-family: verdana,arial,helvetica; font-size:10px; color:#666666; padding-right:5px; padding-left:5px; }
+.welcomeLink { font-family: verdana,arial,helvetica; font-size:10px; color:#000000; text-decoration:underline; }
+.bodyText { font-family: verdana,arial,helvetica; font-size:11px; color:#000000; padding:20px;}
+.footerText { font-family: verdana,arial,helvetica; font-size:9px; color:#000000; }
+
+/* Featured Product */
+.italix { color:#000000; font-size: 10px; font-family:verdana,arial,helvetica; margin-left:5px; }
+.featureText { color:#000000; font-size: 9px; font-family:arial,verdana,helvetica; padding-top:10px; padding-left:10px; padding-right:10px;padding-bottom:10px; }
+.featurePrice { color:#ffffff; font-size: 11px; font-weight:bold; font-family:verdana,arial,helvetica; padding-right:15px; }
+.featureLink { color:#000000; font-size: 9px; font-family:verdana,arial,helvetica; padding-top:10px; }
+.featureBullets { padding-left:15px; line-height:16px; font-size:9px; font-family:arial,verdana,helvetica; }
+.featureButtons { font-size:10px; font-family:verdana,arial,helevtica; }
+
+/* ask expert */
+.aaeSmallInput { height:17px; width:79; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+.aaeLargeInput { height:17px; width:120; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+.aaeTArea { width:250; height:54px; background-color:#FFFFFF; border-top: 1px solid #000000; border-left: 1px solid #000000; border-bottom: 1px solid #D0D0D0; border-right: 1px solid #D0D0D0; font-family:verdana,arial,helvetica; font-size:10px; }
+.aaeButtons { font-size:10px; font-family:verdana,arial,helevtica; }
+
+/* left menu */
+.counterCart { font-size:9px; font-family:verdana,arial,helevtica; color:#000000; line-height:16px; }
+
+/* left menu */
+.counterCart { font-size:9px; font-family:verdana,arial,helevtica; color:#000000; line-height:16px; }
+
+/* product pages */
+.title { font-family:arial,verdana,helvetica; font-size:15px; line-height:20px; color:#000000; font-weight:bold; margin-left:10px; }
+.description { font-family:arial,verdana,helvetica; font-size:12px; line-height:16px; color:#000000; }
+.inventoryButtons { font-size:10px; font-family:arial,verdana,helevtica; color:#000000; }
+.subTitle { font-family:arial,verdana,helvetica; font-size:12px; color:#000000; margin-left:20px; }
+.subDescription { font-family:arial,verdana,helvetica; font-size:12px; color:#000000; line-height:23px; margin-left:10px; font-weight:bold; }
+.PriceWarranty { font-family:arial,verdana,helvetica; font-size:11px; color:#000000; }
+.techSpecsCartSel { font-family:verdana,arial,helvetica; font-size:9px; letter-spacing:1px; color:#000000; line-height:20px; }
+.specs { font-size:9px; font-family:arial,verdana,helevtica; color:#000000; line-height:16px; }
+.shopSelectName { font-size:11px; font-family:arial,verdana,helevtica; color:#000000; }
+.shopSelectPrice { font-size:11px; font-family:arial,verdana,helevtica; color:#000000; }
+.shopSelectName2 { font-size:9px; font-family:arial,verdana,helevtica; color:#000000; line-height:20px; }
+.shopSelectPrice2 { font-size:9px; font-family:arial,verdana,helevtica; color:#000000; line-height:20px; }
+.submitButton {font-size:9px; font-weight:bold; font-family:verdana,arial,helevtica; width:185px;}

@@ -1,0 +1,77 @@
+<style type="text/css">
+<!--
+	.browseResultsBack { background-color:#!!BGCOLOR!!; background-image: url(Night_Vision_Images/browseResultsBacker_!!PRODTYPE!!.gif); background-repeat: no-repeat; background-position: left top;  border:#464646 1px solid; }
+	.browserImages { margin-top:2px; }
+	.productTitle { font-family:Verdana, Arial, Helvetica; font-size:11px; padding-left:5px; color:#000000; }
+	.productPrice { font-family:Verdana, Arial, Helvetica; font-size:10px; }
+	.resultLink { font-family:Verdana, Arial, Helvetica; font-size:11px; text-decoration:underline; font-weight:bold; color:#000000; }
+	.resultDescription { font-family:Verdana, Arial, Helvetica; font-size:10px; padding-left:15px; padding-top:15px; }
+	.resultsInfo { font-family:Verdana, Arial, Helvetica; font-size:11px; color:#000000; }
+-->
+</style>
+<script language="Javascript" src="NightVisionScripts/popwindow.js"></script>
+<script language="Javascript">
+function toggleMyPrint(cual,pid) {
+	if (window.open) {
+		if (cual == "HTML") { popWindow('../brochure.cgi?PID='+pid+'&format=HTML','printProduct','786','590','NO'); }
+		else if (cual == "PDF") { popWindow('../brochure.cgi?PID='+pid+'&format=PDF','printProduct','786','590','NO'); }
+	}
+}
+</script>
+
+<center>
+
+	<!--Start Content Table Wrapper--> 
+<table width="550" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="100%" align="left" valign=top><br>
+
+<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="50%"><font class="resultsInfo">!!SResults!! !!SearchedFor!!</font></td>
+          <td align="right" width="50%">&nbsp;</td>
+        </tr>
+        <tr bgcolor="#000000"> 
+          <td colspan="2" height="1"><img src="images/spacer.gif" width="1" height="1"></td>
+        </tr>
+        <tr> 
+          <td width="50%" height="20"><font class="resultsInfo"><b>!!Matches!! !!SearchedIn!! found</b></font></td>
+          <td width="50%" align="right"><font class="resultsInfo">!!Prev_Pages!! &nbsp; !!Pages!! &nbsp; !!Next_Pages!!</font></td>
+		</tr>
+        <tr> 
+          <td colspan="2" height="15"><img src="images/spacer.gif" width="1" height="15"></td>
+        </tr>
+        <tr> 
+          <td colspan="2" align="left" width="100%">
+!!LETBTR!!
+
+!!SearchResults!!
+		</td>
+        </tr>
+        <tr> 
+          <td colspan="2" height="15"><img src="images/spacer.gif" width="1" height="15"></td>
+        </tr>
+        <tr> 
+          <td width="50%" height="20"><font class="resultsInfo">!!Matches!! !!SearchedIn!! found</font></td>
+          <td width="50%" align="right"><font class="resultsInfo">!!Prev_Pages!! &nbsp; !!Pages!! &nbsp; !!Next_Pages!!</font></td>
+		</tr>		
+        <tr bgcolor="#000000"> 
+          <td colspan="2" height="1"><img src="images/spacer.gif" width="1" height="1"></td>
+        </tr>
+        <tr> 
+          <td width="50%"><font class="resultsInfo"><b>&nbsp;</b></font></td>
+          <td align="right" width="50%">&nbsp;</td>
+        </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+      <!--End Content Table Wrapper-->
+</center>

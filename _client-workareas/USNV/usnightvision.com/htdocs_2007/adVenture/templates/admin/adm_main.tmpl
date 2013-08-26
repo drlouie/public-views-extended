@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>Administration Area / <TMPL_VAR SITE_NAME></title>
+<base href="<TMPL_VAR SERVER_URL>/">
+<script>function openWindow(theURL,winName,features){window.open(theURL,winName,features);return false;}var s="";</script>
+</head>
+<style><!--
+a.button{color:#303030;font-family:Geneva,Verdana,Helvetica;font-size:10px;font-weight:bold;text-decoration:none;}
+a.button:hover{color:#303030;}
+.blk { font-family: verdana; font-size: 9px; color: #000000; font-weight: bold; }
+.wht { color: #ffffff; }
+.title { font-family: Geneva,verdana; font-size: 9px; color: #000000; font-weight: bold; background=#C2CED1}
+.title2 { font-family: Geneva,verdana; font-size: 9px; color: #000000; font-weight: bold;  background=#a3bdd1}
+.list { font-family: Geneva,verdana; font-size: 10px; color: #000000; }
+.help { font-family: Geneva,verdana; font-size: 10px; color: #000000; background=#fcfcef}
+.help_title { font-family: Geneva,verdana; font-size: 10px; font-weight: bold; color: #ffffff; background=#4245b0}
+i3nput { font-family: verdana; font-size: 10px; color: #000000;}
+input{font-size:10px; font-family:Verdana,Arial,Helvetica; color:#000000; border-width:1px; border-top-color:#444444; border-left-color:#444444; border-right-color:#cccccc; border-bottom-color:#cccccc;}
+.myinput{font-size:10px; font-family:Verdana,Arial,Helvetica; color:#000000; border-width:1px; border-top-color:#444444; border-left-color:#444444; border-right-color:#cccccc; border-bottom-color:#cccccc;}
+.m3yinput{font-family: verdana; font-size: 10px; color: #000000;border-color: black; border-style: solid; border-width:1;}
+textarea { font-family: verdana; font-size: 10px; color: #000000; }
+select { font-family: verdana; font-size: 10px; color: #000000; }
+body { font-size: x-small; font-family:verdana;scrollbar-3dlight-color:white; scrollbar-arrow-color:"gray"; scrollbar-track-color:#F2F2F2; scrollbar-darkshadow-color:#D3D3D3; scrollbar-face-color:#E9E9E9; scrollbar-highlight-color:#E9E9E9; scrollbar-shadow-color:#E9E9E9;}
+--></style>
+<body bgcolor="#ffffff" background="ad_images/blank_bg.gif" text="#000000" link="#000099" vlink="#101099" alink="#cc0000" leftmargin="8" topmargin="8" marginwidth="8" marginheight="8">
+<form method="post" name="work" action="<TMPL_VAR SNAME>" enctype="multipart/form-data">
+<input type="hidden" name="act" value="<TMPL_VAR ACT>">
+<input type="hidden" name="my_id" value="<TMPL_VAR MY_ID>">
+<input type="hidden" name="my_ph" value="<TMPL_VAR MY_PH>">
+<script language="JavaScript">function presubmit(actin){with(document.work){act.value=actin;submit();}}</script>
+
+<table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td align="left" valign="top"><table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td height="30" align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="3">
+              <tr>
+                <td height="25" bgcolor="#adb8cf"><font size="-1" face="verdana" color="#000000"><img src="ad_images/padlock.gif" width="16" height="16" align="absmiddle">&nbsp;Administration Area <TMPL_IF INFO> / <span style="color:red"><TMPL_VAR INFO></TMPL_IF></span></font></td>
+              </tr>
+            </table></td>
+        </tr>
+        <tr>
+          <td align="left" valign="top" width="100%" height="100%"><table width="100%" height="100%"  border="0" cellspacing="0" cellpadding="0">
+               <tr>
+                <td width="150" align="left" valign="top"><table width=150 border=0 cellspacing=0 cellpadding=0 align=left>
+                    <tr>
+                      <td height=21 align="LEFT" valign="TOP"><img src="ad_images/panel/top_left.gif" height="21" border=0></td>
+					              <td align="center" valign="top" height=21 width="100%" background="ad_images/panel/top_bg.gif">
+<table width="20" border=0 cellspacing=0 cellpadding=0><tr>
+                              <td class=list background="ad_images/panel/top_text_bg.gif" align=center width="20" height="21">
+                                <div style="padding-bottom:2px"><b>&nbsp;MENU&nbsp;</b></div>
+                              </td>
+                      </tr></table>
+                        </td>
+					  <td align="RIGHT" valign="TOP"><img src="ad_images/panel/top_right.gif" height="21" border=0></td>
+                    </tr>
+                    <tr>
+                      <td background="ad_images/panel/bg_left.gif">&nbsp;</td>
+                      <td align=left valign=top bgcolor=#e4e4e4> <table align=left width="100%" border=0 cellpadding=0 cellspacing=4>
+
+<tr><td><img src="ad_images/home.gif" align="middle"></td><td align=left><a href="<TMPL_VAR SNAME>" class=blk>HOME</a></td></tr>
+<tr><td><img src="ad_images/campaign.gif" align="middle"></td><td align=left><a href="<TMPL_VAR SNAME>?act=list_zone" class="blk">ZONE LIST</a></td></tr>
+<tr><td><img src="ad_images/banners.gif" align="middle"></td><td align=left><a href="<TMPL_VAR SNAME>?act=list_banners" class="blk">BANNERS LIST</a></td></tr>
+<tr><td><img src="ad_images/get_code.gif" align="middle"></td><td align=left><a href="<TMPL_VAR SNAME>?act=get_banner_code" class="blk">GET HTML CODE</a></td></tr>
+<tr><td colspan=2>&nbsp;</td></tr>
+<tr><td><img src="ad_images/logout.gif" align="middle"></td><td align=left><a href="<TMPL_VAR SNAME>?act=logout" class="blk">LOGOUT</a></td></tr>
+<tr><td colspan=2>&nbsp;</td></tr>
+
+                        </table></td>
+                      <td background="ad_images/panel/bg_right.gif">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td align="left" valign="top" height="9"><img src="ad_images/panel/bot_left.gif" height="9" border=0></td>
+                      <td align="left" valign="top" background="ad_images/panel/bot_bg.gif"><img src="ad_images/spacer.gif" height="9" width="108" border=0></td>
+                      <td align="left" valign="top"><img src="ad_images/panel/bot_right.gif" height="9" border=0></td>
+                    </tr>
+                  </table>
+                  </td>
+
+               <td width="5"><img src="ad_images/spacer.gif" width="5" height="1"></td>
+                  <td width="100%" align="left" valign="top" height="100%">
+                    <table width=600 border=0 cellspacing=0 cellpadding=0 height="100%">
+                   <tr>
+                     <td align="left" valign="top" height=21><img src="ad_images/panel/top_left.gif" height="21" border=0></td>
+									      <td align="center" valign="top" height=21 width="100%" background="ad_images/panel/top_bg.gif">
+<table width="180" border=0 cellspacing=0 cellpadding=0><tr>
+                              <td width="180" class=list background="ad_images/panel/top_text_bg.gif" align=center valign="middle" nowrap height="21"><nobr>
+                                <div style="padding-bottom:2px">&nbsp;<b>USNV AdVenture</b>&nbsp;</div>
+                                </nobr></td>
+                   </tr>
+                 </table>
+                        </td>
+						  <td align="left" valign="top"><img src="ad_images/panel/top_right.gif" height="21" border=0></td>
+             </tr>
+
+	<tr>
+  	<td align="left" valign="top" background="ad_images/panel/bg_left.gif" height="100%">&nbsp;</td>
+    <td class=list align="left" valign="top" bgcolor=#e4e4e4><TMPL_VAR BODY></td>
+    <td align="left" valign="top" background="ad_images/panel/bg_right.gif">&nbsp;</td>
+  </tr>
+
+  <tr>
+    <td align="left" valign="top" height=9><img src="ad_images/panel/bot_left.gif" height="9" border=0></td>
+    <td align="left" valign="top" height=9 background="ad_images/panel/bot_bg.gif"><img src="ad_images/spacer.gif" height="9" width="558" border=0></td>
+    <td align="left" valign="top" height=9><img src="ad_images/panel/bot_right.gif" height="9" border=0></td>
+  </tr>
+
+           </table>
+                  </td>
+       </tr>
+     </table></td>
+        </tr>
+      </table>
+     </td>
+  </tr>
+</table>
+
+</form>
+
+</body>
+</html>

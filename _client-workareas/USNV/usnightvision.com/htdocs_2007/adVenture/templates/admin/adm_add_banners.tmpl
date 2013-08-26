@@ -1,0 +1,62 @@
+<table align=center border=0 cellpadding=0 cellspacing=0 width=100%><tr><td>
+<table align=center border=0 cellpadding=2 cellspacing=1 bgcolor=#EEEEEE width=100%>
+	<tr class=title><td colspan=2>&nbsp;<img src="ad_images/campaign.gif" align="absmiddle">&nbsp;[<TMPL_VAR ZONE_NAME>]&nbsp;>&nbsp;<TMPL_IF ID><img src="ad_images/banners.gif" align="absmiddle">&nbsp;[<TMPL_VAR ESCAPE=HTML NAME=TITLE>]<TMPL_ELSE><img src="ad_images/stored.gif" align="absmiddle">&nbsp;[Untitled]</TMPL_IF></td></tr>
+	<tr class=list><td colspan=2>&nbsp;</td></tr>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/zone.gif" align="absmiddle">&nbsp;Advert Zone</td>
+		<td><TMPL_VAR ZONE_LIST></td>
+	</tr>
+	<tr class=list><td colspan=2>&nbsp;</td></tr>
+	<tr class=list valign=top>
+		<td>&nbsp;<img src="ad_images/html.gif" align="absmiddle">&nbsp;HTML banner</td>
+		<td><textarea class=myinput style="width:400" name=banner rows=10 wrap><TMPL_VAR ESCAPE=HTML NAME=BANNER></textarea><br><br></td>
+	</tr>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/title.gif" align="absmiddle">&nbsp;Title</td>
+		<td><input class=myinput type=text style="width:400" name=title value="<TMPL_VAR ESCAPE=HTML NAME=TITLE>"></td>
+	</tr>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/title.gif" align="absmiddle">&nbsp;Status text</td>
+		<td><input class=myinput type=text style="width:400" name=status_text value="<TMPL_VAR ESCAPE=HTML NAME=STATUS_TEXT>"></td>
+	</tr>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/title.gif" align="absmiddle">&nbsp;Text below image</td>
+		<td><input class=myinput type=text style="width:400" name=below_text value="<TMPL_VAR ESCAPE=HTML NAME=BELOW_TEXT>"></td>
+	</tr>
+	<tr class=list><td colspan=2>&nbsp;</td></tr>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/link.gif" align="absmiddle">&nbsp;Destination URL</td>
+		<td><input class=myinput type=text style="width:300" name=url value="<TMPL_UNLESS ID>http://</TMPL_UNLESS><TMPL_VAR ESCAPE=HTML NAME=URL>"> (incl. http://)</td>
+	</tr>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/link.gif" align="absmiddle">&nbsp;Target</td>
+		<td><select class=myinput name=target><option value="_blank">&nbsp;_blank<option value="_parent">&nbsp;_parent<option value="_self">&nbsp;_self<option value="_top">&nbsp;_top</select><TMPL_IF ID> current: <b><TMPL_VAR TARGET></b></TMPL_IF></td>
+	</tr>
+	<tr class=list><td colspan=2>&nbsp;</td></tr>
+	<TMPL_IF FORMAT>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/gif.gif" align="absmiddle">&nbsp;Current image</td>
+		<td><img src="ad_images/zoom.gif" align="absmiddle">&nbsp;<a href="<TMPL_VAR SNAME>?act=preview_banner&id=<TMPL_VAR ID>" target=_new onClick="return openWindow('<TMPL_VAR SNAME>?act=preview_banner&id=<TMPL_VAR ID>', '', 'status=no,scrollbars=no,resizable=no,width=<TMPL_VAR ESCAPE=HTML NAME=WIDTH>,height=<TMPL_VAR ESCAPE=HTML NAME=HEIGHT>');">Preview</a>&nbsp;&nbsp;<img src="ad_images/delete.gif" vspace=3 align="absmiddle" border=0>&nbsp;<a href="javascript:{document.work.my_id.value=<TMPL_VAR ID>;presubmit('delete_ph')}">delete</a></td>
+	</tr>
+	</TMPL_IF>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/gif.gif" align="absmiddle">&nbsp;Image banner</td>
+		<td><input class=myinput type=file style="width:200" name=image value="<TMPL_VAR ESCAPE=HTML NAME=IMAGE>"></td>
+	</tr>
+	<TMPL_IF ID><tr class=list>
+		<td>&nbsp;<img src="ad_images/size.gif" align="absmiddle">&nbsp;Size</td>
+		<td>Width: <input class=myinput type=text style="width:40" name=width value="<TMPL_VAR ESCAPE=HTML NAME=WIDTH>">&nbsp;Height: <input class=myinput type=text style="width:40" name=height value="<TMPL_VAR ESCAPE=HTML NAME=HEIGHT>"></td>
+	</tr>
+	</TMPL_IF>
+	<tr class=list><td colspan=2>&nbsp;</td></tr>
+	<tr class=list>
+		<td>&nbsp;<img src="ad_images/<TMPL_UNLESS ACTIVE>in</TMPL_UNLESS>active.gif" align="absmiddle">&nbsp;Active</td>
+		<td>&nbsp;<input type=checkbox name=active value="1" <TMPL_IF ACTIVE>checked</TMPL_IF>></td>
+	</tr>
+	<tr><td class=list colspan=2><hr noshade></td></tr>
+	<tr class=list><td colspan=2 align=right>
+		<TMPL_IF ID><input type=hidden name=id value="<TMPL_VAR ID>"><input type=image src="ad_images/update_banner.gif" onClick="javascript:presubmit('update_banners')" alt="Update Banner" value="Update Banner">
+		<TMPL_ELSE><input type=image src="ad_images/add_banner.gif" onClick="javascript:presubmit('add_banners')" alt="Add New Banner" value="Add New Banner"></TMPL_IF>
+	&nbsp;</td></tr>
+</table>
+</td></tr></table>
