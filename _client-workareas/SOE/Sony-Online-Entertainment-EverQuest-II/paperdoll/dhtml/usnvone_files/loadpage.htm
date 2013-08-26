@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE></TITLE>
+<SCRIPT language=JavaScript src="aboutusnv_files/pageload1.js"></SCRIPT>
+<SCRIPT language=Javascript src="aboutusnv_files/pageload2.js"></SCRIPT>
+<SCRIPT language=Javascript src="aboutusnv_files/b4dom.js"></SCRIPT>
+
+<STYLE type="text/css">
+	#divCont { LEFT: 28%; OVERFLOW: hidden; WIDTH: 300px; CLIP: rect(0px 300px 450px 0px); POSITION: absolute; TOP: 0px; HEIGHT: 450px; BACKGROUND-COLOR: #a0a0a0 }
+	#divLoad { LEFT: 28%; VISIBILITY: hidden; WIDTH: 300px; CLIP: rect(0px 300px 450px 0px); POSITION: absolute; TOP: 0px; HEIGHT: 450px; BACKGROUND-COLOR: #a0a0a0 }
+	#divArrows { Z-INDEX: 25; LEFT: 0px; VISIBILITY: hidden; POSITION: absolute; TOP: 0px }
+	#divIEText { LEFT: 0px; POSITION: absolute; TOP: 0px; BACKGROUND-COLOR: #a0a0a0 }
+	#bground { LEFT: 0px; WIDTH: 1px; CLIP: rect(0px 1px 1px 0px); POSITION: absolute; TOP: 0px; HEIGHT: 1px; BACKGROUND-COLOR: #a0a0a0 }
+	#divLinks { LEFT: 420px; POSITION: absolute; TOP: 0px }
+</STYLE>
+
+
+</HEAD>
+<BODY onLoad="findInfo()">
+<IFRAME id="overDiv" src="../charFeed.txt" onLoad="javascript:alert(document.getElementById('overDiv').innerHTML)"></IFRAME>
+<DIV id=divLinks></DIV>
+<DIV id=divArrows></DIV>
+
+<SCRIPT language=javascript>
+function findInfo() {
+
+}
+function trigger(myurl) {
+	frame.loadpage(''+myurl+'');
+}
+
+</SCRIPT>
+
+
+<SCRIPT>
+ifrinit();
+</SCRIPT>
+</BODY></HTML>

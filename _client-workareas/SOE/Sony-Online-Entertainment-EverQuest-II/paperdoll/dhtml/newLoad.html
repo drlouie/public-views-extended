@@ -1,0 +1,443 @@
+<head>
+<title>Load Xml Document Demo</title>
+<script language="Javascript">
+// :: TO MAKE THIS LOCAL TO THE VELOCITY ENVIRONMENT ::
+// ADD vm/session charID variable
+// THEN change charFeed.xml to (/securedDataFeed.m?feedId=Item.getCharacterPaperdoll&feedFormat=xml-flat&characterId=)
+// AND change charImage.xml to (/securedDataFeed.m?feedId=Image.getCharacterPaperdollImage&feedFormat=xml-flat&characterId=)
+var characterID = "";
+var characterDataURL = "charFeed.xml" + characterID;
+var characterImageURL = "charImage.xml" + characterID;
+
+// where to go to find out how to upload paperdoll
+var howToUpload = "http://eq2players.station.sony.com/en/sp_faq.vm";
+// item/icon image location http://eq2images.station.sony.com/images/Icons/), for local testing (images/Icons/)
+var iconLocation = "http://eq2players.station.sony.com/images/Icons/";
+// uploaded paperdoll image location (http://eq2images.station.sony.com/), for local testing (paperdoll/)
+var paperdollLocation = "paperdoll/";
+// default slot image (also location for nopaperdoll image and swf)
+// must be left local until new swf is uploaded to this location
+var slotImageLocation = "flash/en/slotImages/";
+// where to go for item details
+var itemDetailsLink = "http://eq2players.station.sony.com/en/item.vm?itemId=";
+
+
+var tooltipWidth = "";
+/* /// ABOVE ///
+	OR
+	var tooltipWidth = '200';
+	AS IN PIXELS
+	NON-STATED: Resizing popups, as per content size
+	STATED: No scrollbar appearance if popup is past width or height of document
+*/
+// fade to transperancy level
+var tooltipFinalOpacity = 75;
+
+
+</script>
+<script type="text/javascript" src="js/muaTooltip.js"></script>
+<script type="text/javascript">
+<!--//
+
+/*
+	DRLOUIE'S CUSTOM XML/TEXT LOADER
+	Strictly for Sony Online Entertainment use. Resditribution of this code is illegal.
+*/
+
+
+var itemArray = new Array();
+function muaDocLoader(xmlContents, cualTagName, cualResults, myFunction) {
+   var xmlDocument;
+   var cualTagName;
+   var cualResults;
+   var myFunction;
+   if( window.ActiveXObject && /Win/.test(navigator.userAgent) ) {
+      xmlDocument = new ActiveXObject("Microsoft.XMLDOM");
+      xmlDocument.async = false;
+      xmlDocument.load(xmlContents);
+      myFunction(xmlDocument, cualTagName, cualResults);
+      return true;
+   }
+   else if( document.implementation && document.implementation.createDocument ) {
+      xmlDocument = document.implementation.createDocument("", "", null);
+      xmlDocument.load(xmlContents);
+      xmlDocument.onload = function() { myFunction(xmlDocument, cualTagName, cualResults); }
+      return true;
+   }
+   else { return false; }
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////
+// CUSTOM FUNCTIONS FOR PARSING OF INCOMING DOCUMENTS //
+//                                                    // 
+// First add new documents ie: charImage.xml
+////////////////////////////////////////////////////////
+
+/// CUSTOM FUNCTION TO PARSE PAPERDOLL
+function paperDollImage(xmlDocument, cualTagName, cualResults) {
+	var docContent = xmlDocument.getElementsByTagName(cualTagName);
+	for(var i = 0; i < docContent.length; ++i) {
+		var oAttrColl = docContent[i].attributes;
+    	var oAttrValue = oAttrColl.getNamedItem("value");
+    	var oAttrName = oAttrColl.getNamedItem("name");
+		if (oAttrName.value.indexOf(cualResults) != -1) {
+			if (oAttrValue.value.indexOf(".jpg") == -1) {
+				document.images.paperDoll.src = slotImageLocation + 'default_paperdoll.jpg';
+				document.getElementById("noPaperdoll").innerHTML = '<object ID="leLinker" CLASSID="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" WIDTH="160" HEIGHT="80" CODEBASE="download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"><PARAM NAME="MOVIE" VALUE="'+slotImageLocation+'nopaperdoll.swf?howToUpload='+howToUpload+'"><param NAME="PLAY" VALUE="true"><param NAME="LOOP" VALUE="false"><param NAME="QUALITY" VALUE="high"><param NAME="MENU" VALUE="false"><param NAME="wmode" Value="Transparent"><embed NAME="leLinker" wmode="transparent" SRC="'+slotImageLocation+'nopaperdoll.swf?howToUpload='+howToUpload+'" WIDTH="160" HEIGHT="80" PLAY="true" LOOP="false" QUALITY="high" MENU="false" TYPE="application/x-shockwave-flash" PLUGINSPAGE="www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></embed></object>';
+			}
+			else {
+				document.images.paperDoll.src = paperdollLocation + oAttrValue.value;
+			}
+		}
+	}
+}
+/// CUSTOM FUNCTION TO PARSE ITEM DETAIL
+function charItemData(xmlDocument, cualTagName, cualResults) {
+	var docContent = xmlDocument.getElementsByTagName(cualTagName);
+	var sCR = cualResults.split(",");
+	var itemCount = 0;
+	var setCount = 0;
+	var itemData = new Array();
+	var lastVN = '';
+	for(var i = 0; i < docContent.length; ++i) {
+    	var oAttrColl = docContent[i].attributes;
+    	var oAttrValue = oAttrColl.getNamedItem("value");
+    	var oAttrName = oAttrColl.getNamedItem("name");
+		for(var i2 = 0; i2 < sCR.length; ++i2) {
+			if (oAttrName.value.indexOf(sCR[i2]) != -1) {
+				var theValueName = oAttrName.value.split(".");
+				var realValueName = theValueName[1];
+				if (realValueName != lastVN) { 
+					lastVN = realValueName;
+					setCount++;
+					itemData[setCount] = oAttrValue.value;
+				}
+				else {
+					itemData[setCount] = itemData[setCount] + '-----' + oAttrValue.value;
+				}
+//				alert(realValueName);
+			}
+		}
+   	}
+	for(var i = 1; i < itemData.length; ++i) {
+		//alert(itemData[i]);
+		var theItemData = itemData[i].split("-----");
+
+		if (theItemData[0] && theItemData[1] && theItemData[3] && theItemData[4]) {
+		var mySlotID = theItemData[4];
+		var realImageNumber = theItemData[0];
+		document.images["slot" + mySlotID].src= iconLocation + 'icon_item_' + realImageNumber + ".jpg";
+		itemArray.push(itemData[i]);
+//		alert(theItemData[1]);
+			
+		}
+	}
+}
+// 	SAMPLE OF ANOTHER FUNCTION
+function anotherFunction() {
+ // just a sample
+}
+
+////////////////////
+// EVENT HANDLERS //
+////////////////////
+function runHover(which) {
+	var thisIconID = document.images[which].src;
+	if (thisIconID.indexOf(".jpg") != -1) {
+		for (var i2 = 0; i2 < itemArray.length; i2++) {
+			var myKnowledge = '';
+			var splitID = itemArray[i2].split("-----");
+			var myRealID = splitID[0];
+			var myRealIcon = splitID[1];
+			var myRealKnow = splitID[2];
+			var myRealIName = splitID[3] + "<br>";
+			var myRealISlotID = splitID[4];
+			if (thisIconID.indexOf(myRealID) != -1) {
+//				document.getElementById(which).style.cursor = 'pointer';
+				document.getElementById(which).style.cursor = 'hand';
+				popTip.showIt('<center class="paperdoll"><b>'+ myRealIName +'</b>'+ myRealKnow +'</center>')
+			}
+		}
+	}
+	else {
+		document.getElementById(which).style.cursor = 'default';	
+	}
+	
+}
+function runBlur(which) {
+	var thisIconID = document.images[which].src;
+	if (thisIconID.indexOf(".jpg") != -1) {
+		popTip.hideTooltip();
+	}
+}
+
+function runLink(which) {
+	var thisIconID = document.images[which].src;
+	// only affect Slots that have Icons (item icons are .jpg, default slot images are .gif)
+	if (thisIconID.indexOf(".jpg") != -1) {
+		for (var i2 = 0; i2 < itemArray.length; i2++) {
+			var myKnowledge = '';
+			var splitID = itemArray[i2].split("-----");
+			var myRealID = splitID[0];
+			if (thisIconID.indexOf(myRealID) != -1) { 
+				myitemArray = itemArray[i2];
+				parent.document.location.href = itemDetailsLink + splitID[1];
+			}
+		}
+	}
+}
+
+// -->
+</script>
+
+
+<style type="text/css">
+	.tipWinStyle { background-color:#FFFFFF; layer-background-color:#FFFFFF; border-color:#4991DE; border-width:1px; border-style:solid; padding-left:2px; padding-right:2px; }
+	.paperdoll { font-family: Arial, Verdana, Helvetica; color:#ffffff; font-size:11px; background-color:#000000; layer-background-color:#000000; border-color:#E6CA5B; border-width:1px; border-style:solid; padding:10px; text-align:left; }
+</style>
+</head>
+
+<body bgcolor="#000000" onload="runTip()">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+<tr><td width="33%" align="center"><img src="flash/en/slotImages/spacer.gif" width="1" height="1" border="0"></td>
+<td width="66%" align="left">
+
+
+<div style="width:300px; height:420px; overflow:hidden;clip: rect(0px, 420px, 300px, 0px);" align="center">
+<div style="z-index:5;background-image: url(flash/en/slotImages/dollareaBacker.gif);">
+			<table height="420" width="300" cellpadding="0" cellspacing="0" border="0">
+				<tr>
+					<td align="center">
+
+						<table cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td colspan="3" align="center"><img src="flash/en/slotImages/dollareaTopper.gif" width="180" height="12" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot2');" onMouseOver="runHover('slot2');" onMouseOut="runBlur('slot2');" style="cursor:default ;" id="slot2"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="175" align="center" rowspan="13"><img src="flash/en/slotImages/dollareaBottom.gif"></td>
+								<td width="44" align="center"><a href="javascript:runLink('slot12');" onMouseOver="runHover('slot12');" onMouseOut="runBlur('slot12');" style="cursor:default ;" id="slot12"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+							<tr>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot3');" onMouseOver="runHover('slot3');" onMouseOut="runBlur('slot3');" style="cursor:default ;" id="slot3"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="44" align="center"><a href="javascript:runLink('slot11');" onMouseOver="runHover('slot11');" onMouseOut="runBlur('slot11');" style="cursor:default ;" id="slot11"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+							<tr>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot4');" onMouseOver="runHover('slot4');" onMouseOut="runBlur('slot4');" style="cursor:default ;" id="slot4"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="44" align="center"><a href="javascript:runLink('slot9');" onMouseOver="runHover('slot9');" onMouseOut="runBlur('slot9');" style="cursor:default ;" id="slot9"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+							<tr>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot5');" onMouseOver="runHover('slot5');" onMouseOut="runBlur('slot5');" style="cursor:default ;" id="slot5"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="44" align="center"><a href="javascript:runLink('slot10');" onMouseOver="runHover('slot10');" onMouseOut="runBlur('slot10');" style="cursor:default ;" id="slot10"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+							<tr>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot6');" onMouseOver="runHover('slot6');" onMouseOut="runBlur('slot6');" style="cursor:default ;" id="slot6"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="44" align="center"><a href="javascript:runLink('slot13');" onMouseOver="runHover('slot13');" onMouseOut="runBlur('slot13');" style="cursor:default ;" id="slot13"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+							<tr>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot7');" onMouseOver="runHover('slot7');" onMouseOut="runBlur('slot7');" style="cursor:default ;" id="slot7"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="44" align="center"><a href="javascript:runLink('slot14');" onMouseOver="runHover('slot14');" onMouseOut="runBlur('slot14');" style="cursor:default ;" id="slot14"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+							<tr>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot8');" onMouseOver="runHover('slot8');" onMouseOut="runBlur('slot8');" style="cursor:default ;" id="slot8"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="44" align="center"><a href="javascript:runLink('slot17');" onMouseOver="runHover('slot17');" onMouseOut="runBlur('slot17');" style="cursor:default ;" id="slot17"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+							<tr>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+								<td width="175" height="2" align="center">
+
+									<table width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+										<tr>
+											<td width="25%" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+											<td width="25%" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+											<td width="25%" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+											<td width="25%" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+										</tr>
+									</table>
+
+								</td>
+								<td width="42" align="center"><img src="flash/en/slotImages/spacerBullet.gif" width="5" height="2" border="0"></td>
+							</tr>
+							<tr>
+								<td width="44" align="center"><a href="javascript:runLink('slot18');" onMouseOver="runHover('slot18');" onMouseOut="runBlur('slot18');" style="cursor:default ;" id="slot18"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+								<td width="175" align="center" style="padding-left:2px;">
+									<table width="175" cellpadding="0" cellspacing="0" border="0">
+										<tr>
+											<td><a href="javascript:runLink('slot19');" onMouseOver="runHover('slot19');" onMouseOut="runBlur('slot19');" style="cursor:default ;" id="slot19"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+											<td><a href="javascript:runLink('slot0');" onMouseOver="runHover('slot0');" onMouseOut="runBlur('slot0');" style="cursor:default ;" id="slot0"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+											<td><a href="javascript:runLink('slot1');" onMouseOver="runHover('slot1');" onMouseOut="runBlur('slot1');" style="cursor:default ;" id="slot1"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+											<td><a href="javascript:runLink('slot15');" onMouseOver="runHover('slot15');" onMouseOut="runBlur('slot15');" style="cursor:default ;" id="slot15"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+										</tr>
+									</table>
+								</td>
+								<td width="44" align="center"><a href="javascript:runLink('slot16');" onMouseOver="runHover('slot16');" onMouseOut="runBlur('slot16');" style="cursor:default ;" id="slot16"><img src="flash/en/slotImages/boxie.gif" width="42" height="42" border="0" style="position:relative;z-index:2"></a></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+</div>
+<div style="position:relative;top:-391px;z-index:1">
+
+	<table cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td colspan="3" align="center"><img src="flash/en/slotImages/spacer.gif" width="180" height="12" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/2.jpg" width="42" height="42" name="slot2"></td>
+			<td width="175" rowspan="13">&nbsp;</td>
+			<td width="44" align="center"><img src="flash/en/slotImages/12.jpg" width="42" height="42" name="slot12"></td>
+		</tr>
+		<tr>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/3.jpg" width="42" height="42" name="slot3" border="0"></td>
+			<td width="44" align="center"><img src="flash/en/slotImages/11.jpg" width="42" height="42" name="slot11"></td>
+		</tr>
+		<tr>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/4.jpg" width="42" height="42" name="slot4"></td>
+			<td width="44" align="center"><img src="flash/en/slotImages/9.jpg" width="42" height="42" name="slot9"></td>
+		</tr>
+		<tr>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/5.jpg" width="42" height="42" name="slot5"></td>
+			<td width="44" align="center"><img src="flash/en/slotImages/10.jpg" width="42" height="42" name="slot10"></td>
+		</tr>
+		<tr>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/6.jpg" width="42" height="42" name="slot6"></td>
+			<td width="44" align="center"><img src="flash/en/slotImages/13.jpg" width="42" height="42" name="slot13"></td>
+		</tr>
+		<tr>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/7.jpg" width="42" height="42" name="slot7"></td>
+			<td width="44" align="center"><img src="flash/en/slotImages/14.jpg" width="42" height="42" name="slot14"></td>
+		</tr>
+		<tr>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/8.jpg" width="42" height="42" name="slot8"></td>
+			<td width="44" align="center"><img src="flash/en/slotImages/17.jpg" width="42" height="42" name="slot17"></td>
+		</tr>
+		<tr>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+			<td width="175" height="2" align="center">
+
+				<table width="100%" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td width="25%" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+						<td width="25%" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+						<td width="25%" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+						<td width="25%" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+					</tr>
+				</table>
+
+			</td>
+			<td width="42" align="center"><img src="flash/en/slotImages/spacer.gif" width="5" height="2" border="0"></td>
+		</tr>
+		<tr>
+			<td width="44" align="center"><img src="flash/en/slotImages/18.jpg" width="42" height="42" name="slot18"></td>
+			<td width="175" align="center" style="padding-left:2px;">
+				<table width="100%" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td><img src="flash/en/slotImages/19.jpg" width="42" height="42" name="slot19"></td>
+						<td><img src="flash/en/slotImages/0.jpg" width="42" height="42" name="slot0"></td>
+						<td><img src="flash/en/slotImages/1.jpg" width="42" height="42" name="slot1"></td>
+						<td><img src="flash/en/slotImages/15.jpg" width="42" height="42" name="slot15"></td>
+					</tr>
+				</table>
+			</td>
+			<td width="44" align="center"><img src="flash/en/slotImages/16.jpg" width="42" height="42" name="slot16"></td>
+		</tr>
+	</table>
+</div>
+<div style="position:relative;top:-741px;z-index:-1;"><img name="paperDoll" src="flash/en/slotImages/spacer.gif"></div>
+<div id="noPaperdoll" style="position:relative;top:-822px;z-index:1;"><img src="flash/en/slotImages/spacer.gif" width="160" height="60"></div>
+</div>
+
+
+
+
+
+</td>
+</tr>
+</table>
+
+
+Seomthing
+
+<div id="xmlInfo"></div>
+<script type="text/javascript">
+// run load sequence for as many docs/data sets requested
+// write a new one for every new document/file we want to read in
+var docsToLoad = new Array();
+docsToLoad.push("charImage.xml-----property-----result.paperDollImage.fullSizeFile.url");
+docsToLoad.push("charFeed.xml-----property-----knowledge,item.icon,item.id,item.name,slotId");
+// 	SAMPLE OF NEXT DOCUMENT
+// 	docsToLoad.push("documentURL-----tagName-----itemsToExtractInOrder");
+
+
+
+// MUST THEN RUN/VIEW THESE DOCUMENTS
+for (var i=0; i<docsToLoad.length; i++) {
+	var splitDTL = docsToLoad[i].split("-----");
+	// FIRST ITEM IN docsToLoad List
+	if (i==0) { muaDocLoader(splitDTL[0], splitDTL[1], splitDTL[2], paperDollImage); }
+	// IF MORE THAN ONE DOCUMENT
+	else if (i==1) { muaDocLoader(splitDTL[0], splitDTL[1], splitDTL[2], charItemData); }	
+// 	SAMPLE OF NEXT DOCUMENT
+//	else if (i==2) { muaDocLoader(splitDTL[0], splitDTL[1], splitDTL[2], anotherFunction); }	
+}
+
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<query-flat-results xmlns="http://soe.sony.com/guilds/view">
+  <property name="result.001.id" value="1616098943276546049"/>
+  <property name="result.001.item.icon" value="252"/>
+  <property name="result.001.item.id" value="516"/>
+  <property name="result.001.item.knowledge.localizedKnowledges.en.name" value="Very Light Armor"/>
+  <property name="result.001.item.name" value="shaped tailored roughspun cap"/>
+  <property name="result.001.slotId" value="2"/>
+  <property name="result.002.id" value="1608986907372462081"/>
+  <property name="result.002.item.icon" value="152"/>
+  <property name="result.002.item.id" value="726"/>
+  <property name="result.002.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.002.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.002.slotId" value="18"/>
+  <property name="result.003.id" value="1608986907383996417"/>
+  <property name="result.003.item.icon" value=""/>
+  <property name="result.003.item.id" value=""/>
+  <property name="result.003.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.003.item.name" value=""/>
+  <property name="result.003.slotId" value="4"/>
+  <property name="result.004.id" value="1598155699940045825"/>
+  <property name="result.004.item.icon" value=""/>
+  <property name="result.004.item.id" value=""/>
+  <property name="result.004.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.004.item.name" value=""/>
+  <property name="result.004.slotId" value="6"/>
+  <property name="result.005.id" value="1643008661990212609"/>
+  <property name="result.005.item.icon" value="254"/>
+  <property name="result.005.item.id" value="4767"/>
+  <property name="result.005.item.knowledge.localizedKnowledges.en.name" value="Very Light Armor"/>
+  <property name="result.005.item.name" value="Thick Woven Armbands"/>
+  <property name="result.005.slotId" value="5"/>
+  <property name="result.006.id" value="1647602149010510849"/>
+  <property name="result.006.item.icon" value="1502"/>
+  <property name="result.006.item.id" value="3310"/>
+  <property name="result.006.item.knowledge.localizedKnowledges.en.name" value="Very Light Armor"/>
+  <property name="result.006.item.name" value="fabricators vest"/>
+  <property name="result.006.slotId" value="3"/>
+  <property name="result.007.id" value="1652972127450701825"/>
+  <property name="result.007.item.icon" value="152"/>
+  <property name="result.007.item.id" value="726"/>
+  <property name="result.007.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.007.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.007.slotId" value="18"/>
+  <property name="result.008.id" value="1654870950307569665"/>
+  <property name="result.008.item.icon" value="369"/>
+  <property name="result.008.item.id" value="1539"/>
+  <property name="result.008.item.knowledge.localizedKnowledges.en.name" value="Symbols"/>
+  <property name="result.008.item.name" value="agate orb"/>
+  <property name="result.008.slotId" value="1"/>
+  <property name="result.009.id" value="1654917802424923137"/>
+  <property name="result.009.item.icon" value="152"/>
+  <property name="result.009.item.id" value="726"/>
+  <property name="result.009.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.009.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.009.slotId" value="18"/>
+  <property name="result.010.id" value="1654993682278950913"/>
+  <property name="result.010.item.icon" value="152"/>
+  <property name="result.010.item.id" value="726"/>
+  <property name="result.010.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.010.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.010.slotId" value="19"/>
+  <property name="result.011.id" value="1663776908731501569"/>
+  <property name="result.011.item.icon" value="257"/>
+  <property name="result.011.item.id" value="4609"/>
+  <property name="result.011.item.knowledge.localizedKnowledges.en.name" value="Very Light Armor"/>
+  <property name="result.011.item.name" value="Thick Woven Shoes"/>
+  <property name="result.011.slotId" value="8"/>
+  <property name="result.012.id" value="1577816009614576641"/>
+  <property name="result.012.item.icon" value=""/>
+  <property name="result.012.item.id" value=""/>
+  <property name="result.012.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.012.item.name" value=""/>
+  <property name="result.012.slotId" value="10"/>
+  <property name="result.013.id" value="1617966657476564993"/>
+  <property name="result.013.item.icon" value="609"/>
+  <property name="result.013.item.id" value="2536"/>
+  <property name="result.013.item.knowledge.localizedKnowledges.en.name" value="Dagger"/>
+  <property name="result.013.item.name" value="shaped forged blackened iron dirk"/>
+  <property name="result.013.slotId" value="0"/>
+  <property name="result.014.id" value="1611925468847613953"/>
+  <property name="result.014.item.icon" value="152"/>
+  <property name="result.014.item.id" value="726"/>
+  <property name="result.014.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.014.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.014.slotId" value="18"/>
+  <property name="result.015.id" value="1642450027591805953"/>
+  <property name="result.015.item.icon" value="255"/>
+  <property name="result.015.item.id" value="4046"/>
+  <property name="result.015.item.knowledge.localizedKnowledges.en.name" value="Very Light Armor"/>
+  <property name="result.015.item.name" value="Thick Woven Gloves"/>
+  <property name="result.015.slotId" value="6"/>
+  <property name="result.016.id" value="1628628149948460033"/>
+  <property name="result.016.item.icon" value="1507"/>
+  <property name="result.016.item.id" value="3250"/>
+  <property name="result.016.item.knowledge.localizedKnowledges.en.name" value="Very Light Armor"/>
+  <property name="result.016.item.name" value="tailored merchantine bloomers"/>
+  <property name="result.016.slotId" value="7"/>
+  <property name="result.017.id" value="1628628150031297537"/>
+  <property name="result.017.item.icon" value="1508"/>
+  <property name="result.017.item.id" value="3254"/>
+  <property name="result.017.item.knowledge.localizedKnowledges.en.name" value="Very Light Armor"/>
+  <property name="result.017.item.name" value="pristine tailored merchantine cape"/>
+  <property name="result.017.slotId" value="4"/>
+  <property name="result.018.id" value="1631151841443171329"/>
+  <property name="result.018.item.icon" value="152"/>
+  <property name="result.018.item.id" value="726"/>
+  <property name="result.018.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.018.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.018.slotId" value="18"/>
+  <property name="result.019.id" value="1629614518929720321"/>
+  <property name="result.019.item.icon" value="196"/>
+  <property name="result.019.item.id" value="1304"/>
+  <property name="result.019.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.019.item.name" value="Sliver of Essence"/>
+  <property name="result.019.slotId" value="18"/>
+  <property name="result.020.id" value="1613276272907069441"/>
+  <property name="result.020.item.icon" value="152"/>
+  <property name="result.020.item.id" value="726"/>
+  <property name="result.020.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.020.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.020.slotId" value="18"/>
+  <property name="result.021.id" value="1606014065890628609"/>
+  <property name="result.021.item.icon" value="152"/>
+  <property name="result.021.item.id" value="726"/>
+  <property name="result.021.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.021.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.021.slotId" value="18"/>
+  <property name="result.022.id" value="1617390815693382657"/>
+  <property name="result.022.item.icon" value="379"/>
+  <property name="result.022.item.id" value="2344"/>
+  <property name="result.022.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.022.item.name" value="shaped tailored burlap sash"/>
+  <property name="result.022.slotId" value="17"/>
+  <property name="result.023.id" value="1642831537667869697"/>
+  <property name="result.023.item.icon" value="152"/>
+  <property name="result.023.item.id" value="726"/>
+  <property name="result.023.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.023.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.023.slotId" value="18"/>
+  <property name="result.024.id" value="1643000882552464385"/>
+  <property name="result.024.item.icon" value="1156"/>
+  <property name="result.024.item.id" value="933"/>
+  <property name="result.024.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.024.item.name" value="Aqueous Stone"/>
+  <property name="result.024.slotId" value="19"/>
+  <property name="result.025.id" value="1652869857767721985"/>
+  <property name="result.025.item.icon" value="152"/>
+  <property name="result.025.item.id" value="726"/>
+  <property name="result.025.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.025.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.025.slotId" value="18"/>
+  <property name="result.026.id" value="1619645797183407105"/>
+  <property name="result.026.item.icon" value="152"/>
+  <property name="result.026.item.id" value="726"/>
+  <property name="result.026.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.026.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.026.slotId" value="18"/>
+  <property name="result.027.id" value="1578956582059820033"/>
+  <property name="result.027.item.icon" value=""/>
+  <property name="result.027.item.id" value=""/>
+  <property name="result.027.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.027.item.name" value=""/>
+  <property name="result.027.slotId" value="12"/>
+  <property name="result.028.id" value="1586492975604685825"/>
+  <property name="result.028.item.icon" value="152"/>
+  <property name="result.028.item.id" value="726"/>
+  <property name="result.028.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.028.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.028.slotId" value="18"/>
+  <property name="result.029.id" value="1600194421234706433"/>
+  <property name="result.029.item.icon" value="152"/>
+  <property name="result.029.item.id" value="726"/>
+  <property name="result.029.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.029.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.029.slotId" value="18"/>
+  <property name="result.030.id" value="1613276272795920385"/>
+  <property name="result.030.item.icon" value="152"/>
+  <property name="result.030.item.id" value="726"/>
+  <property name="result.030.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.030.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.030.slotId" value="19"/>
+  <property name="result.031.id" value="1611856857249413121"/>
+  <property name="result.031.item.icon" value="961"/>
+  <property name="result.031.item.id" value="1562"/>
+  <property name="result.031.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.031.item.name" value="fashioned electrum bangle"/>
+  <property name="result.031.slotId" value="13"/>
+  <property name="result.032.id" value="1611856857247315969"/>
+  <property name="result.032.item.icon" value="961"/>
+  <property name="result.032.item.id" value="1562"/>
+  <property name="result.032.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.032.item.name" value="fashioned electrum bangle"/>
+  <property name="result.032.slotId" value="14"/>
+  <property name="result.033.id" value="1617390815551824897"/>
+  <property name="result.033.item.icon" value="377"/>
+  <property name="result.033.item.id" value="2326"/>
+  <property name="result.033.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.033.item.name" value="fashioned silver hoop"/>
+  <property name="result.033.slotId" value="11"/>
+  <property name="result.034.id" value="1598155700489499649"/>
+  <property name="result.034.item.icon" value="152"/>
+  <property name="result.034.item.id" value="726"/>
+  <property name="result.034.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.034.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.034.slotId" value="18"/>
+  <property name="result.035.id" value="1632540882051912705"/>
+  <property name="result.035.item.icon" value="152"/>
+  <property name="result.035.item.id" value="726"/>
+  <property name="result.035.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.035.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.035.slotId" value="18"/>
+  <property name="result.036.id" value="1632540882057155585"/>
+  <property name="result.036.item.icon" value="607"/>
+  <property name="result.036.item.id" value="3556"/>
+  <property name="result.036.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.036.item.name" value="Murkwater Ring"/>
+  <property name="result.036.slotId" value="9"/>
+  <property name="result.037.id" value="1638987456121523201"/>
+  <property name="result.037.item.icon" value="152"/>
+  <property name="result.037.item.id" value="726"/>
+  <property name="result.037.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.037.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.037.slotId" value="18"/>
+  <property name="result.038.id" value="1638987456195972097"/>
+  <property name="result.038.item.icon" value="152"/>
+  <property name="result.038.item.id" value="726"/>
+  <property name="result.038.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.038.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.038.slotId" value="19"/>
+  <property name="result.039.id" value="1640986917328761857"/>
+  <property name="result.039.item.icon" value="152"/>
+  <property name="result.039.item.id" value="726"/>
+  <property name="result.039.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.039.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.039.slotId" value="18"/>
+  <property name="result.040.id" value="1659455638297681921"/>
+  <property name="result.040.item.icon" value="152"/>
+  <property name="result.040.item.id" value="726"/>
+  <property name="result.040.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.040.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.040.slotId" value="18"/>
+  <property name="result.041.id" value="1660962398888126465"/>
+  <property name="result.041.item.icon" value="152"/>
+  <property name="result.041.item.id" value="726"/>
+  <property name="result.041.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.041.item.name" value="Crystallized Phoenix Feather"/>
+  <property name="result.041.slotId" value="18"/>
+</query-flat-results>
+

@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>Items Details</title>
+<script language="Javascript">
+var characterID = '13048001';
+var serverLocation = "http://eq2images-test.station.sony.com";
+
+function generateMovie() {
+	document.getElementById("paperDoll").innerHTML = '<object ID="lePD" CLASSID="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="300" height="420" CODEBASE="download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=4,0,2,0"><PARAM NAME="MOVIE" VALUE="dollarea.swf?cID='+characterID+'&PDImageServerPath='+serverLocation+'"><param NAME="PLAY" VALUE="true"><param NAME="LOOP" VALUE="false"><param NAME="QUALITY" VALUE="high"><param NAME="MENU" VALUE="false"><param NAME="wmode" Value="Transparent"><embed NAME="lePD" wmode="transparent" SRC="dollarea.swf?cID='+characterID+'&PDImageServerPath='+serverLocation+'" width="300" height="420" PLAY="true" LOOP="false" QUALITY="high" MENU="false" TYPE="application/x-shockwave-flash" PLUGINSPAGE="www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></embed></object>';
+}
+
+</script>
+</head>
+<body bgcolor="#000000" onLoad="generateMovie();">
+
+<div id="paperDoll"></div>
+
+</body>
+</html>
+	

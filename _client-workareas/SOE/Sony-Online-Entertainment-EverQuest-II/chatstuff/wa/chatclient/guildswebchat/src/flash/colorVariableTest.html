@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Flash Wrapper</title>
+<style type="text/css">
+	body {background-color:#000000}
+	.style1 {color: #FFFFFF}
+</style>
+<script>
+function LoadFlashMovieParams() {
+	var borderColor = "";
+	var leFlasher = document.leFlasher;
+	leFlasher.Rewind();
+	leFlasher.SetVariable("borderColor", "0x999999");
+	leFlasher.Play();
+}
+</script>
+</head>
+<BODY LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0">
+<center>
+<div>
+<object ID="leFlasher" CLASSID="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" WIDTH="550" HEIGHT="400" CODEBASE="download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=4,0,2,0"><PARAM NAME="MOVIE" VALUE="colorVariableTest.swf?borderColor=0x999999">
+	<param NAME="PLAY" VALUE="true">
+	<param NAME="LOOP" VALUE="false">
+	<param NAME="QUALITY" VALUE="high">
+	<param NAME="MENU" VALUE="false">
+	<param NAME="wmode" Value="Transparent">
+	<embed NAME="leFlasher" SRC="colorVariableTest.swf?borderColor=0x999999" WIDTH="550" HEIGHT="400" PLAY="true" LOOP="false" QUALITY="high" MENU="false" TYPE="application/x-shockwave-flash" PLUGINSPAGE="www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash">
+	</embed>
+</object>
+<div>
+something
+</center>
+</BODY>
+</html>

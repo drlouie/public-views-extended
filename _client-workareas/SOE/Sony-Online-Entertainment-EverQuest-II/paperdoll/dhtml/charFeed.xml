@@ -1,0 +1,111 @@
+<query-flat-results xmlns="http://soe.sony.com/guilds/view">
+  <property name="result.001.id" value="1756832669016087658"/>
+  <property name="result.001.item.icon" value="638"/>
+  <property name="result.001.item.id" value="5362"/>
+  <property name="result.001.item.knowledge.localizedKnowledges.en.name" value="Great Hammer"/>
+  <property name="result.001.item.name" value="Starfall"/>
+  <property name="result.001.slotId" value="0"/>
+  <property name="result.002.id" value="1735780079600943210"/>
+  <property name="result.002.item.icon" value="1564"/>
+  <property name="result.002.item.id" value="4763"/>
+  <property name="result.002.item.knowledge.localizedKnowledges.en.name" value="Heavy Armor"/>
+  <property name="result.002.item.name" value="Hearth Forged Spaulders"/>
+  <property name="result.002.slotId" value="4"/>
+  <property name="result.003.id" value="1771694215454120042"/>
+  <property name="result.003.item.icon" value="1561"/>
+  <property name="result.003.item.id" value="4645"/>
+  <property name="result.003.item.knowledge.localizedKnowledges.en.name" value="Heavy Armor"/>
+  <property name="result.003.item.name" value="Gauntlets of Storms"/>
+  <property name="result.003.slotId" value="6"/>
+  <property name="result.004.id" value="1761339618574211178"/>
+  <property name="result.004.item.icon" value="1702"/>
+  <property name="result.004.item.id" value="7459"/>
+  <property name="result.004.item.knowledge.localizedKnowledges.en.name" value="Heavy Armor"/>
+  <property name="result.004.item.name" value="Spindlecog Tinkerhelm"/>
+  <property name="result.004.slotId" value="2"/>
+  <property name="result.005.id" value="1792705918772830314"/>
+  <property name="result.005.item.icon" value="2521"/>
+  <property name="result.005.item.id" value="5731"/>
+  <property name="result.005.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.005.item.name" value="Spirit Guide"/>
+  <property name="result.005.slotId" value="18"/>
+  <property name="result.006.id" value="1786554254935241834"/>
+  <property name="result.006.item.icon" value="588"/>
+  <property name="result.006.item.id" value="7407"/>
+  <property name="result.006.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.006.item.name" value="Dusty Earring of the Merchant"/>
+  <property name="result.006.slotId" value="11"/>
+  <property name="result.007.id" value="1787970061718303850"/>
+  <property name="result.007.item.icon" value="595"/>
+  <property name="result.007.item.id" value="11903"/>
+  <property name="result.007.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.007.item.name" value="Band of Essence"/>
+  <property name="result.007.slotId" value="9"/>
+  <property name="result.008.id" value="1778974768161106026"/>
+  <property name="result.008.item.icon" value="578"/>
+  <property name="result.008.item.id" value="8492"/>
+  <property name="result.008.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.008.item.name" value="Bracelet of Pristine Shards"/>
+  <property name="result.008.slotId" value="14"/>
+  <property name="result.009.id" value="1739033173204945002"/>
+  <property name="result.009.item.icon" value="1558"/>
+  <property name="result.009.item.id" value="7441"/>
+  <property name="result.009.item.knowledge.localizedKnowledges.en.name" value="Heavy Armor"/>
+  <property name="result.009.item.name" value="Hearth Forged Breastplate"/>
+  <property name="result.009.slotId" value="3"/>
+  <property name="result.010.id" value="1727857717617422442"/>
+  <property name="result.010.item.icon" value="2229"/>
+  <property name="result.010.item.id" value="210"/>
+  <property name="result.010.item.knowledge.localizedKnowledges.name" value=""/>
+  <property name="result.010.item.name" value="a torch"/>
+  <property name="result.010.slotId" value="19"/>
+  <property name="result.011.id" value="1783519454090561642"/>
+  <property name="result.011.item.icon" value="404"/>
+  <property name="result.011.item.id" value="10063"/>
+  <property name="result.011.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.011.item.name" value="Belt of the Outland Brigade"/>
+  <property name="result.011.slotId" value="17"/>
+  <property name="result.012.id" value="1764285586185789546"/>
+  <property name="result.012.item.icon" value="2268"/>
+  <property name="result.012.item.id" value="9753"/>
+  <property name="result.012.item.knowledge.localizedKnowledges.en.name" value="Kite Shield"/>
+  <property name="result.012.item.name" value="Sheer Bone Kite Shield"/>
+  <property name="result.012.slotId" value="1"/>
+  <property name="result.013.id" value="1731712967881280618"/>
+  <property name="result.013.item.icon" value="554"/>
+  <property name="result.013.item.id" value="8281"/>
+  <property name="result.013.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.013.item.name" value="Butterfly Wing Ring"/>
+  <property name="result.013.slotId" value="10"/>
+  <property name="result.014.id" value="1732906384896321642"/>
+  <property name="result.014.item.icon" value="1560"/>
+  <property name="result.014.item.id" value="3794"/>
+  <property name="result.014.item.knowledge.localizedKnowledges.en.name" value="Heavy Armor"/>
+  <property name="result.014.item.name" value="Hearth Forged Bracers"/>
+  <property name="result.014.slotId" value="5"/>
+  <property name="result.015.id" value="1789539479039511658"/>
+  <property name="result.015.item.icon" value="1552"/>
+  <property name="result.015.item.id" value="11879"/>
+  <property name="result.015.item.knowledge.localizedKnowledges.en.name" value="Heavy Armor"/>
+  <property name="result.015.item.name" value="enchanted black iron plate boots"/>
+  <property name="result.015.slotId" value="8"/>
+  <property name="result.016.id" value="1737528903816200298"/>
+  <property name="result.016.item.icon" value="1563"/>
+  <property name="result.016.item.id" value="5132"/>
+  <property name="result.016.item.knowledge.localizedKnowledges.en.name" value="Heavy Armor"/>
+  <property name="result.016.item.name" value="Hearth Forged Greaves"/>
+  <property name="result.016.slotId" value="7"/>
+  <property name="result.017.id" value="1746411274012465258"/>
+  <property name="result.017.item.icon" value="580"/>
+  <property name="result.017.item.id" value="8179"/>
+  <property name="result.017.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.017.item.name" value="Weathered Bone Necklace"/>
+  <property name="result.017.slotId" value="12"/>
+  <property name="result.018.id" value="1778983787337752682"/>
+  <property name="result.018.item.icon" value="2205"/>
+  <property name="result.018.item.id" value="9330"/>
+  <property name="result.018.item.knowledge.localizedKnowledges.en.name" value="Magic Affinity"/>
+  <property name="result.018.item.name" value="Kiln Fired Bracelet"/>
+  <property name="result.018.slotId" value="13"/>
+</query-flat-results>
+
