@@ -1,0 +1,331 @@
+ID: 0000000001
+ItemName: I3 NightMax Viewer
+Description: NiteMax Digital Night Vision Viewing System ===== The NiteMax is a portable Digital Night Vision viewing device. The digital technology which allows the NiteMax to work in low light is currently used in high end surveillance systems and has now been adapted for use in a hand-held, battery powered device. Unlike image intensified technology the NiteMax Digital system can be used in any lighting condition without damage to the system. Even use in bright sunlight does not harm the system, in fact the system functions normally day or night. The NiteMax utilizes specially manufactured infrared diodes that are focused and tuned to the sensor to allow for maximum distance and clarity in low light applications. The NiteMax performance in many ways surpasses current image intensified night vision viewers by allowing the user to easily adapt the unit to video capture devices such as camcorders and VCR units with the use of its RCA video output which is built-in to the device. The NiteMax can also be powered by auxiliary AC/DC power sources. The image is displayed on a 2.5" TFT-LCD, the same display that is used in millions of camcorder products worldwide. This high-resolution display allows for single and multiple user viewing without the typical eyestrain of current night vision devices. The NiteMax digital technology is the future, it will offer users an unlimited range of applications. From personal viewing devices to weapon sights the NiteMax is just the beginning of the new digital night vision revolution.  Digital Dan at CBS news recently coined the NiteMax "Extraordinary" "This night vision device is hardly a toy: high-output LED's send out infrared 'light' more than 300 feet. The digital chip magnifies the light and you can see remarkably clearly in low-light situations. I've used night scopes that cost $5,000 that couldn't produce such clear imagery as this one does."
+
+ID: 0000000002
+ItemName: I3 NightMax Viewer Ultra W/ 3x Zoom
+Description: NiteMax Digital Night Vision Viewing System ===== The NiteMax is a portable Digital Night Vision viewing device. The digital technology which allows the NiteMax to work in low light is currently used in high end surveillance systems and has now been adapted for use in a hand-held, battery powered device. Unlike image intensified technology the NiteMax Digital system can be used in any lighting condition without damage to the system. Even use in bright sunlight does not harm the system, in fact the system functions normally day or night. The NiteMax utilizes specially manufactured infrared diodes that are focused and tuned to the sensor to allow for maximum distance and clarity in low light applications. The NiteMax performance in many ways surpasses current image intensified night vision viewers by allowing the user to easily adapt the unit to video capture devices such as camcorders and VCR units with the use of its RCA video output which is built-in to the device. The NiteMax can also be powered by auxiliary AC/DC power sources. The image is displayed on a 2.5" TFT-LCD, the same display that is used in millions of camcorder products worldwide. This high-resolution display allows for single and multiple user viewing without the typical eyestrain of current night vision devices. The NiteMax digital technology is the future, it will offer users an unlimited range of applications. From personal viewing devices to weapon sights the NiteMax is just the beginning of the new digital night vision revolution.  Digital Dan at CBS news recently coined the NiteMax "Extraordinary" "This night vision device is hardly a toy: high-output LED's send out infrared 'light' more than 300 feet. The digital chip magnifies the light and you can see remarkably clearly in low-light situations. I've used night scopes that cost $5,000 that couldn't produce such clear imagery as this one does."
+
+ID: 0000000003
+ItemName: I3 NightMax Viewer Ultra Color
+Description: NiteMax Digital Color Night Vision Viewing System ===== The NiteMax Color viewer is a portable Digital Night Vision viewing device. The digital technology which allows the NiteMax to work in low light is currently used in high end surveillance systems and has now been adapted for use in a hand-held, battery powered device. Unlike image intensified technology the NiteMax Digital system can be used in any lighting condition without damage to the system. In low light conditions you can see multiple colors. Identification is greatly improved with the addition of color to the image. When the NiteMax color viewer is attached to a standard camcorder, color video can be recorded in most lighting conditions. In zero light environments, the IR built into the NiteMax color viewer will produce a near invisible light that will provide a crisp clear black and white image. The bright sunlight does not harm the viewer in any way; in fact the system functions normally day or night. The NiteMax utilizes specially manufactured infrared diodes that are focused and tuned to the sensor to allow for maximum distance and clarity in low light applications. The NiteMax performance in many ways surpasses current image intensified night vision viewers by allowing the user to easily adapt the unit to video capture devices such as camcorders and VCR units with the use of its RCA video output which is built-in to the device. The NiteMax can also be powered by auxiliary AC/DC power sources. The image is displayed on a 2.5" TFT-LCD, the same display that is used in millions of camcorder products worldwide. This high-resolution display allows for single and multiple user viewing without the typical eyestrain of current night vision devices. The NiteMax digital technology is the future; it will offer users an unlimited range of applications. From personal viewing devices to weapon sights the NiteMax is just the beginning of the new digital night vision revolution.  Digital Dan at CBS news recently coined the NiteMax "Extraordinary" "This night vision device is hardly a toy: high-output LED's send out infrared light more than 300 feet. The digital chip magnifies the light and you can see remarkably clearly in low-light situations. I've used night scopes that cost $5,000 that couldn't produce such clear imagery as this one does."
+
+ID: 0000000004
+ItemName: USNV-141
+Description: Generation 1 Weapon Sight ===== The USNV-141 weapon sight is built around a high performance Generation 1, enhanced image intensifier. Designed to handle the recoil from a 308 caliber weapon the USNV-141 is built to last. Many Generation 1 weapon sights are damaged by recoil. We warranty the USNV -141 to retain zero for the full one-year warranty period. The USNV-141 is a complete weapon system. It comes standard with an adjustable white on green reticle, and a variable brightness IR illuminator. Simple to use and highly reliable, the 141 comes standard with a super-strength weaver style mounting base for easy installation to most any weapon. The USNV-141 ships with a soft carry case, a manual and batteries.
+
+ID: 0000000005
+ItemName: USNV-143
+Description: Generation 1 Weapon Sight ===== The USNV-143 is specifically designed for use on today's .22 Rimfires, Adult Airguns, Paintball and Airsoft Guns, the USNV-143 Generation 1 weapon sight offers both quality and performance at an entry-level price point. Advanced features included are: 2.2x objective lens, integrated user-friendly controls, standard cross-hair reticle, micro-click adjustable windage and elevation target turrets and comes standard with an extra powerful 75mw infrared illuminator. Available in either Dovetail or Weaver models, the lightweight and compact USNV-143 is ideal for close-range target and pest control applications. Finally, a high-quality night vision weapon sight is available for both Rimfires and Airguns. The USNV-143 ships with a soft carry case, batteries and manual.
+
+ID: 0000000006
+ItemName: USNV-241K
+Description: Generation 2 Weapon Sight ===== The USNV 241K features an adjustable, red-on-green reticle for quick and easy target acquisition. The 3x lens and high-power IR illuminator allows for optimal clarity even on the darkest nights. All user controls have been integrated into the mounting assembly for ease of use. The high-strength weaver mount allows for accurate use on most any modern weapon. With all of these great features, this scope is the professional's choice for target practice or predator control. The USNV-241K ships with a soft carry case, batteries and manual.
+
+ID: 0000000007
+ItemName: USNV-241M
+Description: Generation 2 Intensifier ===== The USNV-241M "Cobra" is built around a high performance US Generation 2 image intensifier. It offers Automatic Brightness Control and Bright Source Protection to safeguard against sudden light overloads, and multi-coated optics that are designed specifically for night vision applications. Other Cobra features include a removable high power, multi-stage infrared light source for sighting in extremely low light conditions, as well as an internally adjustable illuminated reticle for precise target acquisition. Ruggedly built and simple to use, the Cobra utilizes a super strength weaver-style mounting base for easy installation to any modern weapon. Coupled with the camera or camcorder adapter, the Cobra can be also used for night photography. It's the perfect choice for the night vision enthusiast with serious shooting in mind. The USNV-241M ships with a soft carry case, batteries and manual.
+
+ID: 0000000008
+ItemName: USNV-242
+Description: 25mm Weapon Sight w/Crosshair ===== The USNV-242 is a high performance 25 mm weapon sight. Similar to the US Military PVS-4, the USNV-242 features a large 90 mm front objective lens that provides superior light transmission. Standard features include an adjustable illuminated crosshair reticle and an adjustable image tube brightness control that provides the best possible image in all night time conditions. All adjustments controls are also conveniently placed on the mounting base for ease of use by the shooter. Simple and reliable, the USNV-242 offers an extremely bright and clear image in any low light application. The USNV-242 weapon sight uses a high-strength weaver style mounting base that allows easily attachment to a wide variety of weapons. The USNV-242 ships with a soft carry case, batteries and manual.
+
+ID: 0000000009
+ItemName: USNV-341
+Description: Discontinued ===== Discontinued
+
+ID: 0000000010
+ItemName: USNV-343
+Description: Discontinued ===== Discontinued
+
+ID: 0000000012
+ItemName: USNV-441
+Description: Generation 3 Weapon Sight ===== The innovative USNV-441 is a high performance night vision weapon sight. It features an adjustable red on green backlit cross-hair reticle for extremely accurate night time shooting. Precision manufactured from the finest materials, only the latest Generation 3 American made image intensifier tubes are utilized in its construction. The end result is a superb night vision weapon sight that provides an image close to a daylight scope while viewing at night. Easy to operate, all sight controls have been integrated into the mounting assembly for convenient "user friendly" operation. Designed to handle the recoil from a 308 caliber weapon the USNV -441 is built to last. The USNV-441 incorporates a high-strength weaver style mounting base for easily attachment to a wide variety of weapons. A top choice among professionals and serious night vision enthusiasts, the USNV-441 is one of the most formidable night vision weapon sights available today. The USNV-441 ships with a soft carry case, batteries and manual.
+
+ID: 0000000099
+ItemName: USNV-440
+Description: Generation 3 Weapon Sight ===== The most advanced Generation 2 weapon sight on the market, the all new USNV D-440 represents the next level of high-performance target and varmint night vision scopes.  State-of-the-art features include a precision 3x objective lens with micro-click side-wheel focus, illuminated red on green Mil-Dot reticle, integrated user-friendly controls, extra powerful 3-stage 75mw infrared illuminator with quick detach & adjustable beam columniation and a heavy-duty Weaver Mount system.  The impressive D-440 is also lighter in weight and mounts lower to the bore than any other night vision weapon sight in its class.  The first night vision weapon sight to feature a true Mil-Dot reticle is also available in Generation 2+. This new design features an adjustable, red-on-green Mil-Dot reticle for easy target acquisition in total darkness.
+
+ID: 0000000100
+ItemName: USNV-260
+Description: Generation 2 Monocular ===== One of the most versatile Generation 2 monoculars available, the USNV-260 offers both extraordinary performance and multi-function capability in a single design.  Advanced features include an IR illuminator for use in low light environments.  Automatic Brightness Control and Bright Source Protection are standard.  A new light weight housing combined with high quality optics makes this monocular one of the best made unit available today. Optional accessories include fully adjustable headgear for hands-free use, magnifying lenses, video adapter, and a weapon mounting kit that will allow the USNV-260 to be conveniently mounted behind a red-dot or EOTech day optic. With all of these features and capabilities, the USNV-260 has no competition in today's market.
+
+ID: 0000000101
+ItemName: USNV-360
+Description: Generation 3 Monocular ===== One of the most versatile Generation 3 monoculars available, the USNV-360 offers both extraordinary performance and multi-function capability in a single design.  Advanced features include an IR illuminator for use in low light environments.  Automatic Brightness Control and Bright Source Protection are standard.  A new light weight housing combined with high quality optics makes this monocular one of the best made unit available today. Optional accessories include fully adjustable headgear for hands-free use, magnifying lenses, video adapter, and a weapon mounting kit that will allow the USNV-360 to be conveniently mounted behind a red-dot or EOTech day optic. With all of these features and capabilities, the USNV-360 has no competition in today's market.
+
+ID: 0000000103
+ItemName: USNV-303
+Description: Generation 3 Goggle ===== The USNV-303 is a single tube, dual eye goggle that is similar to the Military PVS-7 system. Utilizing US Generation 3 technology, its compact and ergonomic design includes a built in two stage Infrared illuminator with a momentary on off switch. An Infrared indicator and low battery warning is fiber optically displayed within the user's field of view. The fully adjustable, padded headgear allows the unit to be flipped-up or quickly detached from the mask. An optional 3.2x multicoated lens will convert USNV-303 into a high performance binocular and an infrared spot/flood lens will enhance its performance in total darkness. The D 303 is rugged and easy to use, making it a great hands free goggle system for any nighttime application. Ships with unit, carry case, manual and batteries.
+
+ID: 0000000015
+ItemName: Raptor 4X (Includes Mount)
+Description: Generation 3 System w/Mount ===== The RAPTOR® is a state-of-the-art, GENERATION 3 night vision weapon sight, utilizing the latest Ultra military image tube providing 21st Century technology. Rugged yet lightweight construction makes the RAPTOR® very reliable and is the most accurate imaging device designed to withstand the rigors of combat use. Originally designed for military and professional demands for extreme long range accuracy, the RAPTOR® can easily be mounted on almost any weapon system including military .50 cal sniper rifles. Optional mount adapters are available for specific mounting needs. Sighting is accomplished with a variable illuminated red crosshair ballistic reticle. The red on green reticle is fully adjustable for boresighting and has a separate control for optimal reticle brightness and contrast for all lighting conditions. The reticle offers 0.2 Mil elevation and windage adjustments. A daylight cover protects the objective lens, as well as the image tube, against accidental exposure to bright light. This daylight cover can be utilized for training and boresighting during low-light conditions such as dawn, dusk or overcast days. A pressure operated rubber eyeguard provides operator protection from recoil and prevents light scatter from the image tube. All RAPTOR® units ship with an Ultra high performance US military image tube with certification paperwork. Included with each RAPTOR® is a mil-spec throw lever weaver style mount that will attach easily to any weapon as well as hold zero on and off the weapon. Typical operating range is 1857 yards in moonlight / 1232 yards in starlight / 650 yards in cloud cover Ships with, unit, carry case, manual and batteries.
+
+ID: 0000000016
+ItemName: Raptor 6X (Includes Mount)
+Description: Generation 3 System w/Mount ===== The RAPTOR® is a state-of-the-art, GENERATION 2I night vision weapon sight, utilizing the latest Ultra military image tube providing 21st Century technology. Rugged yet lightweight construction makes the RAPTOR® very reliable and is the most accurate imaging device designed to withstand the rigors of combat use. Originally designed for military and professional demands for extreme long range accuracy, the RAPTOR® can easily be mounted on almost any weapon system including military .50 cal sniper rifles. Optional mount adapters are available for specific mounting needs. Sighting is accomplished with a variable illuminated chevron ballistic reticle. The red on green reticle is fully adjustable for boresighting and has a separate control for optimal reticle brightness and contrast for all lighting conditions. The reticle offers 0.2 Mil elevation and windage adjustments. A daylight cover protects the objective lens, as well as the image tube, against accidental exposure to bright light. This daylight cover can be utilized for training and boresighting during low-light conditions such as dawn, dusk or overcast days. A pressure operated rubber eyeguard provides operator protection from recoil and prevents light scatter from the image tube. All RAPTOR® units ship with an Ultra high performance US military image tube with certification paperwork. Included with each RAPTOR® is a mil-spec throw lever weaver style mount that will attach easily to any weapon as well as hold zero on and off the weapon. Typical operating range is 2425 yards in moonlight / 1695 yards in starlight / 840 yards in cloud cover Ships with, unit, carry case, manual and batteries.
+
+ID: 0000000093
+ItemName: 50mm 6X Lens
+Description: 50mm 6X Lens for the NiteMax ===== The 50mm 6X Lens is a perfect addition for your NiteMax viewer. It will allow you to clearly zoom in on distant targets such as license plates, or even allow you to recognize an individual at over 100 yards.
+
+ID: 0000000094
+ItemName: USNV Hard Case
+Description: Classic Fire Arms Hard Case ===== Made for most systems, the USNV commercial hard case is both rugged and flexible. With perforated removable foam, the USNV commercial hard case can be modified to fit just about any night vision scope or weapon sight.
+
+ID: 0000000095
+ItemName: Soft Case
+Description: Classic Binocular Soft Case ===== This night vision protective case can be used when you need to carry more than your pockets will hold. Its nylon construction is water and stain resistant Fully padded and lined this case will protect your night vision device from the elements. With a zippered pocket inside and two removable dividers this case is durable and flexible. It also comes with an adjustable padded waist belt.
+
+ID: 0000000018
+ItemName: Raytheon Palm IR-250
+Description: Thermal Imaging Device ===== A revolutionary breakthrough! Palm IR-250 gives you unparalleled ease-of-use. Raytheon has long been regarded as a leader in infrared technology. Now the Palm IR-250 takes that proven technology one step further by putting it in a device that offers the greatest ease-of-use in the entire industry. Featuring quality image resolution, quiet operation, light weight, and long battery life, the Palm IR-250 is suited for many duties in marine, surveillance, and industrial applications.
+
+ID: 0000000019
+ItemName: DC Car Adapter
+Description: 6ft Wall Transformer for the NiteMax ===== This adapter will allow the NiteMax to be powered by this auxiliary DC power source, such as a car's cigarette lighter. DC Auxiliary Power Adapter, Standard US Plug, 12 v.d.c. operation, 6ft cord
+
+ID: 0000000020
+ItemName: AC/DC Wall Adapter
+Description: 12ft Auxilary Power Cord for the NiteMax ===== This adapter will allow the NiteMax to be powered by any 110 Volt auxiliary AC power source. 
+
+ID: 0000000021
+ItemName: 25mm 3X Lens
+Description: 25mm 3X Lens for the NiteMax ===== The 25mm 3X Lens is a perfect addition for your NiteMax basic viewer. It will allow you to clearly zoom in on distant targets such as license plates, or even allow you to recognize an individual at over 50 yards.
+ 
+ID: 0000000087
+ItemName: IR Illuminator
+Description: USNV-Series Weapon Sight ===== Accessory IR Illuminator allows you to see when there is little or no ambient light, this illuminator screws directly into the weapon sight, it has a focusable beam, and works up to 200 yards.
+
+ID: 0000000024
+ItemName: Spare Battery
+Description: For Spare Battery for NiteMax Systems ===== Spare rechargeable battery for use with the NiteMax. 
+
+ID: 0000000025
+ItemName: Nylon Soft Case w/ Lanyard
+Description: For use with NiteMax ===== Nylon Soft Case w/ Lanyard
+
+ID: 0000000026
+ItemName: USNV Headmount
+Description: USNV Headmount for all USNV compatible systems ===== This headmount was made to fit all our commercial night vision products perfectly. Soft padding and rugged construction makes this head mount comfortable and durable. *Shown with NV system, NV system not included. 
+
+ID: 0000000027
+ItemName: USNV 1X Lens
+Description: For all Commercial Systems ===== This 1X Lens was made to fit all our commercial night vision systems.
+
+ID: 0000000028
+ItemName: USNV 3X Lens
+Description: For all Commercial Systems ===== This 3X Lens was made to fit all our commercial night vision systems.
+
+ID: 0000000029
+ItemName: Weapon Mount Univeral Rail
+Description: For all Commercial Systems ===== Universal SKS/SVD Side Plate, Undrilled. This is a unversal plate without screw holes. The plate has not been drilled so that you can change screw placement. It is a good universal plate that is customizable. It is recommended for the SKS and SVD variants and works with the SVD/SKS version of the POSP and all SVD/SKS side mounts. It mounts on the left side of the receiver for use with PO/PSO/POSP rifle scopes. It is fashioned from machined steel and is 15 mm wide and 100 mm long.
+
+ID: 0000000030
+ItemName: Camera Adapter
+Description: For all Commercial Systems ===== The camera adapter kit enables you to adapt the unit to any 35 mm SLR camera or camcorder with a 46 mm opening. Includes adapter and locking ring.
+
+ID: 0000000031
+ItemName: USNV P-500 (only w/ USNV - 300)
+Description: For all Commercial Systems ===== The 500 mm (F/5.6) Lens has a c-mount adapter.
+
+ID: 0000000032
+ItemName: PVS-7/14 Helmet Assembly
+Description: Helmet Mount for Military Systems ===== The helmet mount allows you to attach the unit directly to the PASGT (Personal Armor System Ground Troop) family of helmets. The helmet mount not only incorporates standard adjustments, it also has a flip-up/flip-down capability, that allows the user to move the PVS-7 or the PVS-14 up and out of the way of the face.
+
+ID: 0000000033
+ItemName: PVS-7/14 Headmount Assembly
+Description: Headmount for Military Systems ===== This Military headstrap assembly allows for hours of comfortable hands-free use while leaving the user with one eye still trained for night time viewing. *Night Vision Goggles NOT included.
+
+ID: 0000000035
+ItemName: Camera Adapter PVS-14
+Description: For Military Use ===== The camera adapter kit enables you to adapt the unit to any 35 mm SLR camera or camcorder with a 46 mm opening. Includes adapter and locking ring.
+
+ID: 0000000036
+ItemName: 3x Military Lens
+Description: Galilean afocal telescope ===== A high performance Galilean afocal telescope, the 3X Military Lens with F/1.5 optics mounts to the objective lens of many of ITT's night vision devices. This lens comes in a convenient, flexible and durable carrying case. For Use With : PVS-7, PVS-14, D-121M
+
+ID: 0000000037
+ItemName: 5x Military Lens
+Description: 5x Lens for Military Systems ===== 5X Military Lens is a high performance Galilean afocal telescope, the 5X Military Lens with F/1.5 optics mounts to the objective lens of many of ITT's night vision devices. This lens comes in a convenient, flexible and durable carrying case. For Use With : PVS-7, PVS-14, D-121M
+
+ID: 0000000038
+ItemName: M-69 Mount PVS-14
+Description: A.R.M.S.® Throw Lever Mounting System Quick Detachable FeatuRings ===== The Patented A.R.M.S.® Throw Lever Mounting System with Guaranteed On and Off repeatability. An adjustable height carrier with locators to prevent slippage horizontally or vertically during firings. A calibrated scale to assist the user in returning the carrier to a favored sweet spot. The most recent addition to our product line is the M69, an adjustable mount for the AN/PVS-14 Monocular Night Vision Device. This mount allows users of the PVS14 and Litton 983's to attach these pocket scopes to any rifle base and use them in conjunction with another optical device. Two thumb screws with integral self-locking systems and slots for easy removal. Tough, state-of-the-art coatings or solid stainless steel parts are used to prevent rust and corrosion. Non-reflective matte finishes. Positive locating surfaces to hold and locate the PVS-14.
+
+ID: 0000000039
+ItemName: Magnetic Compass
+Description: For Use with Military Systems ===== The magnetic compass increases your mobility by displaying a compass heading in the top of the night vision scene. It is very lightweight and slips onto the objective lens of the unit.
+
+ID: 0000000040
+ItemName: Spot Flood IR
+Description: For use with Military Systems ===== ITT Industries Night Vision's IR Spot/Flood Lens slips easily over the front of the unit's body and allows the user to focus the diffused IR light source from 40 degrees to 20 degrees. It also intensifies the beam, making it usable beyond 50 yards, and reduces stray IR illumination.
+
+ID: 0000000041
+ItemName: IR Spot Light Kit
+Description: Million Candle Power ===== This kit includes a million candle power professional grade spotlight with a detachable Infrared filter. The spotlight is cordless and includes a cigarette lighter power cord and an AC charger. 
+
+ID: 0000000042
+ItemName: IR Filter 100
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000043
+ItemName: IR Filter 112
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000044
+ItemName: IR Filter 125
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000045
+ItemName: IR Filter 150
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000046
+ItemName: IR Filter 175
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000047
+ItemName: IR Filter 187
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000048
+ItemName: IR Filter 200
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000049
+ItemName: IR Filter 230
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000050
+ItemName: IR Spot Filter
+Description: IR Flashlight Filter Infrared Flashlight Filters ===== Infrared filters from VT block 99% of the visible light spectrum from any flashlight using Krypton, Xenon, or HaloGeneration light bulbs. These filters allow a maximum of Infrared output while maintaining extreme covertness. Originally manufactured for the US Space program, our filters are designed to meet strinGenerationt standards. The polysulfone blend is known for its strength and ability to withstand extremely high temperatures. When used with your flashlight, our filters will tremendously improve the effectiveness of your night vision equipment. Most filters come with a rubber boot that secures the filter to the flashlight. Some filters must replace the existing lens of the flashlight.
+
+ID: 0000000051
+ItemName: Surefire M1 / IR Flashlight
+Description: 830 nm wavelength Infra-Red diode M1 Infrared Flashlight ===== The SURE-FIRE M1 uses an 830 nm wavelength Infra-Red diode and produces substantially more Infra-Red light than produced by a flashlight with an Infra-Red filter. It also runs for more than eight hours on a single DL123A lithium battery, making it very economical to use. Because of its substantially higher InfraRed light output, and the fact that the human eye still has some sensitivity to the shorter wavelengths of Infra-Red light, the M1 will have a distinctly higher "signature". The M1 utilizes a lens to focus the Infra-Red light into a round beam about 12 degrees wide. This produces a spot about 5 feet in diameter at 25 feet, 10 feet at 50 feet, 20 feet at 100, and so on. This is a much narrower and farther reaching beam than produced by the IR light source typically built into military night vision goggles, such as the AN/PVS-7B. It is wide enough, however, to still be useful at short distances, while providing useful illumination up to as far as 100 yards. It is a very useful tool to have when using night vision devices. If you use night vision goggles or similar devices, there will be situations where you won't have enough ambient light to form a good image of what you are trying to see.
+
+ID: 0000000053
+ItemName: USNV - Night Guardian Viewer
+Description: Generation 1 Monocular ===== The Night Guardian is the finest Generation 1 monocular on the market. This lightweight and compact unit features a built-in IR illuminator and a multi-coated 3.2X objective lens. A built-in photocell safeguards against accidental exposure to bright light sources. Also available as the Night Guardian Mono-Goggle, its features include fully adjustable headgear for hands free operation and 1X optics with a 40º field of view. Optional accessories available are 1X and 3.2X lenses, a C mount lens adapter and a camera/camcorder adapter. The Night Guardian offers quality and performance at an entry-level price.
+
+ID: 0000000054
+ItemName: USNV - NG Mono Goggle
+Description: Generation 1 Monocular ===== Equipped with all the features of the "Night Guardian" such as a built-in, turn-on-demand, powerful infrared illuminator and bright source protection circuitry, this Generation I mono-goggle incorporates a 1x high-resolution f1.2 front objective that provides a wide field of view and sharp focusing. A semi-rigid, fully adjustable head mount that is padded and comfortable to wear for prolong periods of time is included. The headgear features a quick disconnect and flip up mechanism that also allows for 360-degree unit rotation without removal from the harness. Optional accessories include a 3.2 x f1.7 front objective that can be easily installed in the field, camera/camcorder adapters for night photography and an internationally standard "C" lens adapter for installation of commercially available lenses. Ships the with unit, carry case, manual and batteries.
+
+ID: 0000000055
+ItemName: USNV-121
+Description: Generation 2 Night Vision System ===== The USNV-121 Monocular uses a U.S. made Generation 2 Plus image tube in a lightweight and compact design. The USNV-121 features a high power IR illuminator for operation in extreme low light environments. Automatic Brightness Control and Bright Source Protection are standard in this system. In addition, IR mode and low battery warnings are fiber optically displayed within the user's field of view. Optional accessories include fully adjustable headgear for hands-free operation, video adapter, Mil-Spec 3X & 5X lenses and a weapon mount. It can be configured in Generation 2 or high-performance Generation 2 Plus. The USNV-121 is one of the finest and most versatile compact monocular systems available today. Whether hunting, hiking, boating or viewing nature, a night vision monocular can give you the feeling of being home on the range, no matter where you are.
+
+ID: 0000000056
+ItemName: USNV-121M
+Description: Generation 2+ Monocular ===== The USNV-121M is a highly advanced, US Generation 2 Plus, compact night vision monocular. The Generation 2 Plus image tube offers 20-30% improved performance than a standard Generation 2 and each unit is shipped with a data sheet that provides exact specifications. With its new and improved optics and user controls, the USNV-121M offers numerous built in features, which include automatic brightness control, bright source protection and a low battery indicator. In addition, this unit incorporates a high power infrared illuminator that can be turned on independently. The USNV-121M utilizes fiber optics to display its low battery warning and IR operational mode within the users field of view. By attaching the USNV-121M to its optional exclusive head mount assembly, it becomes a hands free mono goggle that allows for easy eye interchangeability and a flip up mechanism for unaided viewing. The USNV-121M can be used in conjunction with a camera or camcorder as a low light image enhancer. The USNV-121M's viewing capabilities can be extended with the use of long-range mil spec 3X or 5X magnification lenses. It can also be used as a weapon scope in conjunction with an external aiming device. The USNV-121M performance and versatility will satisfy the most demanding night vision user. Ships with unit, carry case, manual and battery.
+
+ID: 0000000091
+ItemName: Fast Charger 30 Min.
+Description: Quick NV Battery Charger ===== Provides quick and efficient charging for your night vision products.
+
+ID: 0000000092
+ItemName: Euro 220 V Charger
+Description: European 220 Volt Outlet Charger ===== European 220 Volt Outlet Charger
+
+ID: 0000000058
+ItemName: Northrup Grumman PVS-14D (64lp)
+Description: Generation 3 Monocular ===== The AN/PVS-14D is a light weight, multi-purpose, monocular night viewer. The objective and eyepiece assemblies allow attachment of similar accessories and the head/helmet mount adapter is exactly the same. Also available is a weapon mount adapter to allow the system to be mounted on the M16/M4 Picatinny style rail. A long list of optional accessories allows configuration to meet all customer requirements. The U.S. Army has adopted the AN/PVS-14 as its standard monocular device. It is a self-contained system operating on 2AA batteries and features manual gain control to meet various brightness conditions. A red low-battery indicator appears in the eyepiece when battery replacement is needed. The system also features a projected IR LED for short range illumination for such activities as map reading. The AN/PVS-14 is supplied with the Military headstrap for hands-free use and has many optional accessories. Each system is built to current U.S. Military specifications and ships with certification of performance specifications from the manufacturer. This package includes the PVS-14D, Military headstrap, sacrificial window, demist shield, batteries, manual and carry case.
+
+ID: 0000000059
+ItemName: ITT NQ PVS 14
+Description: Generation 3 System ===== The PVS-14 is the world's most advanced Generation 3 monocular. Used currently by the U.S. Armed Forces elite SWAT and Special Ops Units, this monocular includes an IR illuminator, fully adjustable headgear and multi-coated optics. Automatic Brightness Control and Bright Source Protection are standard. Manual gain control allows the user to increase or decrease image tube brightness for best possible image contrast. The most versatile night vision system on the market, the PVS-14 can be used hands-free, weapons mounted, or attached to a camera or camcorder for nighttime photography. Optional accessories include a military helmet mount, illuminated compass, high magnification lenses and weapon's mount. The PVS-14 is available in many configurations ranging from current Mil-Spec to low-cost commercial systems. This is the finest monocular available on the market today.
+
+ID: 0000000060
+ItemName: ITT 6015 (51lp)
+Description: Generation 3 System ===== The 6015 is a Generation 2I Military style tactical monocular. It was designed to be hand-held, head-worn, weapon-mounted, and camera-adaptable using optional Military accessories. The lightweight 6015 features a low battery indicator and built-in infrared illumination for situations with little or no ambient light. You will not be disappointed with the usefulness of this night vision device. The included Military headstrap assembly allows for hours of comfortable hands-free use while leaving the user with one eye still trained for night time viewing. This is the commercial variant of the Military PVS-14 system. Ships with 6015, carry case, Military head strap, manual and batteries.
+
+ID: 0000000089
+ItemName: EOTech 552 w/ AA Battery
+Description: HOLOgraphic Diffraction Sight (HDS) ===== The HOLOgraphic Diffraction Sight (HDS) is the first electro-optic sighting system to apply holographic technology to small arms. When used in Close Quarter Battle (CQB) environments, this revolutionary optic delivers amazing speed and accuracy gains, uncompromised use of peripheral vision, and leaves no muzzle side operator signature. When the situation is critical, so is the performance of your equipment. Fast, accurate target acquisition can make the difference...and this is exactly what separates the HDS from any other sighting system...the uncompromising combination of speed and accuracy. The HDS delivers critical speed gains for the initial weapon presentation, in multiple target situations, and in conditions where either the operator or the threat(s) are moving rapidly. Engaging around physical barriers or in awkward shooting positions are now made with ease while ensuring rapid reticle to target lock-on.
+
+ID: 0000000062
+ItemName: ITT 160
+Description: Generation 2 System ===== The Night Quest 160 and the give you the same image clarity as the military goggles, but at a fraction of the cost. The NQ 160 are very compact and can be taken to virtually any environment for ultimate nighttime viewing experiece and performance. Both units are waterproof and have a built-in IR illuminator for use in total darkness. Their lightweight allows the devices to float if dropped in the water.
+
+ID: 0000000064
+ItemName: USNV-221B
+Description: Generation 2 Binocular w/Headmount Included ===== The USNV-221B is the only dual tube/dual eye binocular available on the market that offers a true stereoscopic night vision image in a superior US Generation 2 configuration. The unique patented design eliminates the need for interpupillary adjustment, which reduces the size and weight of this unit. It includes all of the advanced features of Generation 2, such as automatic brightness and gain control, bright light protection, along with a powerful IR illuminator and specialized multicoated optics. The D 221B is a highly professional night vision device and offers extreme clarity in low-light situations. The system ships as a 3.2X Binocular or a hands free 1X Goggle with headstrap. Ships with unit, carry case, manual and batteries.
+
+ID: 0000000065
+ItemName: USNV-443
+Description: Generationeneration 3 Night Vision System ===== The most advanced Generation 3 weapon sight on the market, the all new USNV USNV-443 represents the next level of high-performance target and varmint night vision scopes. State-of-the-art features include a precision 3x objective lens with micro-click side-wheel focus, illuminated red on green Mil-Dot reticle, integrated user-friendly controls, extra powerful 3-stage 75mw infrared illuminator with quick detach & adjustable beam columniation and a heavy-duty Weaver Mount system. The impressive USNV-443 is also lighter in weight and mounts lower to the bore than any other night vision weapon sight in its class. The first night vision weapon sight to feature a true Mil-Dot reticle is also available in Generation 3. This new design features an adjustable, red-on-green Mil-Dot reticle for easy target acquisition in total darkness.
+
+ID: 0000000066
+ItemName: USNV-303 G2
+Description: Generation 2 System ===== The USNV-303 is a single tube, dual eye goggle that is similar to the Military PVS-7 system. Utilizing US Generation 2 technology, its compact and ergonomic design includes a built in two stage Infrared illuminator with a momentary on off switch. An Infrared indicator and low battery warning is fiber optically displayed within the user's field of view. The fully adjustable, padded headgear allows the unit to be flipped-up or quickly detached from the mask. An optional 3.2x multicoated lens will convert USNV-303 into a high performance binocular and an infrared spot/flood lens will enhance its performance in total darkness. The D 303 is rugged and easy to use, making it a great hands free goggle system for any nighttime application. Ships with unit, carry case, manual and batteries.
+
+ID: 0000000069
+ItemName: USNV PVS-7B
+Description: Generation 2 Goggle ===== The PVS-7B is the standard issue goggle supplied to the U.S. Military and its allies. With the use of a single Generation 2I image tube and a dual eye configuration, the PVS-7B provides an outstanding performance-to-cost ratio. It features simple user controls and fully automated image tube protection. This system allows the user to have complete freedom of movement while maintaining equilibrium and balance in a hands free application. The PVS-7B also incorporates an infrared illuminator with a momentary and continuous on switching function. Infrared operation and low battery indicators are displayed within the user's field of view. The PVS-7B comes complete with a lightweight, fully adjustable military head strap that allows for comfortable long-term use. A wide range of optional accessories include high magnification lenses, compass, infrared spot/flood lens and helmet mounting bracket.
+
+ID: 0000000070
+ItemName: Northrop Grumman PVS-7D (64lp)
+Description: Generation 3 Mil. Spec. System ===== The PVS-7D is the standard issue goggle supplied to the U.S. Military and its allies. With the use of a single Generation 2I image tube and a dual eye configuration, the PVS-7D provides an outstanding performance-to-cost ratio. It features simple user controls and fully automated image tube protection. This system allows the user to have complete freedom of movement while maintaining equilibrium and balance in a hands free application. The PVS-7D also incorporates an infrared illuminator with a momentary and continuous on switching function. Infrared operation and low battery indicators are displayed within the user's field of view. The PVS-7D comes complete with a lightweight, fully adjustable military head strap that allows for comfortable long-term use. A wide range of optional accessories include high magnification lenses, compass, infrared spot/flood lens and helmet mounting bracket. This complete systems ships with unit, carry case, military head strap, lens tissue, manual and batteries.
+
+ID: 0000000071
+ItemName: USNV PVS-7B (51lp)
+Description: Generation 3 Goggle ===== The PVS-7B is the standard issue goggle supplied to the U.S. Military and its allies. With the use of a single Generation 2I image tube and a dual eye configuration, the PVS-7B provides an outstanding performance-to-cost ratio. It features simple user controls and fully automated image tube protection. This system allows the user to have complete freedom of movement while maintaining equilibrium and balance in a hands free application. The PVS-7B also incorporates an infrared illuminator with a momentary and continuous on switching function. Infrared operation and low battery indicators are displayed within the user's field of view. The PVS-7B comes complete with a lightweight, fully adjustable military head strap that allows for comfortable long-term use. A wide range of optional accessories include high magnification lenses, compass, infrared spot/flood lens and helmet mounting bracket.
+
+ID: 0000000072
+ItemName: ITT 5001 (51lp)
+Description: Generation 3 System ===== The newly improved ITT NQ 5001 (AN/PVS-7B) is the world's most rugged, reliable, high performance night vision goggle. Extensively used by the U.S. Army for ground operations, the 5001 is the state-of-the-art in night vision technology. Utilizing a high performance MX-10130 Generation 3 image intensifier, the 5001 can be used in the darkest of conditions - headmounted or handheld. The system has a built-in IR (infrared) illuminator for close up viewing in total darkness. Engineered for maximum comfort, the 5001 is light weight and easy to use. The 5001's features include a low battery indicator and a high light sensor which automatically cuts power to the image tube when too much light is present.
+
+ID: 0000000074
+ItemName: ITT 220
+Description: Generation 3 System ===== The Night Enforcer 220 is one of the most compact and lighweight units in the ITT line of night vision. At just 20 oz., this new 3rd. Generation binocular can be easily handheld or head-mounted. This capability allows the user to keep both hands-free while you are on patrol, and then use the head mount's quick release feature when you are ready to go back to handheld use.
+
+ID: 0000000075
+ItemName: USNV-2MV
+Description: Generation 1 System ===== The most popular Generation 1 night vision goggle on the market, the rugged USNV-2MV offers true stereoscopic viewing in a dual tube design. The patented optical system eliminates the need for interpupillary adjustment, thus reducing both size and weight. Features include a high power IR illuminator, fully adjustable headgear and multi-coated lenses. Bright Source Protection is standard with every USNV-2MV system. Optional 3X lenses allow the USNV-2MV to be converted into a binocular. See the night come alive and enjoy more time in the great outdoors. A night vision viewer is the perfect companion to any outdoor activity. *Shown with Headstrap, not included.
+
+ID: 0000000076
+ItemName: USNV-221
+Description: Generation 2 Binocular w/ 3x Maginification ===== The USNV-221 is the only dual tube/dual eye binocular available on the market that offers a true stereoscopic night vision image in a superior US Generation 2 configuration. The unique patented design eliminates the need for interpupillary adjustment, which reduces the size and weight of this unit. It includes all of the advanced features of Generation 2, such as automatic brightness and gain control, bright light protection, along with a powerful IR illuminator and specialized multicoated optics. The D 221 is a highly professional night vision device and offers extreme clarity in low-light situations. The system ships as a 3.2X Binocular or a hands free 1X Goggle with headstrap. Ships with unit, carry case, manual and batteries.
+
+ID: 0000000077
+ItemName: USNV-321
+Description: Generation 3 System ===== Derived from USNV-321 binocular system, this unit is the only binocular currently available on the market that offers a true stereoscopic night vision system in superior 2 Generation configuration. Unique patented design eliminates need for interpupillary adjustment and reduces the size and weight of the unit. It includes all of the advanced features of the 2 Generation tubes such as automatic brightness and gain control, bright light protection and high gain along with the powerful IR illuminator and specialized multicoated optics. Optional accessories include 1x f1.1 lenses and a headgear for hands free operation. Assembled in the USA by R&R, it features all current parts and components covered by a 2 year warranty.
+
+ID: 0000000079
+ItemName: 75mm 9X Lens
+Description: F/1.4 Optics and 3x Magnification ===== This 75 mm lens offers f/1.4 optics and three power magnification. For Use With 190, NVPS-10, any C-mount Pocketscope
+
+ID: 0000000080
+ItemName: USNV PVS-7U (64lp)
+Description: Generation 3 System ===== The PVS-7U Night Vision Goggle is the same military system that is used extensively by the U.S. forces worldwide. It is suitable for use on a wide variety of weapons including .223 and .308 rifles. The PVS-7U utilizes an adjustable internal lit reticle and a Generation 3 image intensifier tube which features ABC (automatic brightness control). The PVS-7U allows the user to determine tube and reticle brightness with manual adjustments. The PVS-7U is powered by two standard "AA" batteries and comes complete with daylight cover, rubber eyeguard, M-16 weapon mount, transit case, manual, and one year warranty.
+
+ID: 0000000081
+ItemName: USNV-211
+Description: Lightweight Stereoscopic ===== Built with high performance coated glass optics and dual Generation I image intensifier tubes, the USNV-211 binocular offers true stereoscopic night vision capabilities in a lightweight and ergonomic design. These are the first night vision binoculars to have built-in Bright Source Protection circuitry that safeguards the unit in the event of accidental exposure to bright light sources. The USNV-211 also includes an integral Infrared light source that provides long-range illumination in total darkness. (Such as in an enclosed room, etc.) A professional quality night vision binocular, the USNV-211 offers enhanced performance and reliability in a single package. Ships with unit, carry case, manual and batteries.
+
+ID: 0000000082
+ItemName: USNV-300 (51lp)
+Description: Ready for Military Action ===== The USNV-300 is a highly advanced US Generation 3 night vision monocular. Its innovative design allows the USNV-300 to be one of the most versatile scopes on the market, and without sacrificing performance. The USNV-300 is manufactured with the highest quality components available today. An extremely useful tool for any night vision application, this system features a high-power infrared illuminator with multiple output levels. A high strength bayonet mount on the front lens assembly allows for easy lens interchangeability. A low battery and infrared indicator is fiber optically displayed within the user's field of view. Other optional accessories further enhance the USNV-300's capability to fulfill all aspects of night vision operations. Readily adaptable to the PVS-14 Military headgear, the USNV-300 can serve as a "hands free" mono goggle. Coupled with a camera or camcorder, it further provides an excellent imaging system for nighttime photography and surveillance. The USNV-300 is also capable of accepting a wide variety of high magnification lenses, and our exclusive "P-300" weapon module converts the USNV-300 into a high quality night vision weapon sight. The USNV-300 consistently receives the highest marks from many professionals for its superior design, ease of use and outstanding performance. The USNV-300 is available for export utilizing US Generation 2 plus technology. Ships with unit, carry case, manual and batteries.
+
+ID: 0000000085
+ItemName: Hard Case Commercial
+Description: Hard Plastic Case for your Night Vision System ===== This case can hold your night vision system along with all it's accessories comfortably and securely.
+
+ID: 0000000086
+ItemName: Hard Case PVS/7 & 14
+Description: Hard Plastic Case for your Night Vision System ===== This case can hold your PVS-7 / PVS-14 night vision system along with all it's accessories comfortably and securely.
+
+ID: 0000000088
+ItemName: EOTech 551 w/N Cell Battery
+Description: HOLOgraphic Diffraction Sight (HDS) ===== Model 551 w Night Vision Setting The new Model 550 HOLOgraphic Diffraction Sight (HDS) is now fully compatible with Generation I - 2I+ night vision intensifier tubes. A special night vision setting on the M550 allows the operator to immediately drop the brightness intensity of the holographic reticle to eliminate any "halo" affect and saturation of the night vision device. The M550 can be positioned behind night vision systems without any "bloom" of the target area. Now operators can combine proven night vision system with a superior Close Quarters Battle (CQB) sight to achieve greatly enhanced weapon aiming while in the night vision spectrum. (available to take AA lithium batteries)
+
+ID: 0000000090
+ItemName: Helmet Mount PVS-7
+Description: For use with PVS-7 ===== The helmet mount allows you to attach the unit directly to the PASGT (Personal Armor System Ground Troop) family of helmets. The helmet mount not only incorporates standard adjustments, it also has a flip-up/flip-down capability, that allows the user to move the PVS-7 or up and out of the way of the face.
+
+ID: 0000000096
+ItemName: Aquilia 4X
+Description: Generation3 w/FM ===== The AQUILA 2I is a low profile night vision weapon sight which has 4X objectives with ballistic controls suitable for matching with individual, crew served, and sniper weapons. Because the AQUILA 2I is a straight-through sight design it offers excellent cheek-weld characteristics on the lower carbine profile with a flat mounting rail in the 5.56 mm caliber family. The 6X version features specific ballistic controls that assists in the proper acquisition of targets with longer range 7.62 mm crew served weapons. Windage adjustments include slip scale with 0.5 MOA tactile clicks. Elevation adjustment includes ballistic drop compensating scale and 1.0 MOA tactile clicks. AQUILA 2I can use either high performance Generation 2 or Generation 2I image intensifiers to provide selective performance. AQUILA 2I is constructed of high strength aluminum alloy designed to survive rugged military use and environments. The external surfaces are a non-reflective matte black finish. AQUILA 2I is designed for mounting on a wide range of weapons incorporating STANAG or Weaver mounts. It can also be mounted to meet customer specifications. Controls and adjustments are simple to operate. The system is activated by a ON/OFF lever. The red LED reticle brightness is controlled by an adjustment knob. A focus ring is located on the eyepiece for individual eye adjustment. A seperate objective focus knob is located on the forward portion of the sight body for adjustment from 25 meters to infinity. The AQUILA 2I uses two "AA" batteries to insure longer operational performance between changes.

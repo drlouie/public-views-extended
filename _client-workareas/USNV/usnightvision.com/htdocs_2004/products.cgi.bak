@@ -1,0 +1,1287 @@
+#!/usr/bin/perl5 -w
+
+print "Content-type: text/html\n\n";
+
+require "browserSniffer.nsp";
+
+require "cookiesnif.nsp";
+
+$currSection = "Products";
+require "getHeader.nsp";
+
+# run onload code
+if ($FORM{'Search'} eq "1") { $onload = " onload=\"clearFormatingZeros();loadCart();initWatermark();pageInit();\""; }
+elsif ($FORM{'leAction'} eq "CHECKOUT" && $FORM{'NextLocation'} eq "Step3") { $onload = " onload=\"loadCart();initWatermark();pageInit();toggleFieldsetOn('1','4991DE','4991DE');\""; }
+elsif ($FORM{'PID'}) { $extraSizeScript = "placeRightAligned();"; $onload = " onload=\"loadCart();initWatermark();pageInit();initProductTitle();placeRightAligned();\""; }
+elsif ($FORM{'GETBROCHURE'} eq "si" && !$FORM{'daBrochure'}) { $onload = " onload=\"loadCart();initWatermark();pageInit();document.getBrochure.GETBROCHURE.focus();\""; }
+elsif ($FORM{'packageTracker'} eq "1" && !$FORM{'Package'}) { $onload = " onload=\"loadCart();initWatermark();pageInit();document.view.Package.focus();\""; }
+else { $onload = " onload=\"loadCart();initWatermark();pageInit();\""; }
+
+$backgrounder = "background-image: url(images/prodBG.jpg); background-repeat: repeat-x; background-position: left top;";
+
+print qq~
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>US Night Vision - Manufacturer & Distributor of State-of-the-Art Night Vision Products</title>
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript" src="js/mousetable.js"></script>
+<script language="Javascript">
+	var ovFGColor = "#4991DE";
+
+function focusOnMe(cual) {
+	var este = cual;
+	este.style.background = "FFFFFF";
+}
+
+function blurMe(cual) {
+	var este = cual;
+	este.style.background = "CCCCCC";
+}
+</script>
+<script language="Javascript" src="js/overlib1.js"></script>
+<script language="Javascript" src="js/popwindow.js"></script>
+<script language="Javascript" src="js/quickTooltip.js"></script>
+<style type="text/css">
+<!--
+#tip1,#tip2,#tip3,#tip4,#tip5,#tip6,#tip7,#tip8,#Step1Tip1 { width:200px; position:absolute; visibility:hidden }
+.tipWinStyle { background-color:#FFFFFF; layer-background-color:#FFFFFF; border-color:#4991DE; border-width:1px; border-style:solid; padding-left:2px; padding-right:2px }
+// -->
+</style>
+<style type="text/css">
+body { $backgrounder scrollbar-face-color:#A0A0A0; scrollbar-highlight-color:#000000; scrollbar-shadow-color:#A0A0A0; scrollbar-3dlight-color: #000000; scrollbar-arrow-color:#000000; scrollbar-track-color:#000000; scrollbar-darkshadow-color:#000000; }
+#overDiv {	padding-top:2px; padding-bottom:2px; padding-left:2px; padding-right:2px; position:absolute; top:0px; left:0px; visibility:hidden; z-index:5000; border-top:1px solid #4D4D4D; border-bottom:1px solid #000000; border-left:1px solid #4D4D4D; border-right:1px solid #000000; }
+.overDiv {	background-color: #4D4D4D; font-weight:bold; color:#eb0000; padding-top:3px; padding-bottom:3px; padding-left:3px; padding-right:3px; z-index:5000; }
+.overlibCart { font-size:9px; color: #ffffff; }
+.welcomeText { font-size:10px;font-family:verdana,arial,helvetica;color:ffffff;line-height:16px; }
+.commonSmallB { font-size:11px;font-family:verdana,arial,helvetica;color:#333333;line-height:10px;font-weight:bold; }
+.commonSmall { font-size:11px;font-family:verdana,arial,helvetica;color:#333333; }
+.commonSmallest { font-size:9px;font-family:verdana,arial,helvetica;color:#333333;}
+.commonMediumB { font-size:11px;font-family:verdana,arial,helvetica;color:#333333;line-height:10px;font-weight:bold; }
+.commonInput { background-color: #cccccc; border: 1px solid #4991DE; height:20px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+select { background-color: #cccccc; border: #4991DE; height:20px; font-size: 11px; font-family:verdana,arial,helvetica; padding: 3px; }
+radio { background-color: #cccccc; border: #4991DE; height:20px; font-size: 11px; font-family:verdana,arial,helvetica; padding: 3px; }
+.commonTArea { background-color: #cccccc; border: 1px solid #4991DE; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+.checkbox0 { font-size:11px;font-family:verdana,arial,helvetica;line-height:9px; line-height:12px; }
+</style>
+</head>
+<body bgcolor="#A0A0A0" LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0" ONRESIZE="placeIcons();resized();$extraSizeScript" $onload>
+<div id="overDiv"></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" height="100%">
+  <tr> 
+    <td width="185" valign="top" height="100%"> 
+~;
+
+&leftFlashMenu;
+
+print qq~
+    </td>
+    <td valign="top" rowspan="2" height="108">
+      <table width="100%" align="left" cellpadding="0" cellspacing="0" border="0" height="52" dwcopytype="CopyTableColumn">
+~;
+
+&getMenuTop;
+
+print qq~            
+        <tr> 
+          <td colspan="2" valign="top" align="right"> 
+~;
+
+&getMenuBot;
+
+print qq~            
+          </td>
+        </tr>
+        <tr align="left"> 
+          <td colspan="2" valign="top"> 
+~;
+
+######################## ---------------------------- Search
+if ($FORM{'Search'} eq "1") {
+
+print qq~
+
+
+<script language="Javascript">
+function clearFormatingZeros() {
+	// CLEARS 0000000000000000000000 ON ProductType
+	ProductType = document.searcher.ProductType;
+	var sizer = ProductType.length;
+	for(var i = (sizer-1); i >= 0; i--) {
+		if (ProductType.options[i].text == "0000000000000000000000000000000000") {
+			ProductType.options[i] = null;
+		}
+	}
+
+	// CLEARS 0000000000000000000000 ON PriceRange
+	PriceRange = document.searcher.PriceRange;
+	var sizer = PriceRange.length;
+	for(var i = (sizer-1); i >= 0; i--) {
+		if (PriceRange.options[i].text == "0000000000000000000000000000000000") {
+			PriceRange.options[i] = null;
+		}
+	}
+	
+	// CLEARS 0000000000000000000000 ON Results
+	Results = document.searcher.Results;
+	var sizer = Results.length;
+	for(var i = (sizer-1); i >= 0; i--) {
+		if (Results.options[i].text == "0000000000000000000000000000000000") {
+			Results.options[i] = null;
+		}
+	}	
+
+
+	
+	toggleInterests('Any');
+	toggleGeneration('Default');
+	toggleGrade('None');
+	toggleMfg('Todos');
+	document.getElementById("Fieldset1").focus();
+}
+
+// IMAGE PRELOADER
+check0 = new Image();
+check0.src = "images/Bcheckbox0.gif";
+check1 = new Image();
+check1.src = "images/Bcheckbox1.gif";
+
+var checkedCounterInt = 0;
+
+function toggleInterests(incoming) {
+	var leNombre = incoming;
+	var muaField = document.searcher[leNombre];
+	if (muaField.checked == true) {
+		if (leNombre != "Any") {
+			muaField.checked = 0;
+			document.images[leNombre].src = check0.src;
+			document.getElementById(""+leNombre+"").style.color = "000000";
+			checkedCounterInt--;
+		}
+	}
+	else {
+		muaField.checked = 1;
+		document.images[leNombre].src = check1.src;
+		document.getElementById(""+leNombre+"").style.color = "4C6279";
+		if (leNombre != "Any") { checkedCounterInt++; }
+		else { uncheckAllInterests(); checkedCounterInt=0; }
+	}	
+
+// uncheck or uncheck any as necessary
+	if (leNombre != "Any" && checkedCounterInt > 0) {
+		document.searcher.Any.checked = 0;
+		document.images["Any"].src = check0.src;
+		document.getElementById("Any").style.color = "000000";	
+	}
+	else if (leNombre != "Any" && checkedCounterInt == 0) {
+		document.searcher.Any.checked = 1;
+		document.images["Any"].src = check1.src;
+		document.getElementById("Any").style.color = "4C6279";	
+	}
+}
+
+function uncheckAllInterests() {
+	document.searcher.Hunting.checked = 0;
+	document.images['Hunting'].src = check0.src;
+	document.getElementById("Hunting").style.color = "000000";
+	document.searcher.Camping.checked = 0;
+	document.images['Camping'].src = check0.src;
+	document.getElementById("Camping").style.color = "000000";
+	document.searcher.Security.checked = 0;
+	document.images['Security'].src = check0.src;
+	document.getElementById("Security").style.color = "000000";
+}
+
+var checkedCounterGen = 0;
+
+function toggleGeneration(incoming) {
+	var leNombre = incoming;
+	var muaField = document.searcher[leNombre];
+	if (muaField.checked == true) {
+		if (leNombre != "Default") {
+			muaField.checked = 0;
+			document.images[leNombre].src = check0.src;
+			document.getElementById(""+leNombre+"").style.color = "000000";
+			checkedCounterGen--; 
+		}
+	}
+	else {
+		muaField.checked = 1;
+		document.images[leNombre].src = check1.src;
+		document.getElementById(""+leNombre+"").style.color = "4C6279";
+		if (leNombre != "Default") { checkedCounterGen++; }
+		else { uncheckAllGeneration(); checkedCounterGen=0; }
+	}	
+
+// uncheck or uncheck Default as necessary
+	if (leNombre != "Default" && checkedCounterGen > 0) {
+		document.searcher.Default.checked = 0;
+		document.images["Default"].src = check0.src;
+		document.getElementById("Default").style.color = "000000";	
+	}
+	else if (leNombre != "Default" && checkedCounterGen == 0) {
+		document.searcher.Default.checked = 1;
+		document.images["Default"].src = check1.src;
+		document.getElementById("Default").style.color = "4C6279";	
+	}
+}
+
+function uncheckAllGeneration() {
+	document.searcher.Digital.checked = 0;
+	document.images['Digital'].src = check0.src;
+	document.getElementById("Digital").style.color = "000000";
+	document.searcher.GEN1.checked = 0;
+	document.images['GEN1'].src = check0.src;
+	document.getElementById("GEN1").style.color = "000000";
+	document.searcher.GEN2.checked = 0;
+	document.images['GEN2'].src = check0.src;
+	document.getElementById("GEN2").style.color = "000000";
+	document.searcher.GEN3.checked = 0;
+	document.images['GEN3'].src = check0.src;
+	document.getElementById("GEN3").style.color = "000000";
+	document.searcher.GEN4.checked = 0;
+	document.images['GEN4'].src = check0.src;
+	document.getElementById("GEN4").style.color = "000000";
+}
+
+
+var checkedCounterGrade = 0;
+
+function toggleGrade(incoming) {
+	var leNombre = incoming;
+	var muaField = document.searcher[leNombre];
+	if (muaField.checked == true) {
+		if (leNombre != "None") {
+			muaField.checked = 0;
+			document.images[leNombre].src = check0.src;
+			document.getElementById(""+leNombre+"").style.color = "000000";
+			checkedCounterGrade--; 
+		}
+	}
+	else {
+		muaField.checked = 1;
+		document.images[leNombre].src = check1.src;
+		document.getElementById(""+leNombre+"").style.color = "4C6279";
+		if (leNombre != "None") { checkedCounterGrade++; }
+		else { uncheckAllGrade(); checkedCounterGrade=0; }
+	}	
+
+// uncheck or uncheck None as necessary
+	if (leNombre != "None" && checkedCounterGrade > 0) {
+		document.searcher.None.checked = 0;
+		document.images["None"].src = check0.src;
+		document.getElementById("None").style.color = "000000";	
+	}
+	else if (leNombre != "None" && checkedCounterGrade == 0) {
+		document.searcher.None.checked = 1;
+		document.images["None"].src = check1.src;
+		document.getElementById("None").style.color = "4C6279";	
+	}
+}
+
+function uncheckAllGrade() {
+	document.searcher.Commercial.checked = 0;
+	document.images['Commercial'].src = check0.src;
+	document.getElementById("Commercial").style.color = "000000";
+	document.searcher.LawEnforce.checked = 0;
+	document.images['LawEnforce'].src = check0.src;
+	document.getElementById("LawEnforce").style.color = "000000";
+	document.searcher.Military.checked = 0;
+	document.images['Military'].src = check0.src;
+	document.getElementById("Military").style.color = "000000";
+}
+
+var checkedCounterMfg = 0;
+
+function toggleMfg(incoming) {
+	var leNombre = incoming;
+	var muaField = document.searcher[leNombre];
+	if (muaField.checked == true) {
+		if (leNombre != "Todos") {
+			muaField.checked = 0;
+			document.images[leNombre].src = check0.src;
+			document.getElementById(""+leNombre+"").style.color = "000000";
+			checkedCounterMfg--; 
+		}
+	}
+	else {
+		muaField.checked = 1;
+		document.images[leNombre].src = check1.src;
+		document.getElementById(""+leNombre+"").style.color = "4C6279";
+		if (leNombre != "Todos") { checkedCounterMfg++; }
+		else { uncheckAllMfg(); checkedCounterMfg=0; }
+	}	
+
+// uncheck or uncheck Todos as necessary
+	if (leNombre != "Todos" && checkedCounterMfg > 0) {
+		document.searcher.Todos.checked = 0;
+		document.images["Todos"].src = check0.src;
+		document.getElementById("Todos").style.color = "000000";	
+	}
+	else if (leNombre != "Todos" && checkedCounterMfg == 0) {
+		document.searcher.Todos.checked = 1;
+		document.images["Todos"].src = check1.src;
+		document.getElementById("Todos").style.color = "4C6279";	
+	}
+}
+
+function uncheckAllMfg() {
+	document.searcher.USNV.checked = 0;
+	document.images['USNV'].src = check0.src;
+	document.getElementById("USNV").style.color = "000000";
+	document.searcher.ITT.checked = 0;
+	document.images['ITT'].src = check0.src;
+	document.getElementById("ITT").style.color = "000000";
+	document.searcher.Litton.checked = 0;
+	document.images['Litton'].src = check0.src;
+	document.getElementById("Litton").style.color = "000000";
+	document.searcher.Raytheon.checked = 0;
+	document.images['Raytheon'].src = check0.src;
+	document.getElementById("Raytheon").style.color = "000000";
+}
+
+function toggleFieldsetOn(numero,field,table) {
+	document.getElementById("Fieldset"+numero+"").style.border = '1px solid #'+field;
+	document.getElementById("Table"+numero+"").style.background = '1px solid #'+table;
+	var theNewPlacement = "";
+	// place helper menu
+	if (numero == 2) { theNewPlacement = "77px"; }
+	else if (numero == 3) { theNewPlacement = "145px"; }
+	else if (numero == 4) { theNewPlacement = "212px"; }
+	else if (numero == 5) { theNewPlacement = "278px"; }
+	else if (numero == 6) { theNewPlacement = "345px"; }
+	else if (numero == 7) { theNewPlacement = "415px"; }
+	else if (numero == 8) { theNewPlacement = "485px"; }
+	else { theNewPlacement = "10px"; }
+	document.getElementById("leSubmitter").style.top = theNewPlacement;
+}
+function toggleFieldsetOff(numero,field) {
+	document.getElementById("Fieldset"+numero+"").style.border = '1px solid #'+field;
+	document.getElementById("Table"+numero+"").style.background = '1px solid #A0A0A0';
+}
+
+function runSearch() {
+	checkThyForm();
+	document.searcher.submit();
+}
+function resetSearch() {
+	document.location.href="products.cgi?Search=1";
+}
+
+function checkThyForm() {
+	var leKeys = document.searcher.Keys.value;
+	if (leKeys == "" || leKeys == " " || leKeys.length == 0 || leKeys == null) { 
+		document.searcher.Keys.value = "s";
+		document.searcher.ComingFrom.value = "Browse";
+	}
+	return true;
+}
+</script>
+<table width="90%" align="center" cellpadding="5" cellspacing="0" border="0">
+<form name="searcher" action="products.cgi" method="post" onSubmit="return checkThyForm();">
+<input type="hidden" name="ComingFrom" value="">
+<tr><td width="100%" align="left"><img src="images/title_isearch.jpg" width="384" height="36" border="0"></td></tr>
+<tr><td width="100%" align="left" style="padding-top:15px;padding-bottom:15px;">
+<font class="commonSmall">
+<b>To Begin</b> searching simply click the 'Find It Now!' button. Keyword searching and other options are there to help you in pinpoint the best product for your needs. Yet, none of these options are required to submit a query. <b>Easily Navigate</b> this search page by using your mouse to make your selections. <b>Advanced Users</b> can quickly navigate this form using their <i><u>TAB</u> to change cursor focus. <u>UP/DOWN Arrows</u> to make selections on select lists. <u>SPACEBAR</u> to toggle checkboxes on/off.</i>
+</font>
+</td></tr>
+<tr>
+<td width="100%" align="center">
+
+<table cellpadding="1" cellspacing="0" border="0" width="100%">
+<tr>
+
+<td width="180" valign="top" align="left">
+
+<div id="leSubmitter" style="position:relative;top:10px;left:-32px;">
+<object CLASSID="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" WIDTH="160" HEIGHT="48" CODEBASE="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=4,0,2,0" style="zindex:-500">
+	<PARAM NAME="MOVIE" VALUE="images/soichbuts.swf">
+	<param NAME="PLAY" VALUE="true">
+	<param NAME="LOOP" VALUE="true">
+	<param NAME="QUALITY" VALUE="high">
+	<param NAME="MENU" VALUE="false">
+	<param NAME='wmode' Value='Transparent'>
+	<embed SRC="images/soichbuts.swf" WIDTH="160" HEIGHT="48" PLAY="true" QUALITY="high" MENU="true" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" style="zindex:-500"></embed>
+</object>
+<img src="images/spacer.gif" width="160" height="1">
+</div>
+
+
+</td>
+
+<td align="center" width="100%" valign="top">
+
+<FIELDSET id="Fieldset1" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('1','4991DE','4991DE');" onBlur="toggleFieldsetOff('1','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279;margin-bottom:5px;">&nbsp;What are your interests?&nbsp;&nbsp;</LEGEND>
+<table width="100%" id="Table1" height="30" cellpadding="1" cellspacing="0" border="0" align="center">
+<tr>
+<td width="100%" align="center"><font class="commonSmall">
+<img src="images/spacer.gif" border="0" width="15" height="12">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleInterests('Hunting');" id="Hunting" onFocus="toggleFieldsetOn('1','4991DE','4991DE');" onBlur="toggleFieldsetOff('1','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Hunting"><img src="images/spacer.gif" border="0" width="5" height="12">Hunting</a><input type="checkbox" name="Hunting" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleInterests('Camping');" id="Camping" onFocus="toggleFieldsetOn('1','4991DE','4991DE');" onBlur="toggleFieldsetOff('1','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Camping"><img src="images/spacer.gif" border="0" width="5" height="12">Camping</a><input type="checkbox" name="Camping" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleInterests('Security');" id="Security" onFocus="toggleFieldsetOn('1','4991DE','4991DE');" onBlur="toggleFieldsetOff('1','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Security"><img src="images/spacer.gif" border="0" width="5" height="12">Security / Surveillance</a><input type="checkbox" name="Security" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleInterests('Any');" id="Any" onFocus="toggleFieldsetOn('1','4991DE','4991DE');" onBlur="toggleFieldsetOff('1','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Any"><img src="images/spacer.gif" border="0" width="5" height="12">No Preference</a><input type="checkbox" name="Any" style="visibility:hidden">
+</font></td>
+</tr>
+</table>
+</FIELDSET>
+
+<font class="commonSmall"><br></font>
+<FIELDSET id="Fieldset2" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('2','4991DE','4991DE');" onBlur="toggleFieldsetOff('2','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279">&nbsp;Do you know what Generation of Night Vision you want?&nbsp;&nbsp;</LEGEND>
+<table width="100%" height="30" id="Table2" cellpadding="1" cellspacing="0" border="0" align="center">
+<tr>
+<td width="100%" align="center"><font class="commonSmall">
+<img src="images/spacer.gif" border="0" width="15" height="12">
+<nobr><a href="javascript:void(0);" class="checkbox0" onClick="toggleGeneration('GEN1');" id="GEN1"  onFocus="toggleFieldsetOn('2','4991DE','4991DE');" onBlur="toggleFieldsetOff('2','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="GEN1"><img src="images/spacer.gif" border="0" width="5" height="12">Generation 1</a><input type="checkbox" name="GEN1" style="visibility:hidden"></nobr>
+<nobr><a href="javascript:void(0);" class="checkbox0" onClick="toggleGeneration('GEN2');" id="GEN2"  onFocus="toggleFieldsetOn('2','4991DE','4991DE');" onBlur="toggleFieldsetOff('2','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="GEN2"><img src="images/spacer.gif" border="0" width="5" height="12">Generation 2</a><input type="checkbox" name="GEN2" style="visibility:hidden"></nobr>
+<nobr><a href="javascript:void(0);" class="checkbox0" onClick="toggleGeneration('GEN3');" id="GEN3"  onFocus="toggleFieldsetOn('2','4991DE','4991DE');" onBlur="toggleFieldsetOff('2','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="GEN3"><img src="images/spacer.gif" border="0" width="5" height="12">Generation 3</a><input type="checkbox" name="GEN3" style="visibility:hidden"></nobr>
+<nobr><a href="javascript:void(0);" class="checkbox0" onClick="toggleGeneration('GEN4');" id="GEN4"  onFocus="toggleFieldsetOn('2','4991DE','4991DE');" onBlur="toggleFieldsetOff('2','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="GEN4"><img src="images/spacer.gif" border="0" width="5" height="12">Generation 4</a><input type="checkbox" name="GEN4" style="visibility:hidden"></nobr>
+<nobr><a href="javascript:void(0);" class="checkbox0" onClick="toggleGeneration('Digital');" id="Digital"  onFocus="toggleFieldsetOn('2','4991DE','4991DE');" onBlur="toggleFieldsetOff('2','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Digital"><img src="images/spacer.gif" border="0" width="5" height="12">Digital</a><input type="checkbox" name="Digital" style="visibility:hidden"></nobr>
+<nobr><a href="javascript:void(0);" class="checkbox0" onClick="toggleGeneration('Default');" id="Default"  onFocus="toggleFieldsetOn('2','4991DE','4991DE');" onBlur="toggleFieldsetOff('2','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Default"><img src="images/spacer.gif" border="0" width="5" height="12">No Preference</a><input type="checkbox" name="Default" style="visibility:hidden"></nobr>
+</font></td>
+</tr>
+</table>
+</FIELDSET>
+
+<font class="commonSmall"><br></font>
+<FIELDSET id="Fieldset3" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('3','4991DE','4991DE');" onBlur="toggleFieldsetOff('3','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279">&nbsp;And are you looking for a?&nbsp;&nbsp;</LEGEND>
+<table width="100%" height="30" id="Table3" cellpadding="1" cellspacing="0" border="0" align="center">
+<tr>
+<td width="100%" align="center"><font class="commonSmall">
+	<select name="ProductType" onFocus="focusOnMe(this);toggleFieldsetOn('3','4991DE','4991DE');" OnBlur="toggleFieldsetOff('3','4C6279');">
+		<option value="BIGNULL">0000000000000000000000000000000000</option>
+		<option value="BIGNULL" selected>All Product Types</option>
+~;
+
+## WHICH ProductType IS CHOSEN?
+$count=0;
+@ProductTypes = ("Accessory,Accessory","Monocular,Monocular","Weapon,Weapon Sight","Digital,Digital Viewer","Binocular,Binoculars","Infrared,Infrared","Goggle,Goggles");
+foreach $ProductType (@ProductTypes) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $ProductType);
+	if ($SavedProductType =~ "$value") { 
+		print "<option value=\"$value\" SELECTED>$name</option>"; 
+	}
+	else {
+		print "<option value=\"$value\">$name</option>"; 
+	}
+}
+
+
+print qq~
+
+	</select>
+</font></td>
+</tr>
+</table>
+</FIELDSET>
+
+<font class="commonSmall"><br></font>
+<FIELDSET id="Fieldset4" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('4','4991DE','4991DE');" onBlur="toggleFieldsetOff('4','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279">&nbsp;What Grade of night vision are you looking for?&nbsp;&nbsp;</LEGEND>
+<table width="100%" height="30" id="Table4" cellpadding="1" cellspacing="0" border="0" align="center">
+<tr>
+<td width="100%" align="center"><font class="commonSmall">
+<img src="images/spacer.gif" border="0" width="15" height="12">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleGrade('Commercial');" id="Commercial"  onFocus="toggleFieldsetOn('4','4991DE','4991DE');" onBlur="toggleFieldsetOff('4','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Commercial"><img src="images/spacer.gif" border="0" width="5" height="12">Commercial</a><input type="checkbox" name="Commercial" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleGrade('LawEnforce');" id="LawEnforce"  onFocus="toggleFieldsetOn('4','4991DE','4991DE');" onBlur="toggleFieldsetOff('4','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="LawEnforce"><img src="images/spacer.gif" border="0" width="5" height="12">Law Enforcement</a><input type="checkbox" name="LawEnforce" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleGrade('Military');" id="Military"  onFocus="toggleFieldsetOn('4','4991DE','4991DE');" onBlur="toggleFieldsetOff('4','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Military"><img src="images/spacer.gif" border="0" width="5" height="12">Military</a><input type="checkbox" name="Military" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleGrade('None');" id="None"  onFocus="toggleFieldsetOn('4','4991DE','4991DE');" onBlur="toggleFieldsetOff('4','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="None"><img src="images/spacer.gif" border="0" width="5" height="12">No Preference</a><input type="checkbox" name="None" style="visibility:hidden">
+</font></td>
+</tr>
+</table>
+</FIELDSET>
+
+<font class="commonSmall"><br></font>
+<FIELDSET id="Fieldset5" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('5','4991DE','4991DE');" onBlur="toggleFieldsetOff('5','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279">&nbsp;Manufactured By:&nbsp;&nbsp;</LEGEND>
+<table width="100%" height="30" id="Table5" cellpadding="1" cellspacing="0" border="0" align="center">
+<tr>
+<td width="100%" align="center"><font class="commonSmall">
+<img src="images/spacer.gif" border="0" width="15" height="12">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleMfg('USNV');" id="USNV" onFocus="toggleFieldsetOn('5','4991DE','4991DE');" onBlur="toggleFieldsetOff('5','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="USNV"><img src="images/spacer.gif" border="0" width="5" height="12">US NightVision</a><input type="checkbox" name="USNV" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleMfg('ITT');" id="ITT" onFocus="toggleFieldsetOn('5','4991DE','4991DE');" onBlur="toggleFieldsetOff('5','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="ITT"><img src="images/spacer.gif" border="0" width="5" height="12">ITT Corporation</a><input type="checkbox" name="ITT" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleMfg('Litton');" id="Litton" onFocus="toggleFieldsetOn('5','4991DE','4991DE');" onBlur="toggleFieldsetOff('5','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Litton"><img src="images/spacer.gif" border="0" width="5" height="12">Litton</a><input type="checkbox" name="Litton" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleMfg('Raytheon');" id="Raytheon" onFocus="toggleFieldsetOn('5','4991DE','4991DE');" onBlur="toggleFieldsetOff('5','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Raytheon"><img src="images/spacer.gif" border="0" width="5" height="12">Raytheon</a><input type="checkbox" name="Raytheon" style="visibility:hidden">
+<a href="javascript:void(0);" class="checkbox0" onClick="toggleMfg('Todos');" id="Todos" onFocus="toggleFieldsetOn('5','4991DE','4991DE');" onBlur="toggleFieldsetOff('5','4C6279');"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="Todos"><img src="images/spacer.gif" border="0" width="5" height="12">No Preference</a><input type="checkbox" name="Todos" style="visibility:hidden">
+</font></td>
+</tr>
+</table>
+</FIELDSET>
+
+<font class="commonSmall"><br></font>
+<FIELDSET id="Fieldset6" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('6','4991DE','4991DE');" onBlur="toggleFieldsetOff('6','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279">&nbsp;And you want to spend between:&nbsp;&nbsp;</LEGEND>
+<table width="100%" height="30" id="Table6" cellpadding="1" cellspacing="0" border="0" align="center">
+<tr>
+<td width="100%" align="center"><font class="commonSmall">
+	<select name="PriceRange" onFocus="focusOnMe(this);toggleFieldsetOn('6','4991DE','4991DE');" OnBlur="blurMe(this);toggleFieldsetOff('6','4C6279');">
+		<option value="BIGNULL">0000000000000000000000000000000000</option>
+		<option value="BIGNULL" selected>Any Price</option>
+		<option value="300–600">\$300 – \$600</option>
+		<option value="601–1200">\$601 – \$1200</option>
+		<option value="1201-2000">\$1201 – \$2000</option>
+		<option value="2001-3000">\$2001 – \$3000</option>
+		<option value="3001">\$3001 and up...</option>
+	</select>
+</font></td>
+</tr>
+</table>
+</FIELDSET>
+
+<font class="commonSmall"><br></font>
+<FIELDSET id="Fieldset7" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('7','4991DE','4991DE');" onBlur="toggleFieldsetOff('7','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279">&nbsp;Keyword Lookup?&nbsp;&nbsp;</LEGEND>
+<table width="100%" height="30" id="Table7" cellpadding="1" cellspacing="0" border="0" align="center">
+<tr>
+<td width="100%" align="center">
+<input type="text" class="commonInput" size="50" name="Keys" onFocus="focusOnMe(this);toggleFieldsetOn('7','4991DE','4991DE');" OnBlur="blurMe(this);toggleFieldsetOff('7','4C6279');">
+</td>
+</tr>
+</table>
+</FIELDSET>
+
+<font class="commonSmall"><br></font>
+<FIELDSET id="Fieldset8" style="border:1px solid #4C6279;padding:5px;" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');">
+<LEGEND class="commonMediumB" style="color:#4C6279">&nbsp;Results Display Options&nbsp;&nbsp;</LEGEND>
+<table width="100%" height="30" id="Table8" cellpadding="1" cellspacing="0" border="0">
+<tr>
+<td width="100%" colspan="3" align="center">
+	<select name="Results" onFocus="focusOnMe(this);toggleFieldsetOn('8','4991DE','4991DE');" OnBlur="blurMe(this);toggleFieldsetOff('8','4C6279');">
+		<option value="BIGNULL">0000000000000000000000000000000000</option>
+		<option value="10" selected>10 Products Per Page</option>
+		<option value="20">20 Products Per Page</option>
+		<option value="30">30 Products Per Page</option>
+		<option value="40">40 Products Per Page</option>
+		<option value="50">50 Products Per Page</option>
+	</select>
+	</td>
+</tr>
+
+<tr>
+<td width="50%" align="center"><font class="commonSmall"><nobr>&nbsp;<b>Display Images?</b><br>
+<input type="radio" name="Images" value="Yes" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');" checked>
+<a href="javascript:void(0);" onClick="javascript:document.searcher.Images[0].checked = true;" class="commonSmall" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');">Yes</a> 
+&nbsp;&nbsp;&nbsp; 
+<input type="radio" name="Images" value="No" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');"> 
+<a href="javascript:void(0);" onClick="javascript:document.searcher.Images[1].checked = true;" class="commonSmall" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');">No</a>
+</font></nobr></td>
+<td width="1" align="center" height="75" valign="middle"><img src="images/searchline2.gif" width="1" height="55"></td>
+<td width="50%" align="center"><font class="commonSmall"><nobr>&nbsp;<b>Product Description</b><br>
+<input type="radio" name="Description" value="Long" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');" checked> 
+<a href="javascript:void(0);" onClick="javascript:document.searcher.Description[0].checked = true;" class="commonSmall" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');">Long</a> 
+&nbsp;&nbsp;&nbsp; 
+<input type="radio" name="Description" value="Short" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');"> 
+<a href="javascript:void(0);" onClick="javascript:document.searcher.Description[1].checked = true;" class="commonSmall" onFocus="toggleFieldsetOn('8','4991DE','4991DE');" onBlur="toggleFieldsetOff('8','4C6279');">Short</a></font></nobr></td>
+</tr>
+
+</table>
+</FIELDSET>
+
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</form>
+</table>
+
+~;
+
+}
+
+######################## ---------------------------- KEYS
+elsif($FORM{'Keys'}) {
+	require("ss.cgi");
+}
+
+######################## ---------------------------- PID
+elsif ($FORM{'PID'}) {
+
+$PID = $FORM{'PID'};
+
+### QUERY DB
+use DBI;
+my $dbh = DBI->connect("DBI:mysql:unvWeb","root","chinga2") or die "Unable to connect to database: <b>unvWeb</b>\n"; 
+$dbh->{RaiseError} = 1; 
+
+
+
+$count=0;
+my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$PID'");
+$sth->execute or die "Unable to execute query\n"; 
+my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$SavedPartNum = $row[1];
+		$SavedMFGName = $row[2];
+		$SavedMFGPartNum = $row[3];
+		$SavedMFGProdURL = $row[4];
+		$SavedItemName = $row[5];
+		$SavedDescription = $row[6];
+		$SavedTechSpecs = $row[7];
+		$SavedSmallPhoto = $row[8];
+		$SavedLargePhoto = $row[9];
+		$SavedWarranty = $row[10];
+		$SavedWeight = $row[11];
+		$SavedMasterDist = $row[12];
+		$SavedDistributor = $row[13];
+		$SavedDealer = $row[14];
+		$SavedLawEnforce = $row[15];
+		$SavedRetail = $row[16];
+		$SavedAccessories = $row[17];
+		$SavedProdUsage = $row[18];
+		$SavedProductType = $row[19];
+		$BrochureBulletPoints = $row[23];
+		$SavedIncludedItems = $row[28];
+		$count++;
+		push(@sfiles2,"$SavedPartNum $SavedMFGName $SavedMFGPartNum $SavedMFGProdURL $SavedItemName $SavedDescription $SavedTechSpecs $SavedProdUsage $SavedProductType $row[0]" . "\t" . "$row[0]" . "\t" . "$SavedMFGName" . "\t" . "$SavedMFGPartNum" . "\t" . "$SavedMFGProdURL" . "\t" . "$SavedItemName" . "\t" . "$SavedDescription" . "\t" . "$SavedTechSpecs" . "\t" . "$SavedSmallPhoto" . "\t" . "$SavedLargePhoto" . "\t" . "$SavedWarranty" . "\t" . "$SavedWeight" . "\t" . "$SavedMasterDist" . "\t" . "$SavedDistributor" . "\t" . "$SavedDealer" . "\t" . "$SavedLawEnforce" . "\t" . "$SavedRetail" . "\t" . "$SavedAccessories" . "\t" . "$SavedProdUsage" . "\t" . "$SavedProductType");
+		if ($SavedWarranty =~ "y" || $SavedWarranty =~ "Y") { $DaWarranty = "<img src=\"images/spacer.gif\" width=\"10\" height=\"1\">-<img src=\"images/spacer.gif\" width=\"10\" height=\"1\"><font style=\"font-size:11px;color:#333333;\"><b>Warranty</b> -  $SavedWarranty</font>"; }
+		else { $DaWarranty = ""; }
+		if ($SavedWarranty ne "" && $SavedWarranty ne " " && $SavedWarranty ne "Null" && $SavedWarranty ne "NULL" && $SavedWarranty ne "null") { $losTSpecs = "<img src=\"images/spacer.gif\" width=\"25\" height=\"1\"><b>Warranty</b> - $SavedWarranty"; }
+		else { $losTSpecs = ""; }
+		$BrochureBulletPoints =~ s/>/&gt;/g;
+		$BrochureBulletPoints =~ s/</&lt;/g;
+		$BrochureBulletPoints =~ s/&#8216;/'/g;
+}
+$sth->execute or die "Unable to execute query\n"; 
+$sth->finish;
+
+		if ($custUName =~ "@") {
+			if ($custTipo eq "MasterDist") { $lePrice = "$SavedMasterDist"; }		
+			elsif ($custTipo eq "Distributor") { $lePrice = "$SavedDistributor"; }		
+			elsif ($custTipo eq "Dealer") { $lePrice = "$SavedDealer"; }		
+			elsif ($custTipo eq "LawEnforce") { $lePrice = "$SavedLawEnforce"; }
+			else { $lePrice = "$SavedRetail"; }
+		}
+		elsif ($Cookies{'Logged'} eq "SI") {
+			if ($Cookies{'CT'} eq "MasterDist") { $lePrice = "$SavedMasterDist"; }		
+			elsif ($Cookies{'CT'} eq "Distributor") { $lePrice = "$SavedDistributor"; }		
+			elsif ($Cookies{'CT'} eq "Dealer") { $lePrice = "$SavedDealer"; }		
+			elsif ($Cookies{'CT'} eq "LawEnforce") { $lePrice = "$SavedLawEnforce"; }
+			else { $lePrice = "$SavedRetail"; }
+		}
+		else { $lePrice = "$SavedRetail"; }
+
+@noEnDesc = split(/\n/,$SavedDescription);
+$muacount=0;
+foreach $estedesc (@noEnDesc) {
+	if ($muacount > 0) { 
+		push(@MuaDesc,"$estedesc<br>"); 
+	}
+	$muacount++; 
+}
+
+$MuaDesc = @MuaDesc;
+
+if ($SavedLargePhoto ne "" && $SavedLargePhoto ne " ") { 
+	my $sth = $dbh->prepare("SELECT * FROM Images WHERE ImageID='$SavedLargePhoto';");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+		while(@row = $sth->fetchrow_array) { 
+			$FileName = $row[2];
+			$count++;
+	}
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+
+	$SavedInnerURL = "images/products/$FileName";
+	$leP = $SavedInnerURL;
+	$leP = "$leP";
+}
+else { 
+	$leP = "images/spacer.gif"; 
+	$SavedInnerURL = "images/spacer.gif";
+}
+
+print "
+
+
+<script language=JavaScript>
+function initProductTitle() {
+	var productTitle=\"\";
+	var muaTitle = document.leTITLE;
+	muaTitle.Rewind();
+	muaTitle.SetVariable(\"productTitle\", \"$SavedItemName\");
+	muaTitle.Play();
+}
+
+function SHPTitle(cual) {
+	document.getElementById(\"leTITLE\").style.visibility = cual;
+}
+</script>
+<div id=\"lePhotoFrame\" style=\"z-index:-10;position:absolute;top:214px;left:0px;width:494px;height:178px;clip:rect(0,494,178,0);\"><img src=\"images/prodPhotoFrame.gif\" width=\"495\" height=\"178\"></div>
+<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
+<tr valign=\"top\">
+<td align=\"left\" width=\"100%\"> 
+	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
+    	<tr><td align=\"right\">
+
+";
+
+
+## PRODUCT BULLET POINTS
+if ($BrochureBulletPoints =~ ":::::" && !$ENV{'HTTP_USER_AGENT'} =~ "etscape") {
+	print "<div style=\"position:absolute;left:19%;top:220px;z-index:10px;visibility:hidden;\" id=\"brochureBulletPoints\"><table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" height=\"145\" valign=\"middle\">";
+	
+	@splitBullets = split(/:::::/,$BrochureBulletPoints);
+	$countBul=0;
+	foreach $esteBullet (@splitBullets) {
+		$countBul++;
+		if ($countBul < 6) { print "<tr valign=\"middle\"><td width=\"15\" align=\"center\" height=\"25\"><b><font class=\"commonSmall\" style=\"font-size:12px;margin-right:5px;font-weight:bold;\">*</font></b></font></td><td height=\"25\"><font class=\"commonSmall\" style=\"font-size:11px;font-weight:bold\"><nobr>$esteBullet</nobr></font></td></tr>"; }
+	}
+
+	print "</table></div>";
+}
+		
+print "
+		<img src=\"$SavedInnerURL\" width=\"400\" hspace=\"2\" style=\"margin-top:2px;\"></td></tr>
+    	<tr><td align=\"left\">
+<div id=\"leTITLE\">
+			<object classid='clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'
+				codebase='http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=5,0,0,0'
+				ID='leTITLE' WIDTH='400' HEIGHT='37'>
+				<PARAM NAME='movie' VALUE='ProductTitle.swf'>
+				<PARAM NAME='loop' VALUE='false'>
+				<PARAM NAME='menu' VALUE='false'>
+				<PARAM NAME='quality' VALUE='autohigh'>
+				<PARAM NAME='autoplay' VALUE='false'>
+				<param NAME='wmode' Value='Transparent'>
+				<EMBED src='ProductTitle.swf' loop='false' autoplay='false' menu='false' quality='autohigh' bgcolor='#A0A0A0' WIDTH='400' HEIGHT='37' swLiveConnect='true' NAME='leTITLE' TYPE='application/x-shockwave-flash' PLUGINSPAGE='http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash'></EMBED>
+			</object>		
+</div>
+		</td></tr>
+		<tr><td height=\"25\" valign=\"top\" align=\"center\" style=\"padding-top:8px;\"><nobr><font class=\"commonMediumB\" style=\"font-weight:normal;\"><b>Price - </b>\$$lePrice <img src=\"images/spacer.gif\" width=\"25\" height=\"1\">$losTSpecs</font></nobr></td></tr>
+		<tr><td height=\"16\" valign=\"top\" align=\"right\"><img src=\"images/linear_bottom.gif\" width=\"297\" height=\"16\" hspace=\"20\"></td></tr>
+		<tr><td valign=\"top\" style=\"padding-left:30px;padding-right:10px;\"><font class=\"commonMediumB\" style=\"line-height:18px;font-weight:normal;font-size:12px;\"><a href=\"javascript:void(0);\" onClick=\"togglePrintOptions('PDF');\" onMouseOver=\"document.images.printOptions.src=print1.src;\"  onMouseOut=\"document.images.printOptions.src=print0.src;\"><img src=\"images/printfriend_off.gif\" border=\"0\" width=\"171\" height=\"22\" name=\"printOptions\" align=\"right\" vspace=\"10\" hspace=\"10\"></a>@MuaDesc</font></td></tr>
+	</table>
+
+</td>
+<td align=\"right\" valign=\"top\" width=\"300\">
+<img src=\"images/spacer.gif\" width=\"300\" height=\"1\" border=\"0\">
+";
+
+
+print "<!--SPACE SAVER FOR LAYERS-->";
+
+
+## END MAIN SIDE TABLE...
+print "</td></tr></table>";
+
+
+
+
+
+
+if ($SavedTechSpecs =~ ":::::") {
+
+print "
+<div id=\"TechSpecsLayer\" style=\"z-index:1;position:absolute;top:218px;left:0px;visibility:visible;\">
+	<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"299\">
+		<tr><td width=\"27\" height=\"43\" align=\"left\" valign=\"top\" colspan=\"2\" rowspan=\"4\"><img src=\"images/topleft_specs.gif\" width=\"27\" height=\"43\"></td><td height=\"1\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td></tr>
+		<tr><td height=\"19\" valign=\"top\" align=\"center\"><img src=\"images/DLT_specifications_off.gif\" width=\"91\" height=\"18\" border=\"0\"><img src=\"images/spacer.gif\" width=\"1\" height=\"19\" border=\"0\"><a href=\"javascript:void(0);\" onClick=\"javascript:toggleProductTabs('AccessoryLayer');\"><img src=\"images/DLT_accessories.gif\" width=\"81\" height=\"18\" border=\"0\"></a><img src=\"images/spacer.gif\" width=\"1\" height=\"19\" border=\"0\"><a href=\"javascript:void(0);\" onClick=\"javascript:toggleProductTabs('QuoteLayer');\"><img src=\"images/DLT_pricequote.gif\" width=\"81\" height=\"18\" border=\"0\"></a></td></tr>
+		<tr><td height=\"15\" align=\"center\" bgcolor=\"#000000\"><font size=\"1\" face=\"Verdana, Arial, Helvetica, sans-serif\"><b><font color=\"#E2E2D8\"><nobr>System Technical Specifications&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</nobr></font></b></font></td></tr>
+		<tr><td height=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"3\"></td></tr>
+		<tr>
+			<td bgcolor=\"#000000\" width=\"1\" valign=\"bottom\"><img src=\"images/ending.gif\" width=\"1\" height=\"29\"></td>
+			<td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td>
+			<td>
+				<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
+					<tr align=\"center\" valign=\"bottom\"><td height=\"10\"><img src=\"images/spacer.gif\" width=\"1\" height=\"10\"></td><td width=\"21\" height=\"10\"><img src=\"images/spacer.gif\" width=\"10\" height=\"10\"></td><td height=\"10\"><img src=\"images/spacer.gif\" width=\"1\" height=\"10\"></td></tr>
+					<tr align=\"center\" valign=\"bottom\"><td height=\"10\"><img src=\"images/spacer.gif\" width=\"1\" height=\"10\"></td><td width=\"21\" height=\"10\"><img src=\"images/specsTLine.gif\" width=\"11\" height=\"10\"></td><td height=\"10\"><img src=\"images/spacer.gif\" width=\"1\" height=\"10\"></td></tr>
+";
+
+@splitSpecs = split(/\n\b/,$SavedTechSpecs);
+$countthis=0;
+foreach $esteSpec (@splitSpecs) {
+	$countthis++;
+	@esteSplit = split(/:::::/,$esteSpec);
+	if ($esteSpec ne 0) { print "<tr><td height=\"17\" align=\"right\" width=\"50%\"><div style=\"font-size:9px;color:#333333;font-family:Verdana, Arial, Helvetica;margin-right:5px;\"><nobr>$esteSplit[0]</nobr></div></td><td align=\"center\" width=\"11\" height=\"17\"><img src=\"images/specsDOT.gif\" width=\"11\" height=\"17\"></td><td height=\"17\" align=\"left\" width=\"50%\"><div style=\"letter-spacing:0.5px;font-size:9px;color:#333333;font-family:Verdana, Arial, Helvetica;margin-left:9px;\"><nobr>$esteSplit[1]</nobr></div></td><td width=\"5\"><img src=\"images/spacer.gif\" width=\"5\" height=\"17\"></td></tr>"; }
+}
+
+print "
+					<tr align=\"center\" valign=\"top\"><td height=\"10\"><img src=\"images/spacer.gif\" width=\"1\" height=\"10\"></td><td height=\"10\" width=\"21\"><img src=\"images/specsBLine.gif\" width=\"11\" height=\"10\"></td><td height=\"10\"><img src=\"images/spacer.gif\" width=\"1\" height=\"10\"></td></tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</div>
+";
+## techspecs end
+}
+
+
+
+
+####### ACCESSORY LAYER ########
+@Accessories = split(/,/, $SavedAccessories);
+
+print "
+<div id=\"AccessoryLayer\" style=\"z-index:2;position:absolute;top:218px;left:0px;visibility:hidden;\">
+	<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"299\">
+		<tr>
+			<td width=\"27\" height=\"43\" align=\"left\" valign=\"top\" colspan=\"2\" rowspan=\"4\"><img src=\"images/topleft_specs.gif\" width=\"27\" height=\"43\"></td>
+			<td height=\"1\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td></tr>
+		<tr>
+			<td height=\"19\" valign=\"top\" align=\"center\"><a href=\"javascript:void(0);\" onClick=\"javascript:toggleProductTabs('TechSpecsLayer');\"><img src=\"images/DLT_specifications.gif\" width=\"91\" height=\"18\" border=\"0\"></a><img src=\"images/spacer.gif\" width=\"1\" height=\"19\" border=\"0\"><img src=\"images/DLT_accessories_off.gif\" width=\"81\" height=\"18\" border=\"0\"><img src=\"images/spacer.gif\" width=\"1\" height=\"19\" border=\"0\"><a href=\"javascript:void(0);\" onClick=\"javascript:toggleProductTabs('QuoteLayer');\"><img src=\"images/DLT_pricequote.gif\" width=\"81\" height=\"18\" border=\"0\"></a></td></tr>
+		<tr>
+			<td height=\"15\" align=\"center\" bgcolor=\"#000000\"><font size=\"1\" face=\"Verdana, Arial, Helvetica, sans-serif\"><b><font color=\"#E2E2D8\"><nobr>System Accessories&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</nobr></font></b></font></td></tr>
+		<tr>
+			<td height=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"3\"></td></tr>
+		<tr>
+			<td bgcolor=\"#000000\" width=\"1\" valign=\"bottom\"><img src=\"images/ending.gif\" width=\"1\" height=\"29\"></td>
+			<td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td>
+			<td width=\"100%\" align=\"center\">
+";
+
+
+
+if ($SavedIncludedItems ne "" && $SavedIncludedItems ne " " && $SavedIncludedItems ne "NULL") {
+
+print "
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+<tr><td align=\"center\" width=\"100%\" height=\"5\"><img src=\"images/spacer.gif\" width=\"10\" height=\"5\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"25\"><font class=\"commonMediumB\" style=\"font-size:10px;\"><b>System Ships With</b></font></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"5\"><img src=\"images/spacer.gif\" width=\"10\" height=\"5\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"10\"><img src=\"images/spacer.gif\" width=\"10\" height=\"10\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+</table>
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"5\" width=\"100%\">
+
+<tr><td align=\"left\" width=\"100%\" height=\"25\"><font class=\"checkbox0\" style=\"color:#000000;font-size:9px;\">$SavedIncludedItems</font></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+
+</table>
+";
+
+}
+
+
+print "
+<form name=\"leProducto\" method=\"post\" action=\"cartit.cgi\" target=\"lower\">
+<input type=\"hidden\" name=\"PID\" value=\"$PID\">
+<input type=\"hidden\" name=\"daPrice\" value=\"\$$lePrice\">
+<input type=\"hidden\" name=\"totalPrice\" value=\"\$$lePrice\">
+";
+
+if (@Accessories) {
+
+print "
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+<tr><td align=\"center\" width=\"100%\" height=\"5\"><img src=\"images/spacer.gif\" width=\"10\" height=\"5\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"25\"><font class=\"commonMediumB\" style=\"font-size:10px;\"><b>Optional Accessories</b></font></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"5\"><img src=\"images/spacer.gif\" width=\"10\" height=\"5\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"10\"><img src=\"images/spacer.gif\" width=\"10\" height=\"10\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+</table>
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+";
+
+	foreach $Accessory (@Accessories) {
+		my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID = '$Accessory'");
+		$sth->execute or die "Unable to execute query\n"; 
+		my @row;
+
+		while(@row = $sth->fetchrow_array) { 
+			my $ThyProductID = $row[0];
+			my $ThyItemName = $row[5];
+
+				if ($custUName =~ "@") {
+					## NOW YOU KNOW
+					if ($custTipo eq "MasterDist") { $muaPrice = $row[12]; }
+					elsif ($custTipo eq "Distributor") { $muaPrice = $row[13]; }
+					elsif ($custTipo eq "Dealer") { $muaPrice = $row[14]; }
+					elsif ($custTipo eq "LawEnforce") { $muaPrice = $row[15]; }
+					else { $muaPrice = $row[16]; }
+				}
+				elsif ($Cookies{'Logged'} eq "SI") {
+					if ($Cookies{'CT'} eq "MasterDist") { $muaPrice = $row[12]; }
+					elsif ($Cookies{'CT'} eq "Distributor") { $muaPrice = $row[13]; }
+					elsif ($Cookies{'CT'} eq "Dealer") { $muaPrice = $row[14]; }
+					elsif ($Cookies{'CT'} eq "LawEnforce") { $muaPrice = $row[15]; }
+					else { $muaPrice = $row[16]; }
+				}
+				else { $muaPrice = $row[16]; }
+
+#				if ($Cookies{'CT'} eq "MasterDist") { $muaPrice = $row[12]; }		
+
+			$ThyProductID =~ s/0/_/g;
+			print "<tr height=\"20\"><td align=\"center\" width=\"10\"><a href=\"javascript:void(0);\" class=\"checkbox0\" onClick=\"toggleCheckbox('$ThyProductID');\" id=\"$ThyProductID\" style=\"color:#000000;\"><img src=\"images/Bcheckbox0.gif\" border=\"0\" width=\"10\" height=\"12\" name=\"$ThyProductID\" style=\"margin-right:5px;\"></a></td><td align=\"left\" width=\"100%\"><a href=\"javascript:void(0);\" class=\"checkbox0\" onClick=\"toggleCheckbox('$ThyProductID');\" id=\"$ThyProductID\" style=\"color:#000000;font-size:9px;\">$ThyItemName</a></td><td align=\"right\"><div class=\"commonSmall\" style=\"color:#000000;font-size:9px;\" id=\"$ThyProductID\_2\"><nobr>( add \$$muaPrice )</nobr></div><input type=\"checkbox\" name=\"$ThyProductID\" style=\"visibility:hidden;z-index:-500;position:absolute;\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>";
+		}
+		$sth->finish;
+	}
+	$AccessLayerText = "<br>Click to add<br><b>$SavedItemName<br>and selected Accessories</b><br>to your cart.<br><br>Price for these items comes to<br><b>'+document.leProducto.totalPrice.value+'</b><br>No tax or shipping included<br><br>";
+
+	print "
+	</table>
+	<span id=\"PriceHasChanged\" style=\"visibility:hidden;\">
+	<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+		<tr><td align=\"center\" width=\"100%\" height=\"30\"><img src=\"images/spacer.gif\" width=\"10\" height=\"30\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"30\"></td></tr>
+		<tr><td align=\"center\" width=\"100%\" height=\"25\"><font class=\"commonSmall\" style=\"font-size:10px;color:#FFFFFF;\"><b>Original System Price Has Changed</b></font></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"10\"></td></tr>
+		<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#FFFFFF\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+		<tr><td align=\"center\" width=\"100%\" height=\"10\"><img src=\"images/spacer.gif\" width=\"10\" height=\"10\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"10\"></td></tr>
+		<tr><td align=\"left\" width=\"100%\"><font class=\"commonSmall\" style=\"font-size:10px;color:#FFFFFF;\">The price of this night vision system has been modified to reflect your accessory selection(s). To view the updated price of this system click the 'Price Quote' tab. You can also use the 'Price Quote' tab to add this system to your virtual shopping cart.</font></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"10\"></td></tr>
+		<tr><td align=\"center\" width=\"100%\" height=\"10\"><img src=\"images/spacer.gif\" width=\"10\" height=\"10\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"10\"></td></tr>
+		<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#FFFFFF\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td><td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td></tr>
+	</table>
+	</span>
+	</form>";
+
+}
+else {
+	print "<font class=\"commonSmall\" style=\"color:#000000;font-size:9px;\">no accessories for this product...</font>";
+	print "<span id=\"PriceHasChanged\" style=\"visibility:hidden;\"></span>";
+	$AccessLayerText = "<br>Click to add<br><b>$SavedItemName</b><br>to your cart.<br><br>Price for this item is<br><b>'+document.leProducto.totalPrice.value+'</b><br>No tax or shipping included<br><br>";
+	print "</form>";
+}
+
+
+print "</td></tr></table></div>";
+######## END ACCESSORY LAYER #########
+
+
+
+
+
+
+######## QUOTE LAYER #######
+
+print "
+<div id=\"QuoteLayer\" style=\"z-index:3;position:absolute;top:218px;left:0px;visibility:hidden;\">
+	<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"299\">
+		<tr>
+			<td width=\"27\" height=\"43\" align=\"left\" valign=\"top\" colspan=\"2\" rowspan=\"4\"><img src=\"images/topleft_specs.gif\" width=\"27\" height=\"43\"></td>
+			<td height=\"1\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td></tr>
+		<tr>
+			<td height=\"19\" valign=\"top\" align=\"center\"><a href=\"javascript:void(0);\" onClick=\"javascript:toggleProductTabs('TechSpecsLayer');\"><img src=\"images/DLT_specifications.gif\" width=\"91\" height=\"18\" border=\"0\"></a><img src=\"images/spacer.gif\" width=\"1\" height=\"19\" border=\"0\"><a href=\"javascript:void(0);\" onClick=\"javascript:toggleProductTabs('AccessoryLayer');\"><img src=\"images/DLT_accessories.gif\" width=\"81\" height=\"18\" border=\"0\"></a><img src=\"images/spacer.gif\" width=\"1\" height=\"19\" border=\"0\"><img src=\"images/DLT_pricequote_off.gif\" width=\"81\" height=\"18\" border=\"0\"></td></tr>
+		<tr>
+			<td height=\"15\" align=\"center\" bgcolor=\"#000000\"><font size=\"1\" face=\"Verdana, Arial, Helvetica, sans-serif\"><b><font color=\"#E2E2D8\"><nobr>System Price Quote&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</nobr></font></b></font></td></tr>
+		<tr>
+			<td height=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"3\"></td></tr>
+		<tr>
+			<td bgcolor=\"#000000\" width=\"1\" valign=\"bottom\"><img src=\"images/ending.gif\" width=\"1\" height=\"29\"></td>
+			<td width=\"26\"><img src=\"images/spacer.gif\" width=\"26\" height=\"1\"></td>
+			<td width=\"100%\" align=\"center\">
+<div style=\"position:relative;top:0px;left:-13px;\">
+";
+
+
+
+if (@Accessories) {
+
+print "
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+<tr><td align=\"center\" width=\"100%\" height=\"5\"><img src=\"images/spacer.gif\" width=\"10\" height=\"5\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"20\"><font class=\"commonSmall\" style=\"font-size:9px;\">System Component(s) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Price</font></td></tr>
+</table>
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#CCCCCC\" colspan=\"3\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td></tr>
+<tr height=\"20\" bgcolor=\"#000000\"><td align=\"left\" width=\"100%\" style=\"border-left:1px solid #CCCCCC;padding-left:2px;\"><font class=\"checkbox0\" style=\"color:#CCCCCC;font-size:9px;\">$SavedItemName</font></td><td width=\"1\" height=\"20\" bgcolor=\"#CCCCCC\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td><td align=\"right\" style=\"border-right:1px solid #CCCCCC;\"><font class=\"commonSmall\" style=\"color:#CCCCCC;font-size:9px;padding-right:2px;\">&nbsp;&nbsp;\$$lePrice</font></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#CCCCCC\" colspan=\"3\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td></tr>
+";
+
+	foreach $Accessory (@Accessories) {
+		my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID = '$Accessory'");
+		$sth->execute or die "Unable to execute query\n"; 
+		my @row;
+
+		while(@row = $sth->fetchrow_array) { 
+			my $ThyProductID = $row[0];
+			my $ThyItemName = $row[5];
+
+				if ($custUName =~ "@") {
+					## NOW YOU KNOW
+					if ($custTipo eq "MasterDist") { $muaPrice = $row[12]; }
+					elsif ($custTipo eq "Distributor") { $muaPrice = $row[13]; }
+					elsif ($custTipo eq "Dealer") { $muaPrice = $row[14]; }
+					elsif ($custTipo eq "LawEnforce") { $muaPrice = $row[15]; }
+					else { $muaPrice = $row[16]; }
+				}
+				elsif ($Cookies{'Logged'} eq "SI") {
+					if ($Cookies{'CT'} eq "MasterDist") { $muaPrice = $row[12]; }
+					elsif ($Cookies{'CT'} eq "Distributor") { $muaPrice = $row[13]; }
+					elsif ($Cookies{'CT'} eq "Dealer") { $muaPrice = $row[14]; }
+					elsif ($Cookies{'CT'} eq "LawEnforce") { $muaPrice = $row[15]; }
+					else { $muaPrice = $row[16]; }
+				}
+				else { $muaPrice = $row[16]; }
+
+			$ThyProductID =~ s/0/_/g;
+			print "<tr height=\"20\" id=\"quoteText_$ThyProductID\" style=\"color:#A0A0A0;font-size:9px;font-weight:normal;\" class=\"checkbox0\"><td align=\"left\" width=\"100%\" style=\"border-left:1px solid #000000;padding-left:2px;\">&nbsp; - $ThyItemName</td><td width=\"1\" height=\"20\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td><td align=\"right\" style=\"border-right:1px solid #000000;padding-right:2px;\"><nobr>+ $muaPrice</nobr></td></tr>";
+			print "<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#000000\" colspan=\"3\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td></tr>";
+		}
+		$sth->finish;
+	}
+
+	print "<tr height=\"20\"><td align=\"right\" width=\"100%\"><font class=\"checkbox0\" style=\"color:#000000;font-size:9px;\"><b>Total Price for listed item(s)&nbsp;&nbsp;&nbsp;</b></font></td><td width=\"1\" height=\"20\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td><td align=\"right\" style=\"padding-right:2px;\"><font class=\"commonSmall\" style=\"color:#000000;font-size:9px;\">&nbsp;&nbsp;<span id=\"QuoteTotalPrice\" style=\"font-weight:bold;\">\$$lePrice</span></font></td></tr>
+	<tr><td align=\"center\" width=\"100%\" height=\"20\" colspan=\"3\"><img src=\"images/spacer.gif\" width=\"20\" height=\"10\"></td></tr>
+	</table>";
+
+}
+else {
+print "
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+<tr><td align=\"center\" width=\"100%\" height=\"5\"><img src=\"images/spacer.gif\" width=\"10\" height=\"5\"></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"20\"><font class=\"commonSmall\" style=\"font-size:9px;\">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Item Name &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Item Price</font></td></tr>
+</table>
+<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">
+<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#CCCCCC\" colspan=\"3\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td></tr>
+<tr height=\"20\" bgcolor=\"#000000\"><td align=\"left\" width=\"100%\" style=\"border-left:1px solid #CCCCCC;padding-left:2px;\"><font class=\"checkbox0\" style=\"color:#CCCCCC;font-size:9px;\">$SavedItemName</font></td><td width=\"1\" height=\"20\" bgcolor=\"#CCCCCC\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td><td align=\"right\" style=\"border-right:1px solid #CCCCCC;\"><font class=\"commonSmall\" style=\"color:#CCCCCC;font-size:9px;padding-right:2px;\">&nbsp;&nbsp;\$$lePrice</font></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"1\" bgcolor=\"#CCCCCC\" colspan=\"3\"><img src=\"images/spacer.gif\" width=\"10\" height=\"1\"></td></tr>
+<tr height=\"20\"><td align=\"right\" width=\"100%\"><font class=\"checkbox0\" style=\"color:#000000;font-size:9px;\"><b>Price for listed item&nbsp;&nbsp;&nbsp;</b></font></td><td width=\"1\" height=\"20\" bgcolor=\"#000000\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td><td align=\"right\" style=\"padding-right:2px;\"><font class=\"commonSmall\" style=\"color:#000000;font-size:9px;\">&nbsp;&nbsp;<span id=\"QuoteTotalPrice\" style=\"font-weight:bold;\">\$$lePrice</span></font></td></tr>
+<tr><td align=\"center\" width=\"100%\" height=\"20\" colspan=\"3\"><img src=\"images/spacer.gif\" width=\"20\" height=\"10\"></td></tr>
+</table>
+";
+
+}
+
+
+print "</div>
+<center><a href=\"javascript:void(0);\" onClick=\"document.leProducto.submit();\" onMouseOver=\"document.images.ATC.src = submit1.src;\" onMouseOut=\"document.images.ATC.src = submit0.src;\"><img src=\"images/addtocartNew_off.gif\" width=\"197\" height=\"164\" name=\"ATC\" border=\"0\" vspace=\"20\"></a></center>
+</td></tr></table>
+</div>";
+######## END QUOTE LAYER #######
+
+
+
+
+
+## view cart button
+#print "<div style=\"position:absolute; left:285px; top:150px;\" id=\"carter\"><a href=\"javascript:void(0);\" onClick=\"document.leProducto.submit();\" onMouseOver=\"document.images.carter.src = 'images/addtocart_on.jpg';overlib('<center class=\\'overlibCart\\'>$AccessLayerText</center>');\" onMouseOut=\"document.images.carter.src = 'images/addtocart_off.jpg';return nd();\"><img src=\"images/addtocart_off.jpg\" width=\"165\" height=\"62\" border=\"0\" name=\"carter\"></a></div>";
+
+$dbh->disconnect;
+
+print qq~
+
+<script language="Javascript">
+function placeRightAligned() {
+	currWidth = document.body.clientWidth;
+	tabsPlacement = currWidth - 300;
+	photoFramePlacement = currWidth - 496;
+
+	document.getElementById("AccessoryLayer").style.left = ''+tabsPlacement+'px';
+	document.getElementById("QuoteLayer").style.left = ''+tabsPlacement+'px';
+	document.getElementById("TechSpecsLayer").style.left = ''+tabsPlacement+'px';
+
+	document.getElementById("lePhotoFrame").style.left = ''+photoFramePlacement+'px';
+
+	if (document.getElementById("brochureBulletPoints")) {
+		if (currWidth > 1000) { document.getElementById("brochureBulletPoints").style.visibility = 'visible'; }
+		else { document.getElementById("brochureBulletPoints").style.visibility = 'hidden'; }
+	}
+		
+}
+
+placeRightAligned();
+
+function getContents() {
+	parent.lower.location.href="quickcart.cgi";
+}
+
+// IMAGE PRELOADER
+check0 = new Image();
+check0.src = "images/Bcheckbox0.gif";
+check1 = new Image();
+check1.src = "images/Bcheckbox1.gif";
+
+submit0 = new Image();
+submit0.src = "images/addtocartNew_off.gif";
+submit1 = new Image();
+submit1.src = "images/addtocartNew_on.gif";
+
+function toggleCheckbox(incoming) {
+
+	var leNombre = incoming;
+	var muaField = document.leProducto[leNombre];
+	var lePrecio = document.getElementById(""+leNombre+"_2").innerHTML;
+	
+	//for innerHTML remake
+	lePrecioSplit = lePrecio.split(" ");
+	if (muaField.checked == true) {
+		muaField.checked = 0;
+		document.images[leNombre].src = check0.src;
+		document.getElementById(""+leNombre+"").style.color = "000000";
+		document.getElementById(""+leNombre+"_2").style.color = "000000";
+		
+		document.getElementById(""+leNombre+"_2").innerHTML = "<nobr>( add "+lePrecioSplit[1]+" )</nobr>";
+		document.getElementById("quoteText_"+leNombre+"").style.color = 'A0A0A0';
+
+		whichDel = lePrecioSplit[1];
+		lePrecioSplit = whichDel.split("\$");
+		whichDel = lePrecioSplit[1];
+		delThis(whichDel);
+	}
+	else {
+		muaField.checked = 1; 	
+		document.images[leNombre].src = check1.src;
+		document.getElementById(""+leNombre+"").style.color = "000000";
+		document.getElementById(""+leNombre+"_2").style.color = "000000";
+
+		document.getElementById(""+leNombre+"_2").innerHTML = "<nobr>( "+lePrecioSplit[2]+" added )</nobr>";		
+		document.getElementById("quoteText_"+leNombre+"").style.color = '000000';
+		
+		whichAdd = lePrecioSplit[2];
+		lePrecioSplit = whichAdd.split("\$");
+		whichAdd = lePrecioSplit[1];
+		addThis(whichAdd);
+	}
+
+}
+
+function addThis(incoming) {
+	var oldPrice = document.leProducto.totalPrice.value;
+	var addThis = incoming;
+	lePrecioSplit2 = oldPrice.split("\$");
+	thisOld = lePrecioSplit2[1];
+	parent.lower.location.href = 'register.cgi?DoneScript=added&Type=Price&Numbers='+addThis+',,,,,'+thisOld+'&Equation=Add';
+}
+
+var TotalAdded = 0;
+function added(incoming) {
+	addedPrice = incoming;
+	document.leProducto.totalPrice.value = "\$" + addedPrice + "";
+	document.getElementById("QuoteTotalPrice").innerHTML = "\$"+addedPrice+"";
+	TotalAdded++;
+	checkTotalAdded();
+}
+
+function delThis(incoming) {
+	var oldPrice = document.leProducto.totalPrice.value;
+	var delThis = incoming;
+	lePrecioSplit2 = oldPrice.split("\$");
+	thisOld = lePrecioSplit2[1];
+	parent.lower.location.href = 'register.cgi?DoneScript=deleted&Type=Price&Numbers='+delThis+',,,,,'+thisOld+'&Equation=Delete';
+}
+
+function deleted(incoming) {
+	deletedPrice = incoming;
+	document.leProducto.totalPrice.value = "\$" + deletedPrice + "";
+	document.getElementById("QuoteTotalPrice").innerHTML = "\$"+deletedPrice+"";
+	TotalAdded--;
+	checkTotalAdded();
+}
+
+function checkTotalAdded() {
+	if (TotalAdded > 0) {
+		document.getElementById("PriceHasChanged").style.visibility = 'visible';	
+	}
+	else {
+		document.getElementById("PriceHasChanged").style.visibility = 'hidden';	
+	}
+}
+
+function toggleProductTabs(cual) {
+	// show triggered
+	document.getElementById(""+cual+"").style.visibility = 'visible';
+
+	// HIDE ALERT SPAN INSIDE ACCESSORIES J.I.K.
+	document.getElementById("PriceHasChanged").style.visibility = 'hidden';	
+	
+	// hide others
+	if (cual == "TechSpecsLayer") { 
+		document.getElementById("AccessoryLayer").style.visibility = 'hidden';
+		document.getElementById("QuoteLayer").style.visibility = 'hidden';
+	}
+	else if (cual == "AccessoryLayer") { 
+		document.getElementById("TechSpecsLayer").style.visibility = 'hidden';
+		document.getElementById("QuoteLayer").style.visibility = 'hidden';	
+		// CHCEK TO SEE IF ONE OR MORE ACCESSORIES SELECTED ALREADY
+		checkTotalAdded();
+	}
+	// must be QuoteLayer
+	else { 
+		document.getElementById("AccessoryLayer").style.visibility = 'hidden';
+		document.getElementById("TechSpecsLayer").style.visibility = 'hidden';	
+	}
+}
+</script>
+
+    </td>
+  </tr>
+  <tr> 
+    <td width="185" valign="top" align="left">&nbsp; </td>
+  </tr>
+
+</table>
+
+$elLogo
+</body>
+</html>
+~;
+
+## main IF end
+}
+
+######################## ---------------------------- leAction = VCART
+elsif ($FORM{'leAction'} eq "VCART") {
+	require("vcart.cgi");
+}
+
+######################## ---------------------------- leAction = CHECKOUT
+elsif ($FORM{'leAction'} eq "CHECKOUT") {
+	require("checkout.cgi");
+}
+
+
+######################## ---------------------------- GETBROCHURE
+elsif ($FORM{'packageTracker'} eq "1") {
+
+require("ups_tracking.cgi");
+
+exit;
+
+}
+
+
+
+######################## ---------------------------- GETBROCHURE
+elsif ($FORM{'GETBROCHURE'} || $FORM{'daBrochure'}) {
+
+require("getBrochure.cgi");
+
+exit;
+
+}
+
+######################## ---------------------------- Done with a quote...
+elsif($FORM{'DoneQuote'} eq "1") {
+	$FORM{'NextLocation'} = "DoneQuote";
+	require("checkout.cgi");
+}
+
+else {
+
+if ($Cookies{'UNo'} ne "" && $Cookies{'IM'} =~ "\@") { $cualMio = "YES"; }
+else { $cualMio = "NO";  }
+
+print qq~
+<script language=JavaScript>
+function initFlasher(){
+	var logged="";
+	var muaFlasher = document.flasher;
+	muaFlasher.SetVariable("logged", "$cualMio");
+}
+</script>
+
+<object id="flasher" CLASSID="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" WIDTH="750" HEIGHT="470" CODEBASE="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=4,0,2,0">
+	<PARAM NAME="MOVIE" VALUE="images/products.swf">
+	<param NAME="PLAY" VALUE="true">
+	<param NAME="LOOP" VALUE="true">
+	<param NAME="QUALITY" VALUE="high">
+	<param NAME="MENU" VALUE="false">
+	<param NAME='wmode' Value='Transparent'>
+<embed name="flasher" SRC="images/products.swf" WIDTH="750" HEIGHT="470" PLAY="true" QUALITY="high" MENU="true" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></embed>
+</object>
+
+<script>initFlasher();</script>
+
+~;
+}
+
+
+$dbh->disconnect;
+
+exit;

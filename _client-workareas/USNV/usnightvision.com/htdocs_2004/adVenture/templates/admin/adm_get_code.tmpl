@@ -1,0 +1,21 @@
+<script>
+function findObj(n, d){var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);} if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n]; for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=findObj(n,d.layers[i].document); if(!x && document.getElementById) x=document.getElementById(n); return x;}
+function CopyClipboard(obj){obj=findObj(obj);if(obj){window.clipboardData.setData('Text',obj.value);alert("Now Banner code in Your Clipboard!");}}
+</script>
+<table width=100% align=center border=0 cellpadding=0 cellspacing=0><tr><td>
+<table width=100% align=center border=0 cellpadding=2 cellspacing=1 bgcolor=#EEEEEE>
+	<tr class=title>
+		<td>&nbsp;SELECT ADVERT ZONE</td>
+		<td>&nbsp;</td>
+	</tr>
+		<tr class=list>
+			<td align=left><TMPL_VAR ZONE_LIST></td>
+			<td align=left>&nbsp;<input type=image src="ad_images/get_adv_code.gif" onClick="javascript:presubmit('get_banner_code_done')" alt="Get Advert Code" value="Get Advert Code"></td>
+		</tr>
+	<tr><td class=list colspan=2><hr noshade></td></tr>
+	<TMPL_IF CODE>
+	<tr class=list><td align=left><b class="title">&nbsp;INSERT THIS CODE TO YOUR SITE:&nbsp;</b><br><textarea class=myinput style="width:450" readonly name=banner rows=10 wrap><TMPL_VAR CODE></textarea><br><br></td><td><img src="ad_images/clipboard.gif" align="absmiddle">&nbsp;<a href="javascript:CopyClipboard('banner');">Copy to Clipboard</a></td></tr>
+	</TMPL_IF>
+</table>
+</td></tr></table>
+

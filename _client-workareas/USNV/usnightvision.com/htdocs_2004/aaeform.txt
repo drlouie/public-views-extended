@@ -1,0 +1,54 @@
+<!--Start About Night Vision - Ask An Expert -->
+<table width="299" cellpadding="0" cellspacing="0" border="0" align="center">
+	<tr>
+		<td width="100%" align="right"><a href="techcenter.cgi?subSection=AAE" title="Click to view 'Ask An Expert' section of this site."><img src="images/htitle_aae.gif" width="126" height="24" border="0" alt="Click to view 'Ask An Expert' section of this site."></a></td>
+	</tr>
+	<tr>
+		<td width="100%" align="center">
+
+<form name="askExpert" onSubmit="return validateIt();" method="post" target="lower" action="techcenter.cgi">
+<input type="hidden" name="subSection" value="AAE">
+<input type="hidden" name="myLocation" value="Home">
+<table width="299" height="150" cellpadding="0" cellspacing="0" border="0" background="images/hbacker_aae.jpg">
+	<tr>
+		<td width="100%" align="right">
+
+
+  <table width="100%" border="0" cellspacing="0" cellpadding="1">
+    <tr> 
+      <td> 
+        <input tabindex="1" type="text" class="aaeInput" size="30" name="FName" value="Enter your First Name" onFocus="focusOnAAE(this);" OnBlur="blurAAE(this);">
+      </td>
+      <td rowspan="4" align="center" valign="bottom" width="100%">
+        <input tabindex="5" type="image" border="0" name="Submit" src="images/hbuts_aae_submit_off.gif" width="64" height="14"><br>
+		<input tabindex="6" type="image" border="0" name="Reset" src="images/hbuts_aae_reset_off.gif" width="40" height="10"><br>
+		<img src="images/spacer.gif" width="1" height="10">
+      </td>
+    </tr>
+    <tr> 
+      <td> 
+        <input tabindex="2" type="text" class="aaeInput" size="30" name="LName" value="And your Last Name" onFocus="focusOnAAE(this);" OnBlur="blurAAE(this);">
+      </td>
+    </tr>
+    <tr> 
+      <td> 
+        <input tabindex="3" type="text" class="aaeInput" size="30" name="Email" value="Also your Email Address" onFocus="focusOnAAE(this);" OnBlur="blurAAE(this);">
+      </td>
+    </tr>
+    <tr> 
+      <td> 
+        <textarea tabindex="4" name="Question" rows="6" cols="35" class="aaeTArea" onFocus="focusOnAAE(this);" OnBlur="blurAAE(this);">Now let us how a night vision expert can assist you?</textarea>
+      </td>
+    </tr>
+  </table>
+		
+		</td>
+	</tr>
+</table>
+</form>
+
+		
+		</td>
+	</tr>
+</table>
+<!--End About Night Vision - Ask An Expert -->

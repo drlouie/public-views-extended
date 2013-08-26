@@ -1,0 +1,1573 @@
+#!/usr/bin/perl5 -s
+
+###########################################################################################################
+# Company: ©2001 NetMedia Solutions                                                                             #
+# Date: Saturday, September 21, 2001                                                                      #
+# Location: Los Angeles County, California, United States of America                                      #
+# Made By: Luis Rodriguez (drlouie)                                                                       #
+# Email: Drlouie@NetMediaSol.com                                                                          #
+#                                                                                                         #
+# This program cannot be duplicated, distributed or re-used for any other purpose other than its original #
+# intended purpose and function. You may request NetMedia Solutions for a copy of the script,             #
+# personalized to fit your exact needs for a small re-programming fee.                                    #
+###########################################################################################################
+
+require ("parse_query.nsp");
+
+require ("referer.nsp"); 
+## Snif cookie, if present test for logged in status
+require ("cookiesnif.nsp");
+
+require ("date.nsp"); 
+
+require "email_template.nsp";
+
+## common DB connection
+use DBI; 
+my $dbh = DBI->connect('DBI:mysql:unvWeb','root','chinga2') or die "Unable to connect to database: <b>unvWeb</b>\n"; 
+$dbh->{RaiseError} = 1; 
+
+
+### ------------------------------ >> WITH SOMETHING IN CART
+if ($Cookies{'Shicar'} =~ "xxxxx") {
+		## if more than one drop
+		@EstosShoozoom = split(/xxxxx/, $Cookies{'Shicar'});
+		
+		$counter=0;
+		$items=1;
+		$CMultiples=0;
+		$CSingulars=0;
+		## counting total dollar amount
+		foreach $EsteCOSTAS (@EstosShoozoom) {
+			@leItem = split(/-----/,$EsteCOSTAS);
+			$leItem[0] =~ s/\$//g;
+			sprintf("%.2d", $leItem[0]);
+			if ($counter eq "0") { 
+				$cartTotal = $leItem[0] * $leItem[3];
+				$itemTotal = ""; 
+			}
+			else {
+				$newTotal = $leItem[0] * $leItem[3];
+				$cartTotal = $newTotal + $cartTotal;
+			}
+			push(@multipliers,"$leItem[3]");
+			push(@numeros,"$leItem[1]-----$leItem[2]");
+			## only if count is higher than 1 which makes for dupe
+			if ($leItem[3] > 1) { push(@multiples,"$leItem[0]-----$leItem[1]-----$leItem[2]-----$leItem[3]-----$CMultiples"); $CMultiples++; }
+			else { push(@singulares,"$leItem[0]-----$leItem[1]-----$leItem[2]-----$leItem[3]-----$CSingulars"); $CSingulars++; }
+			$counter++;
+		
+			if($counter eq "0") { $realCount = $muaMultiplier * $items; }
+			else { $newCount = $muaMultiplier * $items; $realCount = $realCount + $newCount; }
+
+		}
+		
+		
+		
+### ------------------------------ >> SHOPPING AS CUSTOMER - ADDED PRODUCTS IN CART - ADD THIS TO TOTAL
+if ($custUName =~ "@" && $Cookies{'AP'} =~ "xxxxx" && $Cookies{'APC'} >= 1) {
+@splitAP1 = split(/xxxxx/,$Cookies{'AP'});
+$daapci1=0;
+foreach (1 .. $Cookies{'APC'}) {
+		@SAP1 = split(/-----/,$splitAP1[$daapci1]);
+		###### NO NEED TO REPUSH WEIGHTS TO CART, ALREADY SAVED FROM STEP 1
+		###### NEED PRICING TO BE PUSHED, NOT SAVED FROM STEP 1
+		if ($SAP1[0] =~ "\$") { $SAP1[0] =~ s/\$//g; }
+		## Price x Quantity
+		$APTotal1 = $SAP1[0] * $SAP1[3];
+		$APTotaled1 = sprintf("%.2f", $APTotal1);
+		$cartTotal = $APTotal1 + $cartTotal;
+
+		$daapci1++;
+	}
+}	
+		
+		
+		
+		
+		
+		
+		
+		
+		##FIRST GRAB FULL COUNT FOR EACH DROP
+		foreach $Numero (@numeros) {
+			@thyItem = split(/-----/,$Numero);
+			$esteCosita=0;
+			foreach $thyItem (@thyItem) {
+				if ($thyItem =~ ",") {
+					@splitN = split(/,/,$Numero);
+					$muaCNT=0;
+					foreach $splited (@splitN) { 
+						$esteCosita++;
+					}
+				}
+				elsif ($thyItem ne "NONE") { $esteCosita++; }
+			}
+			push(@itemsPerSet,$esteCosita);
+		}
+
+		$countie=0;
+		## THEN MULTIPLY USING THE MULTIPLIERS RETRIEVED IN FIRST METHOD
+		foreach $itps (@itemsPerSet) {
+			$leCountie = $multipliers[$countie];
+			$muaC = $itps * $leCountie;
+			push(@allCs,$muaC);
+			$countie++;
+		}
+		## FINALLY ADD ALL PIECES TOGETHER FOR FINAL
+		foreach $meC (@allCs) {
+			if ($ccnt eq "0") { $leFC = $meC; }
+			else { $leFC = $leFC + $meC; }
+		}
+
+		
+		sprintf("%.2d", $cartTotal);
+		sprintf("%.2d", $leFC);
+
+
+
+
+if ($Cookies{'Logged'} eq "SI") {
+
+	if ($Cookies{'SaShUs'} =~ "@") {
+		$cualEmail = "$Cookies{'SaShUs'}";
+		$cualCT = "$Cookies{'SaShTipo'}";
+		$cualFNe = "$Cookies{'SaShFn'}";
+		$cualLNe = "$Cookies{'SaShLn'}";
+		$cualUser = "$Cookies{'SaShUs'}";
+		@splitE = split(/\@/,$Cookies{'IM'});
+		$cualCR = "usnv-" . "$splitE[0]" . "-1-0";
+		##### IF ADMIN - ADMIN USER MADE ORDER - PROCESSING REP SPECIFIED - CAN BE RE-PLACED USING ADMIN SCREEN (OPV)
+		## CANCEL THIS (REQUEST BY DAVE)
+		## $cualRep4Save = "$Cookies{'IM'}:::::$date";
+		$cualRep4Save = "";
+		$cualRepUSNV = "<a href=\"https://www.usnightvision.com/USNightVision.cgi?curr=messenger&requestSection=Products&contactRep=$Cookies{'IM'}\">$Cookies{'FNe'} $Cookies{'LNe'}</a>";
+		$cualRep = "<a href=\"https://www.usnightvision.com/USNightVision.cgi?curr=messenger&requestSection=Products&cr=$cualCR\">$Cookies{'FNe'} $Cookies{'LNe'}</a>";
+		$cualOrderedUsing = "SAC";
+	}
+	else {
+		$cualEmail = "$Cookies{'IM'}";
+		$cualCT = "$Cookies{'CT'}";
+		$cualFNe = "$Cookies{'FNe'}";
+		$cualLNe = "$Cookies{'LNe'}";
+		$cualUser = "$Cookies{'UNo'}";
+		##### IF INTERNET - USER MADE ORDER - NO PROCESSING REP SPECIFIED - CAN BE PLACED USING ADMIN SCREEN (OPV)
+		$cualRep4Save = "";
+		$cualRepUSNV = "Intenet";
+		$cualRep = "Internet";
+		$cualOrderedUsing = "Online";
+	}
+
+}		
+
+
+####################### ------------------>>>> GRAB AND PRINT HIDDEN PAYTYPE INFO (STEP 2 3 4 only)
+if ($FORM{'PayType'} && $FORM{'PayType'} =~ "::") {
+	@losPTs = split(/::/,$FORM{'PayType'});
+	$PayTipo = "<input type=\"hidden\" name=\"PayType\" value=\"$losPTs[1]\">";
+}
+elsif ($FORM{'PayType'}) {
+	$PayTipo = "<input type=\"hidden\" name=\"PayType\" value=\"$FORM{'PayType'}\">";
+}
+
+
+
+####################### ------------------>>>> PROCESS ORDER (FINALIZE)
+if ($FORM{'NextLocation'} eq "Finalize") {
+	&runLogged1;
+	
+	$FORM{'FinalPrice'} =~ s/\$//g;	
+	$FORM{'TotalShipPrice'} =~ s/\$//g;	
+
+## cual package
+@Packages = ("1DM,Next Day Air Early AM","1DA,Next Day Air","2DA,2nd Day Air","3DS,3 Day Select","GNDCOM,Ground Commercial","GNDRES,Ground Residential");
+foreach $Type (@Packages) {
+	local($value, $name) = split(/,/, $Type);	
+	if ($FORM{'Package'} eq "$value") { $cualPackage = "$name"; }
+}
+
+
+if ($FORM{'PayType'} =~ "CC") {
+	use locale;
+	$thySeaSeaT = uc($thySeaSeaT);
+	if ($FORM{'PayType'} =~ "CC1") { $muaCCTi = "$thySeaSeaT"; $muaCCNo = "$thySeaSeaNSecure"; }
+	elsif ($FORM{'PayType'} =~ "CC2") { $muaCCTi = "$thySeaSeaT2"; $muaCCNo = "$thySeaSeaNSecurex2"; }
+	elsif ($FORM{'PayType'} =~ "CC3") { $muaCCTi = "$thySeaSeaT3"; $muaCCNo = "$thySeaSeaNSecurex3"; }
+	$payMethLayout = "Credit Card ( $muaCCTi $muaCCNo )";
+}
+elsif ($FORM{'PayType'} =~ "net") {
+	$payMethLayout = "Pre-Approved Net ( $FORM{'PayType'} )";
+}
+elsif ($FORM{'PayType'} =~ "check") {
+	$payMethLayout = "Pre-Approved ( Check/Money Order )";
+}
+elsif ($FORM{'PayType'} =~ "cod") {
+	$payMethLayout = "Pre-Approved C.O.D. ( Cash on Delivery )";
+}
+
+
+
+
+
+
+
+
+
+	## con cerote
+	$countfile = "pdf/odas.cnt";
+	open(COUNT,"$countfile") || &error('can not write to $countfile');
+	## sin cerote
+	$counto = <COUNT>;
+	$counto++;
+	close(COUNT);
+	## write out current count on tracking file
+	open(COUNT2,">$countfile") || &error('can not write to $countfile');
+	flock(COUNT2, 2);
+	print COUNT2 "$counto";
+	flock(COUNT2, 8);
+	close(COUNT2);
+	## le O Cnt
+	$OrderCounter = "$counto";
+
+	$URLedOrderCounter = "<a href=\"https://www.usnightvision.com/opv.cgi?OhPeeVeih=$OrderCounter&CT=$cualCT\">$OrderCounter</a>";
+
+## GET ORDER PARAMS (PROCESS FORM)
+$muaIncoming=Last;
+&runSTEP3;
+
+
+
+####################################################################################################
+#### PREPARE VARIABLES FOR EMAILINGS (ORDER / RECEIPT ) (USER / REP / LOGGED / TOPADMIN(DAVE) ####
+####################################################################################################
+@splitBill = split(/<br><br>Phone/,$FORM{'BillTo'});
+$muaBillTo = $splitBill[0];
+@splitShip = split(/<br><br>Courier/,$FORM{'ShipTo'});
+$muaShipTo = $splitShip[0];
+
+## upper case
+use locale;
+my $mSeaSeaT = uc($thySeaSeaT);
+
+## sub-total price
+## GET REAL TOTALS ( NO JS INTERRUPTIONS ) 
+$daSubTotal = "0.00";
+foreach $PTotal (@precioTotal) {
+	$thyPrice = sprintf("%.2f", $PTotal);
+	$daSubTotal = $daSubTotal + $thyPrice;
+	$daSubTotal = sprintf("%.2f", $daSubTotal);
+}
+
+	$disTotal = sprintf("%.2f", $disTotal);
+
+	
+
+
+	
+########## >>>>>>>>>>>> MAKE USER'S PACKING SLIP PDF
+### FEED HTML TEMPLATE 
+$leTemplatePS = `cat pdf/PackSlip.html.nsf`;
+$leTemplatePS =~ s/%%MuaDate%%/$date2/g;
+$leTemplatePS =~ s/%%MuaINumber%%/$OrderCounter/g;
+$leTemplatePS =~ s/%%MuaBillTo%%/$muaBillTo/g;
+$leTemplatePS =~ s/%%MuaShipTo%%/$muaShipTo/g;
+$leTemplatePS =~ s/%%MuaPO%%/$FORM{'PurchOrd'}/g;
+$leTemplatePS =~ s/%%MuaShippedOn%%/Pending/g;
+$leTemplatePS =~ s/%%MuaRep%%/$cualRep/g;
+$leTemplatePS =~ s/%%MuaTerms%%/$mSeaSeaT ($thySeaSeaNSecure)/g;
+$leTemplatePS =~ s/%%MuaCourier%%/$FORM{'Courier'} ($FORM{'Package'})/g;
+$leTemplatePS =~ s/%%MuaTodos%%/$todosLosProductos/g;
+$leTemplatePS =~ s/%%MuaSubTotal%%/$disTotal/g;
+$leTemplatePS =~ s/%%MuaShipCost%%/$FORM{'TotalShipPrice'}/g;
+$leTemplatePS =~ s/%%MuaTaxes%%/$FORM{'salesTax'}/g;
+$leTemplatePS =~ s/%%MuaTotal%%/\$$FORM{'FinalPrice'}/g;
+
+## temp invoice file
+$Rhtml = "pdf/PS_dat.html";
+## new PDF as per O-Num
+$Rpdf = "pdf/PS/$OrderCounter.pdf";
+## write out invoice on temporary file
+open(RHTML,">$Rhtml") || &error('can not write to $Rhtml');
+flock(RHTML, 2);
+print RHTML "$leTemplatePS";
+## unlock HTML
+flock(RHTML, 8);
+close(RHTML);
+## create PDF
+$commandline="htmldoc -t pdf13 --pagemode document --header ... --footer ... --left 1cm --size Letter --webpage -f $Rpdf pdf/PS_dat.html";
+select(STDOUT); $| = 1;
+system($commandline);
+
+
+########## >>>>>>>>>>>> MAKE ADMIN'S ORDER RECEIPT PDF
+### FEED HTML TEMPLATE 
+$leTemplateOR = `cat pdf/order.html.nsf`;
+$leTemplateOR =~ s/%%MuaDate%%/$date2/g;
+$leTemplateOR =~ s/%%MuaINumber%%/$URLedOrderCounter/g;
+$leTemplateOR =~ s/%%MuaBillTo%%/$muaBillTo/g;
+$leTemplateOR =~ s/%%MuaShipTo%%/$muaShipTo/g;
+$leTemplateOR =~ s/%%MuaPO%%/$FORM{'PurchOrd'}/g;
+$leTemplateOR =~ s/%%MuaShippedOn%%/Pending/g;
+$leTemplateOR =~ s/%%MuaRep%%/$cualRepUSNV/g;
+$leTemplateOR =~ s/%%MuaTerms%%/$mSeaSeaT ($thySeaSeaNSecureUSNV)/g;
+$leTemplateOR =~ s/%%MuaCourier%%/$FORM{'Courier'} ($FORM{'Package'})/g;
+$leTemplateOR =~ s/%%MuaTodos%%/$todosLosProductos/g;
+$leTemplateOR =~ s/%%MuaSubTotal%%/$disTotal/g;
+$leTemplateOR =~ s/%%MuaShipCost%%/$FORM{'TotalShipPrice'}/g;
+$leTemplateOR =~ s/%%MuaTaxes%%/$FORM{'salesTax'}/g;
+$leTemplateOR =~ s/%%MuaTotal%%/\$$FORM{'FinalPrice'}/g;
+
+## temp order file
+$Ihtml = "pdf/I_dat.html";
+## new PDF as per O-Num
+$Ipdf = "pdf/inv/$OrderCounter.pdf";
+## write out order on temporary file
+open(IHTML,">$Ihtml") || &error('can not write to $Ihtml');
+flock(IHTML, 2);
+print IHTML "$leTemplateOR";
+## unlock HTML
+flock(IHTML, 8);
+close(IHTML);
+## create PDF
+$commandline="htmldoc -t pdf13 --pagemode document --header ... --footer ... --left 1cm --size Letter --webpage -f $Ipdf pdf/I_dat.html";
+select(STDOUT); $| = 1;
+#print "Content-Type: application/pdf\n\n";
+system($commandline);
+
+
+
+
+## PREPARE FOR SAVE IN DB
+$leTemplatePS =~ s/'/`/gi;
+$leTemplateOR =~ s/'/`/gi;
+
+
+	my $sth = $dbh->prepare("INSERT INTO Orders (OrderID, IntOrderID, CustomerID, ItemsOrdered, TotalPrice, ShipCost, FullWeight, Instructions, Courier, Package, TrackingIDs, LastShipOn, OrderedUsing, RecFName, RecLName, ShipAdd, ShipAdd2, ShipCity, ShipState, ShipZip, OrderedOn, LosReps, Tax, PeeTee, POno)
+
+						 	 VALUES (Null, '', '$cualEmail', '$Cookies{'Shicar'}', '$FORM{'FinalPrice'}', '$FORM{'TotalShipPrice'}', '$FORM{'TotalCartWeight'}', '', '$FORM{'Courier'}', '$cualPackage', '', '', '$cualOrderedUsing', '$thyShipFName', '$thyShipLName', '$thyShipAddress1', '$thyShipAddress2', '$thyShipCity', '$thyShipState', '$thyShipZip', '$date', '$cualRep4Save', '$FORM{'salesTax'}','$payMethLayout','$PONO')");
+	$sth->execute or die "Unable to execute query\n";
+	$sth->finish;
+
+
+	## UPDATE LAST ORDER INFO FOR USER ACCOUNT
+	my $sth = $dbh->prepare("UPDATE LOW_PRIORITY Customers 
+							 SET LastOrder='$date'
+							 WHERE Username='$cualEmail'");
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish; 
+
+
+	
+	
+##################################################
+########## >>>>>>>>>>>> SEND USER'S ORDER RECEIVED EMAIL
+##################################################
+$RecIn1 = "$cualEmail ($cualFNe $cualLNe)";
+$SendIn1 = "WebStore\@USNightVision.com ( USNightVision.com Store )";
+use lib "/usr/local/lib/";
+use MIME::Lite;
+my $msg = MIME::Lite->new(
+				From    =>"$SendIn1",
+                To      =>"$RecIn1",
+                Subject =>"US NightVision - New Order Placed",
+                Type    =>'text/html', 
+Data => qq{
+$wrapTop
+
+<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+<tr><td width='100%' align='left'><font class='commonSmall'><b>$cualFNe $cualLNe</b>,<br><br>Your user account with US NightVision, <b>$cualUser</b>, was used to place an order. As soon as we can verify our warehouse has the product you ordered ready to be shipped and your payment has been processed, you will recieve a Packing Slip (Order Confirmation) along with the necessary information to be able to track your order online using our FREE Package Tracking tool. If we have any questions, problems or simply cannot process your order we will contact you immediately. If you have any questions or problems with this order please CALL us A.S.A.P.<br><br><i>If and when you talk to one of our Representatives please give him/her the <b>Online Order Number ( $OrderCounter )</b> for faster service.</i><br><br>We sincerely thank you very for showing interest in our line of high quality night vision products and are looking forward to the next time we can assist you with your Night Vision and Tactical Optics needs.<br><br></font></td></tr>
+<tr><td width='100%' align='left'>
+
+<font class='commonSmall'>
+<ul>
+<li><b>US NightVision E-Com System</b><br><a href='http://www.USNightVision.com/'>http://www.USNightVision.com/</a></li>
+<li><b>US NightVision Product Catalog (FREE)</b><br><a href='http://www.USNightVision.com/freecatalog/'>http://www.USNightVision.com/FreeCatalog/</a></li>
+<li><b>Night Vision Online Forum (FREE)</b><br><a href='http://www.USNightVision.com/nvforum/'>http://www.USNightVision.com/NVForum/</a></li>
+</ul>
+</font>
+
+</td></tr>
+</table>
+
+$wrapBot
+});
+
+$msg->send();
+########## >>>>>>>>>>>>
+
+
+
+
+
+
+########## >>>>>>>>>>>> SEND USNV ADMIN'S ORDER RECIEPT EMAIL
+
+
+
+
+
+
+### EXTRA TEXT TO TOPADMIN (DAVE)   ##
+## if order made by Logged USNV Rep ##
+if ($Cookies{'SaShUs'} =~ "@") {
+	$LoggedEmailInfo = "<br><br><b>A copy of this order reciept was also sent to <b>$Cookies{'FNe'} $Cookies{'LNe'}</b>, a UNSV Representative, since this order was placed by him/her.</b>";
+}
+else { $LoggedEmailInfo = ""; }
+
+## if USNV Rep is associated with this Customer Account
+if ($thyAdminID =~ "@") {
+	my $sth = $dbh->prepare("SELECT * FROM Customers WHERE RepEmail = '$thyAdminID'");
+	$sth->execute or die "Sorry, that Username/Password combination is incorrect, please try again.\n"; 
+	my $row = $sth->fetchrow_arrayref; 
+		$RepFN = $row->[12];
+		$RepLN = $row->[13];
+		$RepEM = $row->[15];
+	$sth->finish;
+
+	$RepEmailInfo = "<br><br><b>A copy of this order reciept was also sent to <b>$RepFN $RepLN</b>, since this UNSV Representative is selected as the admin of this customer's online account.</b>";
+}
+else { $RepEmailInfo = ""; }
+
+
+
+
+
+########## >>>>>>>>>>>> SEND USNV ADMIN/ORDERPROCESSOR EMAILS (IF APPLICABLE)
+	$sth = $dbh->prepare("SELECT * FROM OPMSConfig WHERE ItemID='0000000001'");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$AdminIDs = $row[1];
+		$OrdProcessors = $row[2];
+	}
+	$sth->finish;
+
+	### if more than one split ADMIN(s)
+	if ($AdminIDs =~ ",") { @splitFC1 = split(/,/,$AdminIDs); }
+	### else simply push it into array
+	else { push(@splitFC1,"$AdminIDs"); }	
+
+	### if more than one split OrderProcessor(s)
+	if ($OrdProcessors =~ ",") { @splitADM1 = split(/,/,$OrdProcessors); }
+	### else simply push it into array
+	else { push(@splitADM1,"$OrdProcessors"); }	
+	
+	foreach $unFC (@splitFC1) { 
+		push(@allEM1,"$unFC"); 
+		$losRecipients1 = $losRecipients1 . "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Administrator:</b> $unFC<br>";
+	}
+	foreach $unADM (@splitADM1) { 
+		push(@allEM1,"$unADM"); 
+		$losRecipients1 = $losRecipients1 . "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Order Processor:</b> $unADM<br>";
+	}
+	
+	$theRecipients1 = "<br><br><b>A copy of this message was sent to all these recipients:</b><br><i>$losRecipients1</i>";
+	
+	$cEMs=0;
+	foreach $SEM (@allEM1) {
+		$sth = $dbh->prepare("SELECT * FROM Customers WHERE RepEmail='$SEM'");
+		$sth->execute or die "Unable to execute query\n"; 
+		my @row;
+		while(@row = $sth->fetchrow_array) { 
+			$ThisRepFName3 = $row[12];
+			$ThisRepLName3 = $row[13];
+
+$RecIn2 = "$SEM ($ThisRepFName3 $ThisRepLName3)";
+$SendIn2 = "WebStore\@USNightVision.com ( USNightVision.com Store )";
+use lib "/usr/local/lib/";
+use MIME::Lite;
+my $msg2 = MIME::Lite->new(
+				From    =>"$SendIn2",
+                To      =>"$RecIn2",
+                Subject =>"US NightVision - New Order Recieved",
+                Type    =>'multipart/related'
+                );
+$msg2->attach(Type => 'text/html',
+Data => qq{
+$wrapTop
+
+<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+<tr><td width='100%' align='left'><font class='commonSmall'><b>$ThisRepFName3 $ThisRepLName3</b>,<br><br><b>$cualFNe $cualLNe</b>'s online account, <b>$cualUser</b>, was used to place an order. Attached to this email message you will find an order reciept generated by the system for the order. Remember: The order reciept is in PDF format. $theRecipients1 $LoggedEmailInfo $RepEmailInfo<br><br></font></td></tr>
+<tr><td width='100%' align='left'>
+
+<font class='commonSmall'>
+
+&nbsp;
+
+
+</font>
+
+</td></tr>
+</table>
+
+$wrapBot
+});
+
+$msg2->attach(Type => 'image/pdf', Path => "$Ipdf", Filename => "OrderReciept_$OrderCounter.pdf");
+
+$msg2->send();
+
+
+
+		}
+		$sth->finish;
+	}
+########## >>>>>>>>>>>>
+
+
+
+
+
+
+########## >>>>>>>>>>>> SEND ACCOUNT REP ORDER RECIEPT EMAIL (IF APPLICABLE)
+if ($thyAdminID =~ "@") {
+
+$RecIn3 = "$RepEM ($RepFN $RepLN)";
+#$Rec2In2 = "JohnB\@USNightVision.com (John B)";
+$SendIn3 = "WebStore\@USNightVision.com ( USNightVision.com Store )";
+use lib "/usr/local/lib/";
+use MIME::Lite;
+my $msg3 = MIME::Lite->new(
+				From    =>"$SendIn2",
+                To      =>"$RecIn2",
+                Subject =>"US NightVision - New Order Recieved",
+                Type    =>'multipart/related'
+                );
+$msg3->attach(Type => 'text/html',
+Data => qq{
+$wrapTop
+
+<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+<tr><td width='100%' align='left'><font class='commonSmall'><b>$RepFN $RepLN</b>,<br><br><b>$cualFNe $cualLNe</b>'s online account, <b>$cualUser</b>, was used to place an order. You are receiving this message becuase your are the administrator for this customer's online account. Attached to this email message you will find an order reciept generated by the system for the order. Remember: The order reciept is in PDF format. $theRecipients1 $LoggedEmailInfo $RepEmailInfo<br><br></font></td></tr>
+<tr><td width='100%' align='left'>
+
+<font class='commonSmall'>
+
+&nbsp;
+
+
+</font>
+
+</td></tr>
+</table>
+
+$wrapBot
+});
+
+$msg3->attach(Type => 'image/pdf', Path => "$Ipdf", Filename => "OrderReciept_$OrderCounter.pdf");
+
+$msg3->send();
+}
+########## >>>>>>>>>>>>
+
+
+
+
+
+
+########## >>>>>>>>>>>> SEND LOGGED REP'S Order Reciept EMAIL
+if ($Cookies{'SaShUs'} =~ "@") {
+	$RecIn4 = "$Cookies{'IM'} ($Cookies{'FNe'} $Cookies{'LNe'})";
+	$SendIn4 = "WebStore\@USNightVision.com ( USNightVision.com Store )";
+	use lib "/usr/local/lib/";
+	use MIME::Lite;
+	my $msg4 = MIME::Lite->new(
+					From    =>"$SendIn4",
+        	        To      =>"$RecIn4",
+                	Subject =>"US NightVision - New Order Recieved",
+                	Type    =>'multipart/related'
+                	);
+	$msg4->attach(Type => 'text/html',
+	Data => qq{
+	$wrapTop
+
+	<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+	<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+	<tr><td width='100%' align='left'><font class='commonSmall'><b>$Cookies{'FNe'} $Cookies{'LNe'}</b>,<br><br>You have used <b>$cualFNe $cualLNe</b>'s online account, <b>$cualUser</b>, to place an order. Attached to this email message you will find an order reciept generated by the system for the order. Remember: The order reciept is in PDF format. A copy of this email message and order reciept was sent to the website manager, <b>Dave Rhomberg</b>. $theRecipients1 $LoggedEmailInfo $RepEmailInfo<br><br></font></td></tr>
+	<tr><td width='100%' align='left'>
+
+	<font class='commonSmall'>
+
+	&nbsp;
+
+
+	</font>
+
+	</td></tr>
+	</table>
+
+	$wrapBot
+	});
+
+	$msg4->attach(Type => 'image/pdf', Path => "$Ipdf", Filename => "OrderReciept_$OrderCounter.pdf");
+
+	$msg4->send();
+}
+########## >>>>>>>>>>>>
+
+
+
+
+
+####################################################################################################
+### 										END ORDER EMAILINGS									 ###
+####################################################################################################
+	
+	
+	$checkoutMenu = "images/checkoutfinal.jpg";
+	$cualStep = "<b>Completed - $cualFNe, Your order has been successfully processed</b>";
+	print "<script>parent.lower.location.href = \"emptyc.cgi\";</script>";
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+####################### ------------------>>>> step3
+elsif ($FORM{'NextLocation'} eq "Step3") {
+
+		my $sth = $dbh->prepare("UPDATE LOW_PRIORITY Customers 
+							 SET ShipFName='$FORM{'ShipFName'}', 
+							 ShipLName='$FORM{'ShipLName'}', 
+							 ShipAdd='$FORM{'ShipAddress1'}', 
+							 ShipAdd2='$FORM{'ShipAddress2'}', 
+							 ShipCity='$FORM{'ShipCity'}', 
+							 ShipState='$FORM{'ShipState'}', 
+							 ShipZip='$FORM{'ShipZip'}' 
+							 WHERE Username='$cualUser'");
+	$sth->execute or die "Unable to execute query\n";
+	$sth->finish;
+
+	&runLogged1;
+
+	$checkoutMenu = "images/checkout3.jpg";
+	$checkoutBut = "<input type=\"submit\" value=\"Confirm This Order > > >\" class=\"commonInput\" style=\"font-size:12px;font-weight:bold;height:25px;margin-right:15px;\" onFocus=\"focusOnMe(this);\" OnBlur=\"blurMe(this);\" OnMouseOver=\"focusOnMe(this);\" OnMouseOut=\"blurMe(this);\">";
+	$checkoutButSecond = "<input type=\"button\" onClick=\"javascript:parent.location.href='https://www.usnightvision.com/USNightVision.cgi?curr=products&leAction=VCART';\" value=\"< < < Review Your Order\" class=\"commonInput\" style=\"font-size:12px;font-weight:bold;height:25px;margin-left:15px;\" onFocus=\"focusOnMe(this);\" OnBlur=\"blurMe(this);\" OnMouseOver=\"focusOnMe(this);\" OnMouseOut=\"blurMe(this);\">";
+	$cualStep = "<b>Step3 - $MuaFName now just a click away from owning a US NightVision System</b>";
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####################### ------------------>>>> step2
+elsif ($FORM{'NextLocation'} eq "Step2") { 
+	############################################
+	############ LOGGED INTO SYSTEM #############
+	if (&GetCookies('Logged')) {
+		my $sth = $dbh->prepare("UPDATE LOW_PRIORITY Customers 
+							 SET CompanyName='$FORM{'CName'}', 
+							 Phone='$FORM{'Phone'}', 
+							 Fax='$FORM{'Fax'}', 
+							 MailAdd='$FORM{'Address1'}', 
+							 MailAdd2='$FORM{'Address2'}', 
+							 MailCity='$FORM{'City'}', 
+							 MailState='$FORM{'State'}', 
+							 MailZip='$FORM{'Zip'}', 
+							 RepFName='$FORM{'FName'}', 
+							 RepLName='$FORM{'LName'}', 
+							 SiSiTi='$FORM{'SeaSeaT'}', 
+							 SiSiNo='$FORM{'SeaSeaN'}', 
+							 SiSiEx='$FORM{'SeaSeaEX'}'
+							 WHERE Username='$cualUser'");
+	$sth->execute or die "Unable to execute query\n";
+	$sth->finish;
+
+	&runLogged2Primary;
+
+	}
+	#######################################
+	############ NOT LOGGED IN ############
+	else { 
+	my $Username = $FORM{'Email'};
+	my $Pass1 = $FORM{'Pass1'};
+	my $Email = $FORM{'Email'};
+	my $sth = $dbh->prepare("INSERT INTO Customers (CustomerID, CustNum, CompanyName, 
+							 CompanyType, Phone, Ext, Fax, MailAdd, MailAdd2, MailCity, 
+							 MailState, MailZip, RepFName, RepLName, RepTitle, 
+							 RepEmail, Username, Password, AddedOn, LastLog, LastOrder, 
+							 ShipFName, ShipLName, ShipAdd, ShipAdd2, ShipCity, ShipState, 
+							 ShipZip, PT, SiSiTi, SiSiNo, SiSiEx, UT)
+
+						 	 VALUES (Null, '', '$FORM{'CName'}', 'Retail', '$FORM{'Phone'}', '$FORM{'Ext'}', '$FORM{'Fax'}', '$FORM{'Address1'}', '$FORM{'Address2'}', '$FORM{'City'}', '$FORM{'State'}', 
+							 '$FORM{'Zip'}', '$FORM{'FName'}', '$FORM{'LName'}', '', '$Email', '$Username', '$Pass1', Null, '', '', '', '', '', '', 
+							 '', '', '', 'CC', '$FORM{'SeaSeaT'}', '$FORM{'SeaSeaN'}', '$FORM{'SeaSeaEX'}', 'Internet')");
+	$sth->execute or die "Unable to execute query\n"; 
+	$sth->finish;
+
+
+###############################################################
+############ SEND USER'S NEW ACCOUNT CREATED EMAIL ############
+	$RecIn5 = "$FORM{'Email'} ($FORM{'FName'} $FORM{'LName'})";
+	$SendIn5 = "webadmin\@usnightvision.com ( USNightVision.com Administrator )";
+	use lib "/usr/local/lib/";
+	use MIME::Lite;
+	my $msg5 = MIME::Lite->new(
+				From    =>"$SendIn5",
+                To      =>"$RecIn5",
+                Subject =>"US Night Vision - New Account Created",
+                Type    =>'multipart/related'
+                );
+   	$msg5->attach(Type => 'text/html',
+   	Data => qq{
+	$wrapTop
+
+	<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+	<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+	<tr><td width='100%' align='left'><font class='commonSmall'><b>$FORM{'FName'} $FORM{'LName'}</b>,<br><br>A new user account has been created for you on our Online E-Commerce System. The following are the parameters of the new account for use as a shopping/browsing tool for your future night vision needs. Thank you very much for showing interest in our high quality night vision products.<br><br></font></td></tr>
+	<tr><td width='100%' align='left'>
+
+	<font class='commonSmall'>
+	<b>Username</b> - $FORM{'Email'}<br>
+	<b>Password</b> - $FORM{'Pass1'}
+	<br><br>Thank You,<br>US Night Vision Staff<br><br><br><br>
+	<center>
+	<div style="text-align:left">
+	<ul>
+	<li><b>US NightVision E-Com System</b><br><a href=\"http://www.USNightVision.com/\">http://www.USNightVision.com/</a></li>
+	<li><b>US NightVision Product Catalog (FREE)</b><br><a href=\"http://www.USNightVision.com/freecatalog/\">http://www.USNightVision.com/FreeCatalog/</a></li>
+	<li><b>Night Vision Online Forum (FREE)</b><br><a href=\"http://www.USNightVision.com/nvforum/\">http://www.USNightVision.com/NVForum/</a></li>
+	</ul>
+	</center>
+	</font>
+
+	</td></tr>
+	</table>
+
+	$wrapBot
+	});
+
+	$msg5->send();
+
+################################################################
+############ SEND ADMIN'S NEW ACCOUNT CREATED EMAIL	############
+
+
+
+	$sth = $dbh->prepare("SELECT * FROM OPMSConfig WHERE ItemID='0000000001'");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$AdminIDs = $row[1];
+		$UserAdded = $row[4];
+	}
+	$sth->finish;
+
+	### if more than one split FreeCatalog(ers)
+	if ($AdminIDs =~ ",") { @splitFC = split(/,/,$AdminIDs); }
+	### else simply push it into array
+	else { push(@splitFC,"$AdminIDs"); }	
+
+	### if more than one split ADMIN(s)
+	if ($UserAdded =~ ",") { @splitADM = split(/,/,$UserAdded); }
+	### else simply push it into array
+	else { push(@splitADM,"$UserAdded"); }	
+	
+
+
+
+	foreach $unFC (@splitFC) { 
+		push(@allEM,"$unFC"); 
+		$losRecipients2 = $losRecipients2 . "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Administrator:</b> $unFC<br>";
+	}
+	foreach $unADM (@splitADM) { 
+		push(@allEM,"$unADM"); 
+		$losRecipients2 = $losRecipients2 . "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>USNV Rep (Recieves User Added Emails):</b> $unADM<br>";
+	}
+
+
+	$theRecipients2 = "<br><br><b>A copy of this message was sent to all these recipients:</b><br><i>$losRecipients2</i>";
+	
+	$cEMs=0;
+	foreach $SEM (@allEM) {
+		$sth = $dbh->prepare("SELECT * FROM Customers WHERE RepEmail='$SEM'");
+		$sth->execute or die "Unable to execute query\n"; 
+		my @row;
+		while(@row = $sth->fetchrow_array) { 
+			$ThisRepFName3 = $row[12];
+			$ThisRepLName3 = $row[13];
+
+	my $RecIn6 = "$SEM ($ThisRepFName3 $ThisRepLName3)";
+	my $SendIn6 = "WebStore\@USNightVision.com ( USNightVision.com Administrator )";
+
+	use lib "/usr/local/lib/";
+	use MIME::Lite;
+	my $msg6 = MIME::Lite->new(
+				From    =>"$SendIn6",
+                To      =>"$RecIn6",
+                Subject =>"US Night Vision - New Account Created",
+                Type    =>'multipart/related'
+                );
+   	$msg6->attach(Type => 'text/html',
+   	Data => qq{
+	$wrapTop
+
+	<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+	<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+	<tr><td width='100%' align='left'><font class='commonSmall'><b>$ThisRepFName3 $ThisRepLName3</b>,<br><br>A new user account has been created for <b>$FORM{'FName'} $FORM{'LName'}</b> on our Online E-Commerce System. The following are the parameters of the new account for this new user. $theRecipients2 <br><br></font></td></tr>
+	<tr><td width='100%' align='left'>
+
+	<font class='commonSmall'>
+	<b>Username</b> - $FORM{'Email'}<br>
+	<b>Password</b> - $FORM{'Pass1'}
+	<br><br><br><br>
+	<center>
+	<div style="text-align:left">
+	<ul>
+	<li><b>US NightVision E-Com System</b><br><a href=\"http://www.USNightVision.com/\">http://www.USNightVision.com/</a></li>
+	<li><b>US NightVision Product Catalog (FREE)</b><br><a href=\"http://www.USNightVision.com/freecatalog/\">http://www.USNightVision.com/FreeCatalog/</a></li>
+	<li><b>Night Vision Online Forum (FREE)</b><br><a href=\"http://www.USNightVision.com/nvforum/\">http://www.USNightVision.com/NVForum/</a></li>
+	</ul>
+	</center>
+	</font>
+
+	</td></tr>
+	</table>
+
+	$wrapBot
+	});
+
+	$msg6->send();
+
+
+		}
+		$sth->finish;
+	}
+	
+
+}
+
+
+	if ($FORM{'cualMove'} eq "Quote") {
+		require('quote.nsp');
+		$checkoutMenu = "images/checkoutfinal.jpg";
+		$cualStep = "<b>Quoting System - Your quote has been completed and sent</b>";
+		$checkoutBut = "</a><img src=\"images/spacer.gif\" width=\"115\" height=\"47\" border=\"0\">";
+	}
+	else {
+		$checkoutMenu = "images/checkout2.jpg";
+		$checkoutBut = "</a><input type=\"submit\" value=\"Continue Process > > >\" class=\"commonInput\" style=\"font-size:12px;font-weight:bold;height:25px;margin-right:15px;\" onFocus=\"focusOnMe(this);\" OnBlur=\"blurMe(this);\" OnMouseOver=\"focusOnMe(this);\" OnMouseOut=\"blurMe(this);\">";
+		$checkoutButSecond = "<input type=\"button\" onClick=\"javascript:parent.location.href='https://www.usnightvision.com/USNightVision.cgi?curr=products&leAction=VCART';\" value=\"< < < Start Process Over\" class=\"commonInput\" style=\"font-size:12px;font-weight:bold;height:25px;margin-left:15px;\" onFocus=\"focusOnMe(this);\" OnBlur=\"blurMe(this);\" OnMouseOver=\"focusOnMe(this);\" OnMouseOut=\"blurMe(this);\">";
+		$cualStep = "<b>Step2 - Now, $MuaFName blazing through the checkout process</b>";
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+####################### ------------------>>>> step1
+else { 
+	$daTWeight = "$FORM{'Weight'}";
+	## STEP 1
+	&runSTEP3;
+	if ($Cookies{'Logged'} eq "SI") { &runLogged1; }
+	else { &runUnlogged1; $leTarget="target='lower'"; }
+
+	$checkoutMenu = "images/checkout1.jpg";
+	$checkoutBut = "</a><input type=\"submit\" value=\"Continue Process > > >\" class=\"commonInput\" style=\"font-size:12px;font-weight:bold;height:25px;margin-right:15px;\" onFocus=\"focusOnMe(this);\" OnBlur=\"blurMe(this);\" OnMouseOver=\"focusOnMe(this);\" OnMouseOut=\"blurMe(this);\">";
+	$checkoutButSecond = "<input type=\"button\" onClick=\"javascript:parent.location.href='https://www.usnightvision.com/USNightVision.cgi?curr=products&leAction=VCART';\" value=\"< < < Start Process Over\" class=\"commonInput\" style=\"font-size:12px;font-weight:bold;height:25px;margin-left:15px;\" onFocus=\"focusOnMe(this);\" OnBlur=\"blurMe(this);\" OnMouseOver=\"focusOnMe(this);\" OnMouseOut=\"blurMe(this);\">";
+	$cualStep = "<b>Step1 - $MuaFName at the Checkout Counter</b>";
+}
+
+
+print qq~
+
+<style type="text/css">
+.commonSmall { font-size:11px; line-height:normal; }
+</style>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="100%" align="left" valign=top><br>
+	<!--Start Content Table Wrapper--> 
+<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td colspan="3" width="100%" height="30"><font class="commonMediumB">$cualStep</font></td>
+        </tr>
+        <tr bgcolor="#4C6279"> 
+          <td colspan="3" height="2"><img src="images/spacer.gif" width="100" height="2"></td>
+        </tr>
+        <tr width="100%"> 
+          <td width="1" height="1" bgcolor="#4C6279"><img src="images/spacer.gif" width="1" height="1"></td>
+          <td width="100%" height="60" align="center"><img src="$checkoutMenu" width="351" height="42" border="0"></td>
+          <td width="1" height="1" bgcolor="#4C6279"><img src="images/spacer.gif" width="1" height="1"></td>
+		</tr>
+        <tr bgcolor="#4C6279"> 
+          <td colspan="3" height="2"><img src="images/spacer.gif" width="100" height="2"></td>
+        </tr>
+        <tr width="100%"> 
+          <td width="1" height="1" bgcolor="#4C6279"><img src="images/spacer.gif" width="1" height="1"></td>
+          <td width="100%" align="center">
+<table width="95%" align="center" cellpadding="25" cellspacing="0" border="0">
+<tr><td width="100%" align="center">
+~;
+
+
+################################# ----------------------- >>> Finalize
+if ($FORM{'NextLocation'} eq "Finalize") { 
+	$TotalCartWeight = "$FORM{'TotalCartWeight'}";
+	$TotalShipPrice = "$FORM{'$TotalShipPrice'}";
+	$MuaFinalPrice = "$FORM{'FinalPrice'}";
+	
+	require("STEP4.nsp");
+
+}
+
+
+################################# ----------------------- >>> STEP2
+elsif ($FORM{'NextLocation'} eq "Step3") { 
+
+	$TotalCartWeight = "$FORM{'TotalCartWeight'}";
+	$TotalShipPrice = "$FORM{'$TotalShipPrice'}";
+	$MuaFinalPrice = "$FORM{'FinalPrice'}";
+
+	require("STEP3.nsp");
+
+}
+################################# ----------------------- >>> DoneQuote << NO PURCHASE << COMING DIRECTLY TRHOUGH PRODUCTS.CGI
+elsif ($FORM{'NextLocation'} eq "DoneQuote") {
+	require("DoneQuote.nsp");
+}
+################################# ----------------------- >>> STEP2 << PURCHASES GET HERE ONLY
+elsif ($FORM{'NextLocation'} eq "Step2") { 
+		$TotalCartWeight = "$FORM{'TotalCartWeight'}";
+		require("STEP2.nsp");
+}
+################################# ----------------------- >>> STEP1
+else {
+
+	$TotalCartWeight = "$FORM{'Weight'}";
+	require("STEP1.nsp");
+
+}
+
+
+print qq~
+</td></tr>
+</table>
+		  </td>
+          <td width="1" height="1" bgcolor="#4C6279"><img src="images/spacer.gif" width="1" height="1"></td>
+		</tr>
+      </table>
+
+	  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr bgcolor="#4C6279"> 
+          <td colspan="3" height="2"><img src="images/spacer.gif" width="100" height="2"></td>
+        </tr>
+        <tr width="100%"> 
+          <td width="1" height="1" bgcolor="#4C6279"><img src="images/spacer.gif" width="1" height="1"></td>
+          <td width="50%" height="60" align="left">$checkoutButSecond</td>
+          <td width="50%" height="60" align="right">$checkoutBut</td>
+          <td width="1" height="1" bgcolor="#4C6279"><img src="images/spacer.gif" width="1" height="1"></td>
+		</tr>
+        <tr bgcolor="#4C6279"> 
+          <td colspan="3" height="2"><img src="images/spacer.gif" width="100" height="2"></td>
+        </tr>
+      </table>
+    
+	</td>
+  </tr>
+</table>
+</td>
+  </tr>
+</form>
+</table>
+<br>
+~;
+
+
+	}
+### ------------------------------ >> NOTHING IN CART
+	else {
+		print "Your shopping cart is currently empty.<br><u>Continue shopping</u>";
+	}
+
+	
+sub runLogged1 {
+	$MuaFName = "$cualFNe is";
+	$MuaUsername = "$cualUser<input type=\"hidden\" name=\"Username\" value=\"$cualUser\"><input type=\"hidden\" name=\"UNamePassed\" value=\"YES\">";
+	$readOnly1 = "readonly onmouseover=\"toolTips(event,'Step1Tip1'); return true\" onmouseout=\"tipDown('Step1Tip1')\"";
+	$thyCT = "$cualCT";
+	$thyFName = "$cualFNe";
+	$thyLName = "$cualLNe";
+	$thyEmail = "$cualEmail";
+	$thyUsername = "$cualUser";
+
+	my $sth = $dbh->prepare("SELECT * FROM Customers WHERE Username = '$thyUsername'");
+	$sth->execute or die "Sorry, that Username/Password combination is incorrect, please try again.\n"; 
+	my $row = $sth->fetchrow_arrayref; 
+		$thyCNum = $row->[0];
+		$thyCName = $row->[2];
+		$thyPhone = $row->[4];
+		$thyExt = $row->[5];
+		$thyFax = $row->[6];
+		$thyAddress1 = $row->[7];
+		$thyAddress2 = $row->[8];
+		$thyCity = $row->[9];
+		$thyState = $row->[10];
+		$thyZip = $row->[11];
+		$thyUsername = $row->[16];
+		$thyPass = $row->[17];
+		$thyShipFName = $row->[21];
+		$thyShipLName = $row->[22];
+		$thyShipAddress1 = $row->[23];
+		$thyShipAddress2 = $row->[24];
+		$thyShipCity = $row->[25];
+		$thyShipState = $row->[26];
+		$thyShipZip = $row->[27];
+		$thyPT = $row->[28];
+		$thySeaSeaT = $row->[29];
+		$thySeaSeaN = $row->[30];
+		$thySeaSeaEX = $row->[31];
+		$thyUT = $row->[32];
+		$thySeaSeaT2 = $row->[33];
+		$thySeaSeaN2 = $row->[34];
+		$thySeaSeaEX2 = $row->[35];
+		$thySeaSeaT3 = $row->[36];
+		$thySeaSeaN3 = $row->[37];
+		$thySeaSeaEX3 = $row->[38];
+		$thyAdminID = $row->[39];
+	$sth->finish;
+
+		$thyTArea = substr($thyPhone, 0, 3);
+		$thyTNum = substr($thyPhone, 3, 7);
+		$thyTNum3 = substr($thyPhone, 3, 3);
+		$thyTNum4 = substr($thyPhone, 6, 4);
+
+		$thyFArea = substr($thyFax, 0, 3);
+		$thyFNum = substr($thyFax, 3, 7);
+		$thyFNum3 = substr($thyFax, 3, 3);
+		$thyFNum4 = substr($thyFax, 6, 4);
+
+		$thySeaSeaNS = $thySeaSeaN;
+		$thySeaSeaNS =~ s/-//g;
+		$thySeaSeaNS2 = substr($thySeaSeaNS, 12, 4);
+		$thySeaSeaNSecure = "xxxx-xxxx-xxxx-".$thySeaSeaNS2;
+		$thySeaSeaNSecureUSNV = "<a href=\"https://www.usnightvision.com/sup.cgi?SeeAiDee=0000000024\" alt=\"Click to get CC Information\">xxxx-xxxx-xxxx-" . $thySeaSeaNS2x2 . "</a>";
+
+		$thySeaSeaNSx2 = $thySeaSeaN2;
+		$thySeaSeaNSx2 =~ s/-//g;
+		$thySeaSeaNS2x2 = substr($thySeaSeaNSx2, 12, 4);
+		$thySeaSeaNSecurex2 = "xxxx-xxxx-xxxx-".$thySeaSeaNS2x2;
+		$thySeaSeaNSecureUSNVx2 = "<a href=\"https://www.usnightvision.com/sup.cgi?SeeAiDee=0000000024\" alt=\"Click to get CC Information\">xxxx-xxxx-xxxx-" . $thySeaSeaNS2x2 . "</a>";
+
+		$thySeaSeaNSx3 = $thySeaSeaN3;
+		$thySeaSeaNSx3 =~ s/-//g;
+		$thySeaSeaNS2x3 = substr($thySeaSeaNSx3, 12, 4);
+		$thySeaSeaNSecurex3 = "xxxx-xxxx-xxxx-".$thySeaSeaNS2x3;
+		$thySeaSeaNSecureUSNVx3 = "<a href=\"https://www.usnightvision.com/sup.cgi?SeeAiDee=0000000024\" alt=\"Click to get CC Information\">xxxx-xxxx-xxxx-" . $thySeaSeaNS2x3 . "</a>";
+		
+
+}
+
+sub runLogged2Primary {
+	if ($FORM{'YesToSame'} eq "on") {
+		$thyShipFName = "$FORM{'FName'}";
+		$thyShipLName = "$FORM{'LName'}";
+		$thyShipAddress1 = "$FORM{'Address1'}";
+		$thyShipAddress2 = "$FORM{'Address2'}";
+		$thyShipCity = "$FORM{'City'}";
+		$thyShipState = "$FORM{'State'}";
+		$thyShipZip = "$FORM{'Zip'}";
+	}
+	else {
+		&runLogged1;
+	}
+}
+	
+sub runUnlogged1 {
+	$MuaFName = "You're";
+	$MuaUsername = "Username is your email address<input type=\"hidden\" name=\"Username\" value=\"\"><input type=\"hidden\" name=\"UNamePassed\" value=\"\">";
+	$thyCN = ""; $thyCT = ""; $thyFName = ""; $thyLName = ""; $thyLName = ""; $thyEmail = ""; $thyUsername = ""; $thyPhone = ""; $thyExt = ""; $thyFax = "";
+	$thyAddress1 = ""; $thyAddress2 = ""; $thyCity = ""; $thyState = ""; $thyZip = ""; $thyUsername = ""; $thyPass = ""; $thyShipFName = ""; $thyShipLName = ""; $thyShipAddress1 = ""; $thyShipAddress2 = ""; $thyShipCity = "";
+	$thyShipState = ""; $thyShipZip = ""; $thyPT = ""; $thySeaSeaT = ""; $thySeaSeaN = ""; $thySeaSeaEX = ""; $thyUT = ""; $thyTArea = ""; $thyTNum = ""; $thyFArea = ""; $thyFNum = "";
+}
+
+sub runLogged2 {
+
+	$MuaFName = "$cualFNe is";
+	$MuaUsername = "$cualUser<input type=\"hidden\" name=\"Username\" value=\"$cualUser\"><input type=\"hidden\" name=\"UNamePassed\" value=\"YES\">";
+	$thyCT = "$cualCT";
+	$thyFName = "$cualFNe";
+	$thyLName = "$cualLNe";
+	$thyEmail = "$cualEmail";
+	$thyUsername = "$cualUser";
+
+}
+
+sub runSTEP3 {
+
+	if ($muaIncoming) { $todosLosProductos = ""; }
+	else { print ""; }
+
+		############################################# DUPES
+		$countPosted = 0;
+		if (@multiples) {
+			$CMulti=0;
+			foreach $mul (@multiples) {
+			@muaAccess = 0;
+			@splitN = 0;
+			@esteAcc = 0;
+			@muaSplit = 0;
+			@muaPrices = 0;
+			$totalistico = 0;
+			$esteTotals = 0;
+			$newPrice = 0;
+			$totalWeight = "0.0";
+				@splitMul = split(/-----/,$mul);
+				$count1=0;
+				my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$splitMul[1]'");
+				$sth->execute or die "Unable to execute query\n"; 
+				my @row;
+				while(@row = $sth->fetchrow_array) { 
+					$MainItemName = $row[5];
+					$MainSmallPhoto = $row[8];
+					$MainWeight = $row[11];
+					$totalWeight = $MainWeight * $splitMul[3];
+					push(@allWeights,$totalWeight);
+					if ($cualCT eq "MasterDist") { $MainPrice = $row[12]; }
+					elsif ($cualCT eq "Distributor") { $MainPrice = $row[13]; }
+					elsif ($cualCT eq "Dealer") { $MainPrice = $row[14]; }
+					elsif ($cualCT eq "LawEnforce") { $MainPrice = $row[15]; }
+					else { $MainPrice = $row[16]; }
+					$count1++;
+					if ($MainSmallPhoto ne "" && $MainSmallPhoto ne " ") {
+						if ($muaIncoming eq "Last" || !$muaIncoming) { $MainSmallPhoto =~ s/small_/small2_/g; }
+						$SavedInnerURL = "images/products/$MainSmallPhoto"; 
+						$leP = $SavedInnerURL;
+						$leP =~ s/small/ptitle/g;
+						$leP = "$leP";
+					}
+					else { 
+						$leP = "images/spacer.gif"; 
+						$SavedInnerURL = "images/spacer.gif";
+					}
+					$picture = "<img src='$SavedInnerURL' border='0'>";
+					$MainPrice = sprintf("%.2f", $MainPrice);
+					##single price
+					push(@muaPrices,"$MainPrice-----$CMulti");
+					## if no accessories we need qty price
+					$totalistico1 = $MainPrice * $splitMul[3];
+					$totalistico1 = sprintf("%.2f", $totalistico1);
+				}
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+
+				##### START ACCESSORY DROP IF NECESSARY
+				if ($splitMul[2] =~ "00") {
+					if ($splitMul[2] =~ "," && $CMulti == $splitMul[4]) {
+						@splitN = split(/,/,$splitMul[2]);
+						foreach $splited (@splitN) { push(@muaAccess,$splited); }
+					}
+					elsif ($splitMul[2] ne "NONE" && $CMulti == $splitMul[4]) { push(@muaAccess,$splitMul[2]); }
+
+					$counter2=1;
+					foreach $muaA (@muaAccess) {
+						my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$muaA'");
+						$sth->execute or die "Unable to execute query\n"; 
+						my @row;
+						while(@row = $sth->fetchrow_array) { 
+							$AccItemName = $row[5];
+							$AccSmallPhoto = $row[8];
+							$AccWeight = $row[11];
+							$totalWeight = $AccWeight * $splitMul[3];
+							push(@allWeights,$totalWeight);
+							if ($cualCT eq "MasterDist") { $AccPrice = $row[12]; }
+							elsif ($cualCT eq "Distributor") { $AccPrice = $row[13]; }
+							elsif ($cualCT eq "Dealer") { $AccPrice = $row[14]; }
+							elsif ($cualCT eq "LawEnforce") { $AccPrice = $row[15]; }
+							else { $AccPrice = $row[16]; }
+							if ($muaIncoming eq "Last" || !$muaIncoming) { push(@esteAcc,"$AccWeight-----$AccPrice-----<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$muaA\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$AccItemName</font></a>-----$CMulti"); }
+							else { push(@esteAcc,"$AccWeight-----$AccPrice-----&nbsp;&nbsp;&nbsp;&nbsp;- <a href=\"http://www.usnightvision.com/products.cgi?PID=$muaA\" class=\"commonSmall\" style=\"margin-left:10px;\">$AccItemName</a>-----$CMulti"); }
+							push(@muaPrices,"$AccPrice-----$CMulti");
+						}
+						$sth->execute or die "Unable to execute query\n"; 
+						$sth->finish;
+						$counter2++;				
+					}
+			
+					$esteTotal = $estePrice * $splitMul[3];
+				
+					$CountPrice=0;
+					foreach $muaPrecio (@muaPrices) {
+						@muaSplit = split(/-----/,$muaPrecio);
+						if ($muaSplit[1] == $CMulti) { 
+							$lePrice = sprintf("%.2f", $muaSplit[0]);
+							if ($CountPrice > 0) { $esteTotals = $lePrice * $splitMul[3]; }
+							else { $newPrice = $lePrice * $splitMul[3]; $esteTotals = $newPrice + $esteTotals; }
+						}
+					}
+
+					
+					$totalistico = sprintf("%.2f", $esteTotals);
+
+					## for getting price for just one QUANTITY item					
+					$oldPrice = $totalistico / $splitMul[3];
+					
+					$countPosted++;
+					$myQuantity = "Qty" . $countPosted;
+					$myOldCookieName = "Cookie" . $countPosted;
+					$myOldCookie = "\$$oldPrice-----$splitMul[1]-----$splitMul[2]-----$splitMul[3]";
+
+					$myPrice1 = $MainPrice * $splitMul[3];
+					$MP1 = sprintf("%.2f", $myPrice1);
+
+					if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<tr><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$MainItemName</b></font></a></font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MainPrice</td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitMul[3]</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP1</td><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td></tr>"; }
+					elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b> - <font class=\"commonSmall\" style=\"text-decoration:underline;\">$splitMul[3] Units</a></font>"; }
+					elsif (!$muaIncoming) { $todosLosProductos = $todosLosProductos . "<tr onMouseOver=\"runto2(this,'#B2B2B2');\" onMouseOut=\"runback2(this,'#CCCCCC');\" style=\"background-color:#CCCCCC;cursor:hand;\" onclick=\"javascript:parent.location.href='http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]';\"><td><a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$MainItemName</b></font></a></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MainPrice</td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitMul[3]</font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP1</td></tr>"; }
+					else { print "<font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b> - <a href=\"javascript:void(0);\" class=\"commonSmall\" onMouseOver=\"overlib('<center class=\\'overlibCart\\'>Each unit consists of a Product and all its selected Accessories.</center>');\" onMouseOut=\"return nd();\">$splitMul[3] Units</a></font>"; }
+					
+					$CountThisD=1;
+					foreach $cnfg (@esteAcc) {
+						$CountThisD++;
+						##spacing image under last accessory (3 = 1 Accessory and 4 = 2 and so on and so forth)
+						## for last items only
+						if ($CountThisD eq "$counter2") { 
+							## if last item between 3-5 make specific size space
+							if ($counter2 eq "3") { $muaHeight= "36"; }
+							elsif ($counter2 eq "4") { $muaHeight= "23"; }
+							elsif ($counter2 eq "5") { $muaHeight= "18"; }
+							## otherwise parse common last space
+							else { $muaHeight= "15"; }
+							$extraBreak = "<br>"; 
+							$extraSpacer = "<img src=\"images/spacer.gif\" width=\"50\" height=\"$muaHeight\">";
+						}
+						else { $extraBreak = ""; $extraSpacer = ""; }
+
+						if ($cnfg ne "0") {
+							@splitCnfg = split(/-----/,$cnfg);
+							$muaPrice = $splitCnfg[1];
+							$muaPrice =~ s/\$//g;
+							$muaTotal = $muaPrice * $splitMul[3];
+							sprintf("%.2d", $muaTotal);
+
+							$myPrice2 = $muaPrice * $splitMul[3];
+							$MP2 = sprintf("%.2f", $myPrice2);
+
+							if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<tr><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><i>$splitCnfg[2]</i></font></a></font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$muaPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitMul[3]</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP2</font></td><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td></tr>"; }
+							elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\">&nbsp;&nbsp;&nbsp;&nbsp;$splitCnfg[2]<br> $extraBreak</font>"; }
+							elsif (!$muaIncoming) { $todosLosProductos = $todosLosProductos . "<tr onMouseOver=\"runto2(this,'#B2B2B2');\" onMouseOut=\"runback2(this,'#CCCCCC');\" style=\"background-color:#CCCCCC;cursor:hand;\" onclick=\"javascript:parent.location.href='http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]';\"><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - <a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><i>$splitCnfg[2]</i></font></a></font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$muaPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitMul[3]</font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP2</font></td></tr>"; }
+							else { print "<font class=\"commonSmall\">&nbsp;&nbsp;&nbsp;&nbsp;$splitCnfg[2]<br> $extraBreak</font>"; }
+						}
+						##spacing TR
+						else { 							
+							if ($muaIncoming) { $todosLosProductos = $todosLosProductos . "<br>"; } 
+							else { print "<br>"; } 
+						}
+					}
+					$CMulti++;
+					## for total tally
+					push(@precioTotal,"$totalistico");
+				}
+				###### END ACCESSORIES DROP
+
+				else {
+					$countPosted++;
+					$myQuantity = "Qty" . $countPosted;
+					$myOldCookieName = "Cookie" . $countPosted;
+					$myOldCookie = "\$$MainPrice-----$splitMul[1]-----$splitMul[2]-----$splitMul[3]";
+
+					$myPrice3 = $MainPrice * $splitMul[3];
+					$MP3 = sprintf("%.2f", $myPrice3);
+
+					if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<tr><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$MainItemName</b></font></a></font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MainPrice</td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitMul[3]</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP3</td><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td></tr>"; } 
+					elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b><br><br></font>"; } 
+					elsif (!$muaIncoming) { $todosLosProductos = $todosLosProductos . "<tr onMouseOver=\"runto2(this,'#B2B2B2');\" onMouseOut=\"runback2(this,'#CCCCCC');\" style=\"background-color:#CCCCCC;cursor:hand;\" onclick=\"javascript:parent.location.href='http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]';\"><td><a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$MainItemName</b></font></a></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MainPrice</td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitMul[3]</font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP3</td></tr>"; } 
+					else { print "<font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b><br><br></font>"; }
+
+					## for total tally
+					push(@precioTotal,"$totalistico1");
+				}
+			if ($muaIncoming eq "Last" || !$muaIncoming) { $todosLosProductos = $todosLosProductos . ""; }
+			}
+
+		}
+		############################################# SINGULARES
+		if (@singulares) {
+			foreach $singular (@singulares) {
+			@muaAccess = 0;
+			@splitN = 0;
+			@esteAcc = 0;
+			@muaSplit = 0;
+			@muaPrices = 0;
+			$totalistico = 0;
+			$esteTotals = 0;
+			$newPrice = 0;
+			$totalWeight = "0.0";
+				@splitSing = split(/-----/,$singular);
+				$count1=0;
+				my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$splitSing[1]'");
+				$sth->execute or die "Unable to execute query\n"; 
+				my @row;
+				while(@row = $sth->fetchrow_array) { 
+					$SingItemName = $row[5];
+					$SingSmallPhoto = $row[8];
+					$SingWeight = $row[11];
+					$totalWeight = $SingWeight * $splitSing[3];
+					push(@allWeights,$totalWeight);
+					if ($cualCT eq "MasterDist") { $SingPrice = $row[12]; }
+					elsif ($cualCT eq "Distributor") { $SingPrice = $row[13]; }
+					elsif ($cualCT eq "Dealer") { $SingPrice = $row[14]; }
+					elsif ($cualCT eq "LawEnforce") { $SingPrice = $row[15]; }
+					else { $SingPrice = $row[16]; }
+					push(@muaPrices,"$SingPrice");
+					$count1++;
+					if ($SingSmallPhoto ne "" && $SingSmallPhoto ne " ") { 
+						if ($muaIncoming eq "Last" || !$muaIncoming) { $SingSmallPhoto =~ s/small_/small2_/g; }
+						$SingInnerURL = "images/products/$SingSmallPhoto"; 
+						$leP = $SingInnerURL;
+						$leP =~ s/small/ptitle/g;
+						$leP = "$leP";
+					}
+					else { 
+						$leP = "images/spacer.gif"; 
+						$SingInnerURL = "images/spacer.gif";
+					}
+					$picture = "<img src='$SingInnerURL' border='0'>";
+
+				$SingPrice = sprintf("%.2f", $SingPrice);
+				$Stotalistico1 = $splitSing[3] * $SingPrice;
+				$Stotalistico1 = sprintf("%.2f", $Stotalistico1);
+				
+				##### START ACCESSORY DROP IF NECESSARY
+				if ($splitSing[2] =~ "00") {
+					if ($splitSing[2] =~ "," && $CMulti2 == $splitSing[4]) {
+						@splitN = split(/,/,$splitSing[2]);
+						foreach $splited (@splitN) { push(@muaAccess,$splited); }
+					}
+					elsif ($splitSing[2] ne "NONE" && $CMulti2 == $splitSing[4]) { push(@muaAccess,$splitSing[2]); }
+
+					$counteie=1;
+					foreach $muaA (@muaAccess) {
+						my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$muaA'");
+						$sth->execute or die "Unable to execute query\n"; 
+						my @row;
+						while(@row = $sth->fetchrow_array) { 
+							$AccItemName = $row[5];
+							$AccSmallPhoto = $row[8];
+							$AccWeight = $row[11];
+							$totalWeight = $AccWeight * $splitSing[3];
+							push(@allWeights,$totalWeight);
+							if ($cualCT eq "MasterDist") { $AccPrice = $row[12]; }
+							elsif ($cualCT eq "Distributor") { $AccPrice = $row[13]; }
+							elsif ($cualCT eq "Dealer") { $AccPrice = $row[14]; }
+							elsif ($cualCT eq "LawEnforce") { $AccPrice = $row[15]; }
+							else { $AccPrice = $row[16]; }
+							if ($muaIncoming eq "Last" || !$muaIncoming) { push(@esteAcc,"$AccWeight-----$AccPrice-----<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$muaA\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$AccItemName</font></a>-----$CMulti2"); }
+							else { push(@esteAcc,"$AccWeight-----$AccPrice-----&nbsp;&nbsp;&nbsp;&nbsp;- <a href=\"http://www.usnightvision.com/products.cgi?PID=$muaA\" class=\"commonSmall\" style=\"margin-left:10px;\">$AccItemName</a>-----$CMulti2"); }
+							push(@muaPrices,"$AccPrice");
+						}
+						$sth->execute or die "Unable to execute query\n"; 
+						$sth->finish;
+						$counteie++;				
+					}
+			
+					$esteTotal = $estePrice * $splitSing[3];
+				
+					$CountPrice=0;
+					foreach $muaPrecio (@muaPrices) {
+						$lePrice = sprintf("%.2f", $muaPrecio);
+						if ($CountPrice > 0) { $esteTotals = $lePrice * $splitSing[3]; }
+						else { $newPrice = $lePrice * $splitSing[3]; $esteTotals = $newPrice + $esteTotals; }
+					}
+
+					$Stotalistico = sprintf("%.2f", $esteTotals);
+
+				## for getting price for just one QUANTITY item					
+				$oldPrice = $Stotalistico / $splitSing[3];
+
+				$countPosted++;
+				$myQuantity = "Qty" . $countPosted;					
+				$myOldCookieName = "Cookie" . $countPosted;
+				$myOldCookie = "\$$oldPrice-----$splitSing[1]-----$splitSing[2]-----$splitSing[3]";
+
+				$myPrice4 = $SingPrice * $splitSing[3];
+				$MP4 = sprintf("%.2f", $myPrice4);
+
+				if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<tr><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$SingItemName</b></font></a></font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$SingPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">1</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP4</font></td><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td></tr>"; } 
+				elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b> - <font class=\"commonSmall\" style=\"text-decoration:underline;\">$splitSing[3] Unit</font><br></font>"; } 
+				elsif (!$muaIncoming) { $todosLosProductos = $todosLosProductos . "<tr onMouseOver=\"runto2(this,'#B2B2B2');\" onMouseOut=\"runback2(this,'#CCCCCC');\" style=\"background-color:#CCCCCC;cursor:hand;\" onclick=\"javascript:parent.location.href='http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]';\"><td><a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$SingItemName</b></font></a></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$SingPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">1</font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP4</font></td></tr>"; } 
+				else { print "<font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b> - <a href=\"javascript:void(0);\" class=\"commonSmall\" onMouseOver=\"overlib('<center class=\\'overlibCart\\'>Each unit consists of a Product and all its selected Accessories.</center>');\" onMouseOut=\"return nd();\">$splitSing[3] Unit</a><br></font>"; }
+
+					$CountThisS = 1;
+					foreach $cnfg (@esteAcc) {
+						$CountThisS++;
+						##spacing image under last accessory (3 = 1 Accessory and 4 = 2 and so on and so forth)
+						## for last items only
+						if ($CountThisS eq "$counteie") { 
+							## if last item between 3-5 make specific size space
+							if ($counteie eq "3") { $muaHeight= "36"; }
+							elsif ($counteie eq "4") { $muaHeight= "23"; }
+							elsif ($counteie eq "5") { $muaHeight= "18"; }
+							## otherwise parse common last space
+							else { $muaHeight= "15"; }
+							$extraBreak = "<br>"; 
+							$extraSpacer = "<img src=\"images/spacer.gif\" width=\"50\" height=\"$muaHeight\">";
+						}
+						else { $extraBreak = ""; $extraSpacer = ""; }
+						
+						if ($cnfg ne "0") {
+							@splitCnfg = split(/-----/,$cnfg);
+							$muaPrice = $splitCnfg[1];
+							$muaPrice =~ s/\$//g;
+
+							$muaTotal = $muaPrice * $splitSing[3];
+							sprintf("%.2d", $muaTotal);
+
+							$myPrice5 = $muaPrice * $splitSing[3];
+							$MP5 = sprintf("%.2f", $myPrice5);
+
+							if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<tr><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><i>$splitCnfg[2]</i></font></a></font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$muaPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitSing[3]</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP5</font></td><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td></tr>"; } 
+							elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\" valign=\"top\">&nbsp;&nbsp;&nbsp;&nbsp;$splitCnfg[2]<br> $extraBreak</font>"; } 
+							elsif (!$muaIncoming) { $todosLosProductos = $todosLosProductos . "<tr onMouseOver=\"runto2(this,'#B2B2B2');\" onMouseOut=\"runback2(this,'#CCCCCC');\" style=\"background-color:#CCCCCC;cursor:hand;\" onclick=\"javascript:parent.location.href='http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]';\"><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - <a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><i>$splitCnfg[2]</i></font></a></font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$muaPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$splitSing[3]</font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP5</font></td></tr>"; } 
+							else { print "<font class=\"commonSmall\" valign=\"top\">&nbsp;&nbsp;&nbsp;&nbsp;$splitCnfg[2]<br> $extraBreak</font>"; }
+						}
+						##spacing TR
+						else { 
+							if ($muaIncoming) { $todosLosProductos = $todosLosProductos . "<br>"; } 
+							else { print "<br>"; } 
+						 }
+					}
+					$CMulti2++;
+
+					## for total tally
+					push(@precioTotal,"$Stotalistico");
+				}
+				###### END ACCESSORIES DROP
+				
+				else {
+					$countPosted++;
+					$myQuantity = "Qty" . $countPosted;		
+					$myOldCookieName = "Cookie" . $countPosted;
+					$myOldCookie = "$splitSing[0]-----$splitSing[1]-----$splitSing[2]-----$splitSing[3]";
+
+					$myPrice6 = $SingPrice * $splitSing[3];
+					$MP6 = sprintf("%.2f", $myPrice6);
+
+					if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<tr><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td><td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$SingItemName</b></font></a></font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$SingPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">1</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP6</font></td><td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td></tr>"; }
+					elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b><br><br></font>"; }
+					elsif (!$muaIncoming) { $todosLosProductos = $todosLosProductos . "<tr onMouseOver=\"runto2(this,'#B2B2B2');\" onMouseOut=\"runback2(this,'#CCCCCC');\" style=\"background-color:#CCCCCC;cursor:hand;\" onclick=\"javascript:parent.location.href='http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]';\"><td><a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitSing[1]\" target=\"_parent\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$SingItemName</b></font></a></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$SingPrice</font></td><td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">1</font></td><td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$MP6</font></td></tr>"; }
+					else { print "<font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b><br><br></font>"; }
+
+					## for total tally
+					push(@precioTotal,"$Stotalistico1");
+
+				}
+
+				}
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+			}
+
+		}
+
+				## sub total
+				if (!$muaIncoming) {
+					$CTT = sprintf("%.2f", $cartTotal);
+				}
+
+				
+### ------------------------------ >> SHOPPING AS CUSTOMER - ADDED PRODUCTS IN CART
+if ($custUName =~ "@" && $Cookies{'AP'} =~ "xxxxx" && $Cookies{'APC'} >= 1) {
+@splitAP2 = split(/xxxxx/,$Cookies{'AP'});
+$daapci2=0;
+foreach (1 .. $Cookies{'APC'}) {
+		@SAP2 = split(/-----/,$splitAP2[$daapci2]);
+		###### NO NEED TO REPUSH WEIGHTS TO CART, ALREADY SAVED FROM STEP 1
+		###### NEED PRICING TO BE PUSHED, NOT SAVED FROM STEP 1
+		if ($SAP2[0] =~ "\$") { $SAP2[0] =~ s/\$//g; }
+		## Price x Quantity
+		$APTotal2 = $SAP2[0] * $SAP2[3];
+		$SAP2[0] = sprintf("%.2f", $SAP2[0]);
+		$APTotaled2 = sprintf("%.2f", $APTotal2);
+		## Weight x Quantity
+		$APWeight2 = $SAP2[4] * $SAP2[3];
+
+
+		if ($muaIncoming eq "Last") { 
+			$todosLosProductos = $todosLosProductos . "
+			<tr>
+				<td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td>
+				<td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>$SAP2[2]</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><i>* Non Inventory Item</i></font></td>
+				<td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">\$$SAP2[0]</font></td>
+				<td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$SAP2[3]</font></td>
+				<td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">\$$APTotaled2</font></td>
+				<td width=\"5%\"><font face=\"arial\" size=\"2\" color=\"#000000\">&nbsp;</font></td>
+			</tr>
+			"; 
+		}
+		elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\"><b>$SAP2[2]</b><br> <i>* Non Inventory Item</i><br><br></font>"; }
+		elsif (!$muaIncoming) { 
+			$todosLosProductos = $todosLosProductos . "
+			<tr onMouseOver=\"runto2(this,'#B2B2B2');\" onMouseOut=\"runback2(this,'#CCCCCC');\" style=\"background-color:#CCCCCC;cursor:hand;\">
+				<td><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\"><b>$SAP2[2]</b><br> <i>* Non Inventory Item</i></font></td>
+				<td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">\$$SAP2[0]</font></td>
+				<td align=\"center\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">$SAP2[3]</font></td>
+				<td align=\"right\"><font face=\"Verdana,Arial,Helevetica\" size=\"1\" color=\"#000000\">\$$APTotaled2</font></td>
+			</tr>
+			"; 
+		}
+		else { print "<font class=\"commonSmall\"><b>$SAP2[2]</b><br> <i>* Non Inventory Item</i><br><br></font>"; }
+		
+#		print "<tr><td bgcolor=\"#4C6279\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td>";
+#		print "<td height=\"20\" width=\"160\" align=\"center\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"160\" height=\"1\"></td>";
+#		print "<td height=\"20\" width=\"100%\" valign=\"top\"><font class=\"commonSmall\"><b>$SAP2[2]</b><br>- <i>* Non Inventory Item</i></font></td>";
+#		print "<td height=\"20\" align=\"center\" valign=\"top\"><font class=\"commonSmall\"><b>$SAP2[4]</b></font></td>";
+#		print "<td height=\"20\" align=\"center\" valign=\"top\"><font class=\"commonSmall\"><b>$SAP2[0]</b></font></td>";
+#		print "<td height=\"20\" align=\"center\" valign=\"top\"><font class=\"commonSmall\"><b>$SAP2[3]</b></font></td>";
+#		print "<td height=\"20\" align=\"center\" valign=\"top\"><font class=\"commonSmall\"><b>\$$APTotaled2</b></font></td>";
+#		print "<td bgcolor=\"#4C6279\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td></tr>";
+#		print "<tr bgcolor=\"#4C6279\"><td width=\"1\" height=\"1\" colspan=\"8\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td></tr>";				
+		## for total tally
+
+
+		$daapci2++;
+	}
+}	
+				
+		
+}
+## disconnect DB connection
+$dbh->disconnect; 
+
+
+
+
+exit;

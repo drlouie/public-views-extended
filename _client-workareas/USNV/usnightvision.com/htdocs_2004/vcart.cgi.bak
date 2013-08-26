@@ -1,0 +1,481 @@
+#!/usr/bin/perl5 -s
+
+###########################################################################################################
+# Company: ©2001 NetMedia Solutions                                                                             #
+# Date: Saturday, September 21, 2001                                                                      #
+# Location: Los Angeles County, California, United States of America                                      #
+# Made By: Luis Rodriguez (drlouie)                                                                       #
+# Email: Drlouie@NetMediaSol.com                                                                          #
+#                                                                                                         #
+# This program cannot be duplicated, distributed or re-used for any other purpose other than its original #
+# intended purpose and function. You may request NetMedia Solutions for a copy of the script,             #
+# personalized to fit your exact needs for a small re-programming fee.                                    #
+###########################################################################################################
+
+require ("parse_query.nsp");
+
+require ("referer.nsp"); 
+## Snif cookie, if present test for logged in status
+require ("cookiesnif.nsp");
+##################################### if re-cookieing
+if ($FORM{'RECART'} eq "1") {
+
+foreach $muaPieza (@Todo_Form) {
+	if (($muaPieza ne "leAction-----VCART" && $muaPieza ne "RECART-----1") && $muaPieza ne "afterDone-----" && $muaPieza ne "afterDone-----CHECKOUT") {
+		if ($muaPieza =~ "Cookie") {
+			push(@todosCookie,"$muaPieza");
+		}
+		else {
+			push(@todosQty,"$muaPieza");
+		}
+	}
+}
+$counter=0;
+$oldPrice=0;
+$newPrice=0;
+foreach $esteC (@todosCookie) {
+	if ($esteC =~ "extraP") { 
+		@splitC1 = split(/-----xxxxx/,$esteC);
+		push(@todosAP,"$splitC1[0]"); 
+	}
+	@splitC = split(/-----/,$esteC);
+	$newCount = $todosQty[$counter];
+	@splitCounter = split(/-----/,$newCount);
+	if ($splitCounter[1] > 0) {
+		## give new cookie parameters
+		$newCookie = "$splitC[1]-----$splitC[2]-----$splitC[3]-----$splitCounter[1]"; 
+		push(@todosNew,"$newCookie");
+	}
+	$counter++;
+}
+
+if ($FORM{'APC'} >= "1" && $FORM{'extraP_name_1'} ne "" && $FORM{'extraP_weight_1'} ne "" && $FORM{'extraP_price_1'} ne "" && $FORM{'extraP_qty_1'} ne "") {
+	$APCinner = "$FORM{'APC'}";
+	$apci=1;
+	foreach (1 .. $APCinner) {
+		push(@todosAP,"\$$FORM{'extraP_price_' . $apci}-----AP000$apci-----$FORM{'extraP_name_' . $apci}-----$FORM{'extraP_qty_' . $apci}-----$FORM{'extraP_weight_' . $apci}");
+		$apci++;
+	}
+}
+
+
+##print "<script>alert('@todosNew');</script>";
+##finally bring it to one item divided by (xxxxx) for each drop
+$myCartContent = "";
+foreach $esteDrop (@todosNew) {
+	$myCartContent = $myCartContent . $esteDrop . "-----xxxxx";
+}
+$myCartContent2 = "";
+foreach $esteDropAP (@todosAP) {
+	$myCartContent2 = $myCartContent2 . $esteDropAP . "-----xxxxx";
+}
+
+print "Content-type: text/html\n";
+&SetCookies('Shicar',$myCartContent);
+if (!$Cookies{'AP'}) {
+	&SetCookies('AP',$myCartContent2);
+	&SetCookies('APC',$FORM{'APC'});
+}
+print "\n";
+
+if ($FORM{'afterDone'} eq "CHECKOUT") { print "<html><script language=\"javascript\">function runCartAgain() { parent.upper.document.forms[0].leAction.value = 'CHECKOUT'; parent.upper.document.forms[0].target = 'upper'; parent.upper.document.forms[0].action = 'products.cgi'; parent.upper.document.forms[0].submit(); }</script><body bgcolor=\"#4d4d4d\" onload=\"runCartAgain();\"></body>"; }
+else { print "<html><script language=\"javascript\">function runCartAgain() { parent.location.href = \"https://www.usnightvision.com/USNightVision.cgi?curr=products&leAction=VCART\"; }</script><body bgcolor=\"#4d4d4d\" onload=\"runCartAgain();\"></body>"; }
+
+print "</html>";
+}
+
+###################################### else show cart
+else {
+### ------------------------------ >> WITH SOMETHING IN CART
+	if ($Cookies{'Shicar'} =~ "xxxxx") {
+	### QUERY DB
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:unvWeb","root","chinga2") or die "Unable to connect to database: <b>unvWeb</b>\n"; 
+	$dbh->{RaiseError} = 1; 
+
+		## if more than one drop
+		@EstosShoozoom = split(/xxxxx/, $Cookies{'Shicar'});
+		
+		$counter=0;
+		$items=1;
+		$CMultiples=0;
+		$CSingulars=0;
+		## counting total dollar amount
+		foreach $EsteCOSTAS (@EstosShoozoom) {
+			@leItem = split(/-----/,$EsteCOSTAS);
+			$leItem[0] =~ s/\$//g;
+			sprintf("%.2d", $leItem[0]);
+			if ($counter eq "0") { 
+				$cartTotal = $leItem[0] * $leItem[3];
+				$itemTotal = ""; 
+			}
+			else {
+				$newTotal = $leItem[0] * $leItem[3];
+				$cartTotal = $newTotal + $cartTotal;
+			}
+			push(@multipliers,"$leItem[3]");
+			push(@numeros,"$leItem[1]-----$leItem[2]");
+			## only if count is higher than 1 which makes for dupe
+			if ($leItem[3] > 1) { push(@multiples,"$leItem[0]-----$leItem[1]-----$leItem[2]-----$leItem[3]-----$CMultiples"); $CMultiples++; }
+			else { push(@singulares,"$leItem[0]-----$leItem[1]-----$leItem[2]-----$leItem[3]-----$CSingulars"); $CSingulars++; }
+			$counter++;
+		
+			if($counter eq "0") { $realCount = $muaMultiplier * $items; }
+			else { $newCount = $muaMultiplier * $items; $realCount = $realCount + $newCount; }
+
+		}
+		##FIRST GRAB FULL COUNT FOR EACH DROP
+		foreach $Numero (@numeros) {
+			@thyItem = split(/-----/,$Numero);
+			$esteCosita=0;
+			foreach $thyItem (@thyItem) {
+				if ($thyItem =~ ",") {
+					@splitN = split(/,/,$Numero);
+					$muaCNT=0;
+					foreach $splited (@splitN) { 
+						$esteCosita++;
+					}
+				}
+				elsif ($thyItem ne "NONE") { $esteCosita++; }
+			}
+			push(@itemsPerSet,$esteCosita);
+		}
+
+		$countie=0;
+		## THEN MULTIPLY USING THE MULTIPLIERS RETRIEVED IN FIRST METHOD
+		foreach $itps (@itemsPerSet) {
+			$leCountie = $multipliers[$countie];
+			$muaC = $itps * $leCountie;
+			push(@allCs,$muaC);
+			$countie++;
+		}
+		## FINALLY ADD ALL PIECES TOGETHER FOR FINAL
+		foreach $meC (@allCs) {
+			if ($ccnt eq "0") { $leFC = $meC; }
+			else { $leFC = $leFC + $meC; }
+		}
+
+		
+		sprintf("%.2d", $cartTotal);
+		sprintf("%.2d", $leFC);
+
+	if ($custUName =~ "@") { $MuaFName = "$Cookies{'SaShFn'}'s"; }
+	elsif ($Cookies{'FNe'} ne "") { $MuaFName = "$Cookies{'FNe'}'s"; }
+	else { $MuaFName = "Your"; }
+	
+print qq~
+
+<style type="text/css">
+.commonSmall { font-size:11px; line-height:normal; }
+</style>
+
+<script language="Javascript">
+
+function checkInputQty(val) {
+   	var key = window.event.keyCode;
+	var leValue= val.value;
+
+	// if Key is right submit form
+	if (key == "13") { runUCart(); }
+   // key numeric?
+   	if (key > 47 && key < 58) {
+		leValue = val.value;
+		return; 
+	}
+	else {
+		// discard
+    	window.event.returnValue = null;
+	}
+}
+
+
+function checkEPPrice(val) {
+   	var key = window.event.keyCode;
+	var leValue= val.value;
+
+	// if Key is right submit form
+	if (key == "13") { runUCart(); }
+	
+   // key numeric?
+   	if ((key > 47 && key < 58) || key == 46) {
+		leValue = val.value;
+		return; 
+	}
+	else {
+		// discard
+    	window.event.returnValue = null;
+	}
+}
+
+
+function checkEPWeight(val) {
+   	var key = window.event.keyCode;
+	var leValue= val.value;
+
+	// if Key is right submit form
+	if (key == "13") { runUCart(); }
+	
+   // key numeric?
+   	if ((key > 47 && key < 58) || key == 46) {
+		leValue = val.value;
+		return; 
+	}
+	else {
+		// discard
+    	window.event.returnValue = null;
+	}
+}
+
+function runUCart() {
+	document.cart.target = 'lower';
+	document.cart.leAction.value = 'VCART';
+	document.cart.submit();
+}
+
+function runCheckout() {
+	document.cart.target = 'lower';
+	document.cart.leAction.value = 'VCART';
+	document.cart.afterDone.value = 'CHECKOUT';
+	document.cart.submit();
+}
+</script>
+<form name="cart" method="post" action="vcart.cgi" target="">
+<input type="hidden" name="leAction" value="VCART">
+<input type="hidden" name="RECART" value="1">
+<input type="hidden" name="afterDone" value="">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="100%" align="left" valign=top><br>
+	<!--Start Content Table Wrapper--> 
+<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+		  <td colspan="8" width="100%" height="30">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    			<tr> 
+					<td width="50%"><font class="commonMediumB"><b>$MuaFName Shopping Cart</b></font></td>
+		  			<td width="50%" align="right"><nobr><font class="commonMediumB"><font style="color:#FFFFFF">< < < <a href="/" target="_parent" class="commonSmall" onmouseover="toolTips(event,'tip9'); return true" onmouseout="tipDown('tip9')" style="font-size:11px;color:#FFFFFF">Continue Shopping</a> < < <</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" class="commonSmall" onmouseover="toolTips(event,'tip2'); return true" onmouseout="tipDown('tip2')" style="font-size:9px;font-weight:normal;">Cart Terminology</a></font></nobr></td></td>
+	        	</tr>
+   			</table>
+        </tr>
+	    <tr bgcolor="#4991DE"> 
+          <td colspan="8" height="3"><img src="images/spacer.gif" width="3" height="3"></td>
+        </tr>
+        <tr width="100%"> 
+          <td width="1" height="1"><img src="images/spacer.gif" width="1" height="1"></td>
+          <td height="1" colspan="2"><img src="images/spacer.gif" width="150" height="1"></td>
+          <td width="75" height="1"><img src="images/spacer.gif" width="50" height="1"></td>
+          <td width="100" height="1"><img src="images/spacer.gif" width="100" height="1"></td>
+          <td width="75" height="1"><img src="images/spacer.gif" width="50" height="1"></td>
+          <td width="100" height="1"><img src="images/spacer.gif" width="100" height="1"></td>
+          <td width="1" height="1"><img src="images/spacer.gif" width="1" height="1"></td>
+		</tr>
+        <tr> 
+          <td bgcolor="#4991DE"><img src="images/spacer.gif" width="1" height="1"></td>
+          <td height="20" colspan="2" align="center"><font class="commonSmall">Selected Product(s)</font></td>
+          <td height="20" align="center"><font class="commonSmall"><a href="javascript:void(0);" class="commonSmall" onmouseover="toolTips(event,'tip3'); return true" onmouseout="tipDown('tip3')">Weight</a></font></td>
+          <td height="20" align="center"><font class="commonSmall"><a href="javascript:void(0);" class="commonSmall" onmouseover="toolTips(event,'tip4'); return true" onmouseout="tipDown('tip4')">Price</a></font></td>
+          <td height="20" align="center"><font class="commonSmall"><a href="javascript:void(0);" class="commonSmall" onmouseover="toolTips(event,'tip5'); return true" onmouseout="tipDown('tip5')">Quantity</a></font></td>
+          <td height="20" align="center"><font class="commonSmall"><a href="javascript:void(0);" class="commonSmall" onmouseover="toolTips(event,'tip6'); return true" onmouseout="tipDown('tip6')">Totals</a></font></td>
+          <td bgcolor="#4991DE"><img src="images/spacer.gif" width="1" height="1"></td>
+		</tr>
+        <tr bgcolor="#4991DE"> 
+          <td colspan="8" height="3"><img src="images/spacer.gif" width="3" height="3"></td>
+        </tr>
+~;
+		############################################# DUPES
+		$countPosted = 0;
+		if (@multiples) {
+			$CMulti=0;
+			foreach $mul (@multiples) {
+			@muaAccess = 0;
+			@splitN = 0;
+			@esteAcc = 0;
+			@muaSplit = 0;
+			@muaPrices = 0;
+			$totalistico = 0;
+			$esteTotals = 0;
+			$newPrice = 0;
+			$totalWeight = "0.0";
+				@splitMul = split(/-----/,$mul);
+				$count1=0;
+				my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$splitMul[1]'");
+				$sth->execute or die "Unable to execute query\n"; 
+				my @row;
+				while(@row = $sth->fetchrow_array) { 
+					$MainItemName = $row[5];
+					$MainSmallPhoto = $row[8];
+					$MainWeight = $row[11];
+
+					if ($custUName =~ "@") {
+						## NOW YOU KNOW
+						if ($custTipo eq "MasterDist") { $MainPrice = $row[12]; }
+						elsif ($custTipo eq "Distributor") { $MainPrice = $row[13]; }
+						elsif ($custTipo eq "Dealer") { $MainPrice = $row[14]; }
+						elsif ($custTipo eq "LawEnforce") { $MainPrice = $row[15]; }
+						else { $MainPrice = $row[16]; }
+					}
+					elsif ($Cookies{'Logged'} eq "SI") {
+						if ($Cookies{'CT'} eq "MasterDist") { $MainPrice = $row[12]; }
+						elsif ($Cookies{'CT'} eq "Distributor") { $MainPrice = $row[13]; }
+						elsif ($Cookies{'CT'} eq "Dealer") { $MainPrice = $row[14]; }
+						elsif ($Cookies{'CT'} eq "LawEnforce") { $MainPrice = $row[15]; }
+						else { $MainPrice = $row[16]; }
+					}
+					else { $MainPrice = $row[16]; }
+
+				}
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+
+				$totalWeight = $MainWeight * $splitMul[3];
+				push(@allWeights,$totalWeight);
+
+
+
+				$count1++;
+				$MainPrice = sprintf("%.2f", $MainPrice);
+				##single price
+				push(@muaPrices,"$MainPrice-----$CMulti");
+				## if no accessories we need qty price
+				$totalistico1 = $MainPrice * $splitMul[3];
+				$totalistico1 = sprintf("%.2f", $totalistico1);
+			
+			my $sth = $dbh->prepare("SELECT * FROM Images WHERE ImageID='$MainSmallPhoto';");
+			$sth->execute or die "Unable to execute query\n"; 
+			my @row;
+				while(@row = $sth->fetchrow_array) { 
+					$FileName = $row[2];
+					$count++;
+			}
+			$sth->execute or die "Unable to execute query\n"; 
+			$sth->finish;
+
+			if ($FileName ne "" && $FileName ne " ") { $SavedInnerURL = "images/products/$FileName"; }
+			else { $SavedInnerURL = "images/spacer.gif"; }
+				
+
+					$picture = "<img src='$SavedInnerURL' border='0'>";
+
+
+
+
+				##### START ACCESSORY DROP IF NECESSARY
+				if ($splitMul[2] =~ "00") {
+					if ($splitMul[2] =~ "," && $CMulti == $splitMul[4]) {
+						@splitN = split(/,/,$splitMul[2]);
+						foreach $splited (@splitN) { push(@muaAccess,$splited); }
+					}
+					elsif ($splitMul[2] ne "NONE" && $CMulti == $splitMul[4]) { push(@muaAccess,$splitMul[2]); }
+
+					$counter2=1;
+					foreach $muaA (@muaAccess) {
+						my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$muaA'");
+						$sth->execute or die "Unable to execute query\n"; 
+						my @row;
+						while(@row = $sth->fetchrow_array) { 
+							$AccItemName = $row[5];
+							$AccSmallPhoto = $row[8];
+							$AccWeight = $row[11];
+							$totalWeight = $AccWeight * $splitMul[3];
+							push(@allWeights,$totalWeight);
+							if ($custUName =~ "@") {
+								## NOW YOU KNOW
+								if ($custTipo eq "MasterDist") { $AccPrice = $row[12]; }
+								elsif ($custTipo eq "Distributor") { $AccPrice = $row[13]; }
+								elsif ($custTipo eq "Dealer") { $AccPrice = $row[14]; }
+								elsif ($custTipo eq "LawEnforce") { $AccPrice = $row[15]; }
+								else { $AccPrice = $row[16]; }
+							}
+							elsif ($Cookies{'Logged'} eq "SI") {
+								if ($Cookies{'CT'} eq "MasterDist") { $AccPrice = $row[12]; }
+								elsif ($Cookies{'CT'} eq "Distributor") { $AccPrice = $row[13]; }
+								elsif ($Cookies{'CT'} eq "Dealer") { $AccPrice = $row[14]; }
+								elsif ($Cookies{'CT'} eq "LawEnforce") { $AccPrice = $row[15]; }
+								else { $AccPrice = $row[16]; }
+							}
+							else { $AccPrice = $row[16]; }
+
+							push(@esteAcc,"$AccWeight-----$AccPrice-----&nbsp;&nbsp;&nbsp;&nbsp;- <a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$muaA\" target=\"_parent\" class=\"commonSmall\"style=\"margin-left:10px;\">$AccItemName</a>-----$CMulti");
+							push(@muaPrices,"$AccPrice-----$CMulti");
+						}
+						$sth->execute or die "Unable to execute query\n"; 
+						$sth->finish;
+						$counter2++;				
+					}
+			
+					$esteTotal = $estePrice * $splitMul[3];
+				
+					$CountPrice=0;
+					foreach $muaPrecio (@muaPrices) {
+						@muaSplit = split(/-----/,$muaPrecio);
+						if ($muaSplit[1] == $CMulti) { 
+							$lePrice = sprintf("%.2f", $muaSplit[0]);
+							if ($CountPrice > 0) { $esteTotals = $lePrice * $splitMul[3]; }
+							else { $newPrice = $lePrice * $splitMul[3]; $esteTotals = $newPrice + $esteTotals; }
+						}
+					}
+
+					
+					$totalistico = sprintf("%.2f", $esteTotals);
+
+					## for getting price for just one QUANTITY item					
+					$oldPrice = $totalistico / $splitMul[3];
+					
+					$countPosted++;
+					$myQuantity = "Qty" . $countPosted;
+					$myOldCookieName = "Cookie" . $countPosted;
+					$myOldCookie = "\$$oldPrice-----$splitMul[1]-----$splitMul[2]-----$splitMul[3]";
+					print "<tr><td bgcolor=\"#4991DE\" rowspan=\"$counter2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td>";
+					print "<td height=\"20\" width=\"150\" style=\"padding:10px;\" rowspan=\"$counter2\" align=\"center\" valign=\"top\">$picture<br><img src=\"images/spacer.gif\" width=\"150\" height=\"1\"></td>";
+					print "<td height=\"20\" width=\"100%\" style=\"padding:10px;\" valign=\"top\"><font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/USNightVision.cgi?curr=products&PID=$splitMul[1]\" target=\"_parent\" class=\"commonSmall\"style=\"margin-left:10px;\">$MainItemName</a></b><div style=\"position:relative;top:27px;left:15px;\"><i>Acccessories Selected for this NV System</i></div></font></td>";
+					print "<td height=\"20\" style=\"padding:10px;\" align=\"center\" valign=\"top\"><font class=\"commonSmall\"><b>$MainWeight</b></font></td>";
+					print "<td height=\"20\" style=\"padding:10px;\" align=\"center\" valign=\"top\"><font class=\"commonSmall\"><b>\$$MainPrice</b></font></td>";
+					print "<td height=\"20\" style=\"padding:10px;\" align=\"center\" valign=\"top\" rowspan=\"$counter2\"><input type=\"hidden\" name=\"$myOldCookieName\" value=\"$myOldCookie\"><input type=\"text\" onFocus=\"focusOnMe(this);\" OnBlur=\"blurMe(this);\" size=\"2\" name=\"$myQuantity\" value=\"$splitMul[3]\" class=\"commonInput\" style=\"text-align:center\" OnKeyPress=\"checkInputQty(this);\"  onmouseover=\"toolTips(event,'tip1'); return true\" onmouseout=\"tipDown('tip1')\"></td>";
+					print "<td height=\"20\" style=\"padding:10px;\" align=\"center\" valign=\"top\" rowspan=\"$counter2\"><font class=\"commonSmall\"><b>\$$totalistico</b></font></td>";
+					print "<td bgcolor=\"#4991DE\" rowspan=\"$counter2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td></tr>";
+
+					$CountThisD=1;
+					foreach $cnfg (@esteAcc) {
+						$CountThisD++;
+						##spacing image under last accessory (3 = 1 Accessory and 4 = 2 and so on and so forth)
+						## for last items only
+						if ($CountThisD eq "$counter2") { 
+							## if last item between 3-5 make specific size space
+							if ($counter2 eq "3") { $muaHeight= "36"; }
+							elsif ($counter2 eq "4") { $muaHeight= "23"; }
+							elsif ($counter2 eq "5") { $muaHeight= "18"; }
+							## otherwise parse common last space
+							else { $muaHeight= "15"; }
+							$extraBreak = "<br>"; 
+							$extraSpacer = "<img src=\"images/spacer.gif\" width=\"50\" height=\"$muaHeight\">";
+						}
+						else { $extraBreak = ""; $extraSpacer = ""; }
+
+						if ($cnfg ne "0") {
+							@splitCnfg = split(/-----/,$cnfg);
+							$muaPrice = $splitCnfg[1];
+							$muaPrice =~ s/\$//g;
+							$muaTotal = $muaPrice * $splitMul[3];
+							sprintf("%.2d", $muaTotal);
+							print "<tr>";
+							print "<td valign=\"top\"><font class=\"commonSmall\"><div style=\"margin-left:15px;\">$splitCnfg[2]</div> $extraSpacer</font></td>";
+							print "<td align=\"center\" valign=\"top\"><font class=\"commonSmall\">$splitCnfg[0] $extraBreak$extraSpacer</font></td>";
+							print "<td align=\"center\" valign=\"top\"><font class=\"commonSmall\">$splitCnfg[1] $extraBreak$extraSpacer</font></td>";
+							print "</tr>";
+						}
+						##spacing TR
+						else { print "<tr><td height=\"20\" colspan=\"3\"><img src=\"images/spacer.gif\" border=\"0\" width=\"150\" height=\"20\"></td></tr>"; }
+					}
+					print "<tr bgcolor=\"#4991DE\"><td width=\"1\" height=\"1\" colspan=\"8\"><img src=\"images/spacer.gif\" width=\"1\" height=\"1\"></td></tr>";
+					$CMulti++;
+					## for total tally
+					push(@precioTotal,"$totalistico");
+				}
+				###### END ACCESSORIES DROP
+
+				else {
+					$countPosted++;
+					$myQuantity = "Qty" . $

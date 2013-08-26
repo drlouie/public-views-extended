@@ -1,0 +1,874 @@
+#!/usr/bin/perl5 -s
+
+###########################################################################################################
+# Company: ©2001 NetMedia Solutions                                                                             #
+# Date: Saturday, September 21, 2001                                                                      #
+# Location: Los Angeles County, California, United States of America                                      #
+# Made By: Luis Rodriguez (drlouie)                                                                       #
+# Email: Drlouie@NetMediaSol.com                                                                          #
+#                                                                                                         #
+# This program cannot be duplicated, distributed or re-used for any other purpose other than its original #
+# intended purpose and function. You may request NetMedia Solutions for a copy of the script,             #
+# personalized to fit your exact needs for a small re-programming fee.                                    #
+###########################################################################################################
+
+require "parse_query.nsp";
+require "date.nsp";
+
+## script's name
+$script = "$ENV{'SCRIPT_NAME'}";
+
+	## Test location of request
+	require ("referer.nsp");
+	$noaccess = "";
+	## Snif thisurl, in case user needs to login you have somewhere to send em back to
+	$lasturl = "opv.cgi";
+	## Snif cookie, if present test for logged in status
+	require ("Acookiesnif.nsp");
+	## else continue with process
+
+	
+if ($noaccess eq "" && $FORM{'OID'} && $FORM{'Tipo'}) {
+print "Content-type: text/html\n\n";
+
+		##remove zeros, files contain no preceding zeros
+		$trueOID = "$FORM{'OID'}";
+		if ($trueOID =~ "000000") { 
+			$trySUBS = substr("$trueOID",0,6);
+			if ($trySUBS =~ "000000") {
+				$muaID = substr("$trueOID",6,7);
+			}
+		}
+		elsif ($trueOID =~ "00000") { 
+			$trySUBS2 = substr("$trueOID",0,5);
+			if ($trySUBS2 =~ "00000") {
+				$muaID = substr("$trueOID",5,8);
+			}
+		}
+		else { 
+			$muaID = $trueOID;
+		}		
+		
+	print "<script>parent.location.href='pdf/$FORM{'Tipo'}/$muaID.pdf';</script>";
+}
+
+elsif ($noaccess eq "" && $FORM{'OhPeeVeih'}) {
+print "Content-type: text/html\n\n";
+
+	my $OID = "$FORM{'OhPeeVeih'}";
+
+	use DBI;
+	$dbh = DBI->connect("DBI:mysql:unvWeb","root","chinga2") or die "Unable to connect to database...\n"; 
+	$dbh->{RaiseError} = 1; 
+
+
+	$sth = $dbh->prepare("SELECT * FROM Orders WHERE OrderID='$OID'");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+
+		$OrderID = $row[0];
+		$IntOrderID = $row[1];
+		$CustomerID = $row[2];
+		$ItemsOrdered = $row[3];
+		$TotalPrice = $row[4];
+		$ShipCost = $row[5];
+		$FullWeight = $row[6];
+		$Instructions = $row[7];
+		$Courier = $row[8];
+		$Package = $row[9];
+		$TrackingIDs = $row[10];
+		$LastShipOn = $row[11];
+		$OrderedUsing = $row[12];
+		$RecFName = $row[13];
+		$RecLName = $row[14];
+		$ShipAdd = $row[15];
+		$ShipAdd2 = $row[16];
+		$ShipCity = $row[17];
+		$ShipState = $row[18];
+		$ShipZip = $row[19];
+		$OrderedOn = $row[20];
+		$LosReps = $row[21];
+		$Tax = $row[22];
+
+	}
+	$sth->execute or die "Unable to execute query\n";
+	$sth->finish;
+
+## GET ORDERED ITEMS
+&orderReader;
+$muaIncoming=Last;
+&runSTEP3;
+
+&topper;
+
+
+print "
+<script language=\"Javascript\">
+	function toggleCustomer() {
+		var formindex = document.Customers.SeeAiDee.selectedIndex;
+		var myValue = document.Customers.SeeAiDee.options[formindex].value;
+		parent.location.href='sup.cgi?SeeAiDee=' + myValue + '';
+	}
+</script>
+
+<script language=\"Javascript\">
+	function toggleOrder() {
+		var formindex = document.Orders.OhPeeVeih.selectedIndex;
+		var thyValue = document.Orders.OhPeeVeih.options[formindex].value;
+		valueSplit = thyValue.split(\"-----\");
+		parent.location.href='opv.cgi?OhPeeVeih=' + valueSplit[0] + '&CT='+valueSplit[1]+'';
+	}
+</script>
+<style type=\"text/css\">
+select { background-color:#4C6279 ; color:#ffffff ; font-size:10px;}
+</style>
+";
+print "<br><table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">";
+print "<tr height=\"1\"><form name=\"Customers\"><td width=\"50%\" align=\"center\" class=\"commonSmall\" style=\"font-size:9px;\"><b style=\"font-size:12px;\">Active Customer List</b><br><select name=\"SeeAiDee\" onChange=\"toggleCustomer();\" style=\"margin-top:5px;\">";
+
+	$sth = $dbh->prepare("SELECT * FROM Customers ORDER BY RepLName");
+	$sth->execute or die "Unable to execute query\n";
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$allCIDs = $row[0];
+		$CNames = $row[2];
+		$CT = $row[3];
+		$RFNames = $row[12];
+		$RLNames = $row[13];
+		$REmail = $row[15];
+		$myUT = $row[32];
+		if ($CNames ne "") { $CNAME = "( $CNames )"; }
+		else { $CNAME = ""; }
+		if ($CustomerID eq "$REmail") { $Selected = "selected"; }
+		else { $Selected = ""; }
+		if ($myUT ne "SalesUser" && $myUT ne "2ndAdmin" && $myUT ne "TopAdmin") {
+			print "<option value=\"$allCIDs\" $Selected>$RLNames, $RFNames $CNAME</option>";
+			push(@allCustomers,"$REmail%%%%%$RLNames, $RFNames $CNAME%%%%%$CT");
+		}
+	}
+	$sth->execute or die "Unable to execute query\n";
+	$sth->finish;
+
+print "</select></td></form>";
+print "<form name=\"Orders\"><td width=\"50%\" align=\"center\" class=\"commonSmall\" style=\"font-size:9px;\"><b style=\"font-size:12px;\">Orders by Customer</b><br><select name=\"OhPeeVeih\" onChange=\"toggleOrder();\" style=\"margin-top:5px;\">";
+
+
+foreach $unCust (@allCustomers) {
+	@splitLinea = split(/%%%%%/,$unCust);
+	$sth = $dbh->prepare("SELECT * FROM Orders WHERE CustomerID='$splitLinea[0]' ORDER BY OrderID ASC");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+
+		$ThisOrderID = $row[0];
+		$ThisIntOrderID = $row[1];
+		$ThisCustomerID = $row[2];
+		$ThisItemsOrdered = $row[3];
+		$ThisTotalPrice = $row[4];
+		$ThisShipCost = $row[5];
+		$ThisThisFullWeight = $row[6];
+		$ThisInstructions = $row[7];
+		$ThisCourier = $row[8];
+		$ThisPackage = $row[9];
+		$ThisTrackingIDs = $row[10];
+		$ThisLastShipOn = $row[11];
+		$ThisOrderedUsing = $row[12];
+		$ThisRecFName = $row[13];
+		$ThisRecLName = $row[14];
+		$ThisShipAdd = $row[15];
+		$ThisShipAdd2 = $row[16];
+		$ThisShipCity = $row[17];
+		$ThisShipState = $row[18];
+		$ThisShipZip = $row[19];
+		$ThisOrderedOn = $row[20];
+		$ThisLosReps = $row[21];
+		$ThisTax = $row[22];
+		if ($ThisOrderID eq "$OID") { $ISelected = "selected"; }
+		else { $ISelected = ""; }
+		if ($ThisTrackingIDs ne "") { $ShipStatus = "Shipped"; }
+		else { $ShipStatus = "Not Shipped Yet"; }
+		if ($ThisLosReps =~ ":::::") {
+			$ProcessStatus = "Processed"; 
+		}
+		else { $ProcessStatus = "Not Processed Yet"; }
+
+		##remove zeros, files contain no preceding zeros
+		$trueOID = "$ThisOrderID";
+		if ($trueOID =~ "000000") { 
+			$trySUBS = substr("$trueOID",0,6);
+			if ($trySUBS =~ "000000") {
+				$muaID = substr("$trueOID",6,7);;
+			}
+		}
+		elsif ($trueOID =~ "00000") { 
+			$trySUBS2 = substr("$trueOID",0,5);
+			if ($trySUBS2 =~ "00000") {
+				$muaID = substr("$trueOID",5,8);;
+			}
+		}
+
+		print "<option value=\"$ThisOrderID-----$splitLinea[2]\" $ISelected>$muaID .:. $splitLinea[1]</option>";
+		print "<option value=\"$ThisOrderID-----$splitLinea[2]\"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;- Placed on $ThisOrderedOn</option>";
+	}
+	$sth->execute or die "Unable to execute query\n";
+	$sth->finish;
+
+}
+print "</select></td></form>";
+print "</tr></table>";
+print "<table width=\"100%\" align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr bgcolor=\"#000000\"><td width=\"100%\"><img src=\"images/spacer.gif\" height=\"2\" width=\"1\" border=\"0\"</td></tr></table>";
+
+
+$TTOPS =~ s/Access Denied/Order Parameters ( Order# $OrderID )/g;
+$TTOPS =~ s/\"50\"/\"20\"/g;
+$TTOPS =~ s/\"350\"/\"100%\"/g;
+$TTOPS =~ s/height=\"100%\"//g;
+$TTOPS =~ s/<\/b><br><br>/<\/b>/g;
+print $TTOPS;
+
+print "<style type=\"text/css\">.commonMedium { font-weight:bold; }</style>";
+
+##remove zeros, files contain no preceding zeros
+$truePDF = "$OID";
+if ($truePDF =~ "000000") { 
+	$trySUBS = substr("$truePDF",0,6);
+	if ($trySUBS =~ "000000") {
+		$myPDF = substr("$truePDF",6,7);;
+	}
+}
+elsif ($truePDF =~ "00000") { 
+	$trySUBS2 = substr("$truePDF",0,5);
+	if ($trySUBS2 =~ "00000") {
+		$myPDF = substr("$truePDF",5,8);;
+	}
+}
+
+print "
+<script language=\"Javascript\" src=\"js/popwindow.js\"></script>
+<script language=\"Javascript\">
+	function toggleUPS() {
+		var formindex = document.opv.trackID.selectedIndex;
+		var thyValue = document.opv.trackID.options[formindex].value;
+		var myurl = 'https://www.usnightvision.com/trackMe.cgi?Package=' + thyValue + '';
+		popWindow(myurl,'VIEWUPS','775','440','NO');
+	}
+	function toggleAddTrack() {
+		var myurl = 'https://www.usnightvision.com/addTrack.cgi?OID=$OrderID&CID=$CustomerID';
+		popWindow(myurl,'ADDTRACK','775','440','NO');
+	}
+	function deleteUPS() {
+		var formindex = document.opv.trackID.selectedIndex;
+		var thyValue = document.opv.trackID.options[formindex].value;
+		var myurl = 'https://www.usnightvision.com/addTrack.cgi?DELETE=1&OID=$OrderID&trackID='+thyValue+'';
+		popWindow(myurl,'DELETETRACK','775','440','NO');
+	}
+	function markProcessed() {
+		var myurl = 'https://www.usnightvision.com/addTrack.cgi?MARKSMAN=1&OID=$OrderID&CID=$CustomerID';
+		popWindow(myurl,'MARKPROCESSED','775','440','NO');
+	}
+
+
+
+//preload images
+print0 = new Image();
+print0.src = \"images/print_INV_PDF_off.gif\";
+print1 = new Image();
+print1.src = \"images/print_INV_PDF_on.gif\";
+print2 = new Image();
+print2.src = \"images/print_REC_PDF_off.gif\";
+print3 = new Image();
+print3.src = \"images/print_REC_PDF_on.gif\";
+
+function printableINV() {
+	popWindow('opv.cgi?OID=$OID&Tipo=inv','adminPrintScreen','786','590','NO');
+	document.images.printOptions1.src = print1.src;
+}
+function printableREC() {
+	popWindow('opv.cgi?OID=$OID&Tipo=rec','adminPrintScreen','786','590','NO');
+	document.images.printOptions2.src = print3.src;
+}
+</script>
+";
+print "<form name=\"opv\">";
+print "<table width=\"100%\" cellpadding=\"3\" cellspacing=\"0\" border=\"0\">";
+print "<tr height=\"1\"><td width=\"35%\"><img src=\"images/spacer.gif\" width=\"200\" height=\"1\" border=\"0\"></td><td width=\"65%\"><img src=\"images/spacer.gif\" width=\"400\" height=\"1\" border=\"0\"></td></tr>";
+
+print "<tr height=\"35\"><td width=\"100%\" align=\"center\" colspan=\"2\"><a href=\"javascript:void(0);\" onClick=\"printableINV();\" onMouseOver=\"document.images.printOptions1.src=print1.src;\"  onMouseOut=\"document.images.printOptions1.src=print0.src;\"><img src=\"images/print_INV_PDF_off.gif\" border=\"0\" width=\"171\" height=\"22\" name=\"printOptions1\"></a><img src=\"images/spacer.gif\" width=\"25\" height=\"1\"><a href=\"javascript:void(0);\" onClick=\"printableREC();\" onMouseOver=\"document.images.printOptions2.src=print3.src;\"  onMouseOut=\"document.images.printOptions2.src=print2.src;\"><img src=\"images/print_REC_PDF_off.gif\" border=\"0\" width=\"171\" height=\"22\" name=\"printOptions2\"></a></td></tr>";
+
+print "<tr height=\"15\"><td width=\"200\"><img src=\"images/spacer.gif\" width=\"200\" height=\"15\" border=\"0\"></td><td width=\"400\"><img src=\"images/spacer.gif\" width=\"400\" height=\"15\" border=\"0\"></td></tr>";
+
+print "<tr valign=\"top\"><td class=\"commonMediumB\" colspan=\"2\" align=\"center\">Destination Information</td></tr>";
+print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Contact Name</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">$RecFName $RecLName</td></tr>";
+print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Address Line 1</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">$ShipAdd</td></tr>";
+if ($ShipAdd2 ne "") { print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Line 2</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">$ShipAdd2</td></tr>"; }
+print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>City</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">$ShipCity, $ShipState $ShipZip</td></tr>";
+
+print "<tr height=\"15\"><td width=\"200\"><img src=\"images/spacer.gif\" width=\"200\" height=\"15\" border=\"0\"></td><td width=\"400\"><img src=\"images/spacer.gif\" width=\"400\" height=\"15\" border=\"0\"></td></tr>";
+
+print "<tr valign=\"top\"><td class=\"commonMediumB\" colspan=\"2\" align=\"center\">Shipping Information</td></tr>";
+
+$CostPerPound = $ShipCost / $FullWeight;
+## make rounded
+$CostPerPound = int($CostPerPound * 100);
+$CostPerPound = $CostPerPound / 100;
+
+print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Courier(Package - \$s/lb.)</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">$Courier($Package - $CostPerPound/lb.)</td></tr>";
+print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Price for Weight</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">\$$ShipCost for $FullWeight lbs.</td></tr>";
+if ($ShipAdd2 ne "") { print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Line 2</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">$ShipAdd2</td></tr>"; }
+
+
+print "<tr height=\"15\"><td width=\"200\"><img src=\"images/spacer.gif\" width=\"200\" height=\"15\" border=\"0\"></td><td width=\"400\"><img src=\"images/spacer.gif\" width=\"400\" height=\"15\" border=\"0\"></td></tr>";
+
+print "<tr valign=\"top\"><td class=\"commonMediumB\" colspan=\"2\" align=\"center\">Order Status ( Method of Order: $OrderedUsing )</td></tr>";
+if ($LosReps =~ ":::::") {
+	if ($LosReps =~ "Internet") { 
+		## Snif cookie, find UNo
+		require ("cookiesnif.nsp");
+		$ReRepBut = "<br><input type=\"button\" value=\"Mark as 'Processed' by Me ($Cookies{'UNo'})\" onClick=\"markProcessed();\" class=\"commonInput\" style=\"font-weight:normal;\">"; 
+	}
+	else { $ReRepBut = ""; }
+	print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Last Rep ( Processed On )</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">";
+	@repSplit = split(/:::::/,$LosReps);
+	print "$repSplit[0] ( $repSplit[1] )";
+	print "$ReRepBut</td></tr>";
+}
+else {
+		## Snif cookie, find UNo
+	require ("cookiesnif.nsp");
+	print "<tr valign=\"top\"><td class=\"commonMediumB\" align=\"center\" colspan=\"2\"><i>Not Yet Processed</i><br><br><input type=\"button\" value=\"Mark as 'Processed' by Me ($Cookies{'UNo'})\" onClick=\"markProcessed();\" class=\"commonInput\" style=\"font-weight:normal;\"></td></tr>"; 
+}
+
+
+print "<tr height=\"15\"><td width=\"200\"><img src=\"images/spacer.gif\" width=\"200\" height=\"15\" border=\"0\"></td><td width=\"400\"><img src=\"images/spacer.gif\" width=\"400\" height=\"15\" border=\"0\"></td></tr>";
+
+print "<tr valign=\"top\"><td class=\"commonMediumB\" colspan=\"2\" align=\"center\">Delivery Status</td></tr>";
+if ($LastShipOn ne "") {
+	print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Last Shipment On</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\">$LastShipOn</td></tr>";
+	if ($TrackingIDs ne "") {
+		print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\"><i>Shipment Tracking</i></td><td class=\"commonMediumB\" style=\"font-weight:normal;\"><select name=\"trackID\">";
+		if ($TrackingIDs =~ ":::::") { @todosTrackings = split(/:::::/,$TrackingIDs); }
+		else { push(@todosTrackings,$TrackingIDs); }
+		
+		foreach $untracker (@todosTrackings) {
+			if ($untracker ne "" && $untracker ne " ") { print "<option value=\"$untracker\">$untracker</option>"; }
+		}
+		print "</select><br><br><nobr><input type=\"button\" value=\"Status of Selected #\" onClick=\"toggleUPS();\" class=\"commonInput\"><input style=\"margin-left:15px;\" type=\"button\" value=\"Delete Selected #\" onClick=\"deleteUPS();\" class=\"commonInput\"><input style=\"margin-left:15px;\" type=\"button\" value=\"Add New #\" onClick=\"toggleAddTrack();\" class=\"commonInput\"></nobr></td></tr>";
+	}
+}
+else {
+	print "<tr valign=\"top\"><td class=\"commonMediumB\" align=\"center\" colspan=\"2\"><i>Not Shipped Yet</i><br><br><input type=\"button\" value=\"Add Tracking # / Mark as Shipped\" onClick=\"toggleAddTrack();\" class=\"commonInput\" style=\"font-weight:normal;\"></td></tr>"; 
+}
+
+print "<tr height=\"30\"><td width=\"200\"><img src=\"images/spacer.gif\" width=\"200\" height=\"30\" border=\"0\"></td><td width=\"400\"><img src=\"images/spacer.gif\" width=\"400\" height=\"30\" border=\"0\"></td></tr>";
+
+print "<tr valign=\"top\"><td class=\"commonMedium\" align=\"right\" colspan=\"2\" width=\"100%\">";
+
+print "$todosLosProductos";
+
+
+print $TBOTS; 
+
+print "</form></body></html>";
+
+$dbh->disconnect;
+exit;
+}
+
+elsif (!$FORM{'OhPeeVeih'}) { 
+&topper;
+
+print $TTOPS;
+print "<font class=\"commonSmall\">You must have an order's system ID in order to run this module. This module ONLY works in conjunction with other modules on this site. If you do not know what you are doing here, then more than likely you shouldn't be trying to access this system at this specfic entrypoint. Multiple BAD login attempts are logged to the system and every break-in attemp is taken seriously and addressed for all our website properties. So we suggest you do not try to break-in to this system for your own good.</body></html>";
+print $TBOTS; 
+}
+
+else {
+&topper;
+
+print $TTOPS;
+print "<font class=\"commonSmall\">We have detected that you are not logged into the system. To continue with this request you must first login. A window will pop open in a few seconds to allow you to login. If you login successfully with an Administrative username you will automatically be granted access to the system." . $TBOTS . "\n\n<script language=\"Javascript\">\n setTimeout('runLogin()',5000);\n function runLogin() { \n popWindow('https://www.usnightvision.com/login.cgi?comingFrom=emailer&OhPeeVeih=$FORM{'OhPeeVeih'}&CT=$FORM{'CT'}','LOGWIN','350','225','NO'); \n } \n </script></font><br></body></html>";
+print $TBOTS; 
+
+exit;
+}
+
+sub topper {
+
+print qq~
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>US Night Vision - Order Parameter Viewer</title>
+<script language="Javascript">
+	var ovFGColor = "#E6A306";
+</script>
+<script language="Javascript" src="js/b4dom.js"></script>
+<script language="Javascript" src="js/popwindow.js"></script>
+<style type="text/css">
+body { scrollbar-face-color:#A0A0A0; scrollbar-highlight-color:#000000; scrollbar-shadow-color:#A0A0A0; scrollbar-3dlight-color: #000000; scrollbar-arrow-color:#000000; scrollbar-track-color:#000000; scrollbar-darkshadow-color:#000000; }
+#overDiv {	padding-top:2px; padding-bottom:2px; padding-left:2px; padding-right:2px; position:absolute; top:0px; left:0px; visibility:hidden; z-index:5000; border-top:1px solid #4D4D4D; border-bottom:1px solid #000000; border-left:1px solid #4D4D4D; border-right:1px solid #000000; }
+.overDiv {	background-color: #4D4D4D; font-weight:bold; color:#eb0000; padding-top:3px; padding-bottom:3px; padding-left:3px; padding-right:3px; z-index:5000; }
+.overlibCart { font-size:9px; color: #ffffff; }
+.welcomeText { font-size:10px;font-family:verdana,arial,helvetica;color:ffffff;line-height:16px; }
+.commonSmallB { font-size:10px;font-family:verdana,arial,helvetica;color:#000000;line-height:10px;font-weight:bold; }
+.commonSmall { font-size:11px;font-family:verdana,arial,helvetica;color:#000000;line-height:16px; }
+.commonSmallest { font-size:9px;font-family:verdana,arial,helvetica;color:#000000;}
+.commonMedium { font-size:11px;font-family:verdana,arial,helvetica;color:#000000; }
+.commonMediumB { font-size:11px;font-family:verdana,arial,helvetica;color:#000000; font-weight:bold; }
+.commonInput { background-color: #cccccc; border: 1px solid #E6A306; height:20px; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+select { background-color: #cccccc; border: #E6A306; height:20px; font-size: 11px; font-family:verdana,arial,helvetica; padding: 3px; }
+radio { background-color: #cccccc; border: #E6A306; height:20px; font-size: 11px; font-family:verdana,arial,helvetica; padding: 3px; }
+.commonTArea { background-color: #cccccc; border: 1px solid #E6A306; font-size: 10px; font-family:verdana,arial,helvetica; padding: 3px; }
+.checkbox0 { font-size:10px;font-family:verdana,arial,helvetica;line-height:9px; line-height:12px; }
+a{ color:#4d4d4d }
+u{ color:#4d4d4d }
+</style>
+</head>
+<body bgcolor="#A0A0A0" LEFTMARGIN="0" TOPMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0" ONLOAD="runSecrityImage();">
+~;
+
+print '
+<!--TOP RIGHT ICONS-->
+<div id="losTRIcons" style="position:absolute;top:2px;left:5px;z-index:10;width:10px; height:10px;"></div>
+
+
+<script language="Javascript">
+function runSecrityImage() {
+    TOPF = parent.location.href;
+	TS = TOPF.split("https://");
+	if (TS[1]) {
+		document.getElementById("losTRIcons").innerHTML = "<img src=\'images/secure.gif\' border=\'0\' width=\'104\' height=\'15\' name=\'secureDocument\' alt=\'This document is secured using a Secure Sockets Layer (SSL) connection to transmit personal and/or classified information.\'>";
+	}
+	else { 
+		document.getElementById("losTRIcons").innerHTML = "<img src=\'images/unsecure.gif\' border=\'0\' width=\'104\' height=\'15\' name=\'unsecureDocument\' alt=\'This document does NOT need an SSL (Secure Sockets Layer) connection.\n\nIt does not transmit any personal or classified information.\'>";
+	}
+}
+</script>
+';
+
+
+1;
+}
+
+
+
+sub orderReader {
+
+		## if more than one drop
+		@EstosShoozoom = split(/xxxxx/, $ItemsOrdered);
+		
+		$counter=0;
+		$items=1;
+		$CMultiples=0;
+		$CSingulars=0;
+		## counting total dollar amount
+		foreach $EsteCOSTAS (@EstosShoozoom) {
+			@leItem = split(/-----/,$EsteCOSTAS);
+			$leItem[0] =~ s/\$//g;
+			sprintf("%.2d", $leItem[0]);
+			if ($counter eq "0") { 
+				$cartTotal = $leItem[0] * $leItem[3];
+				$itemTotal = ""; 
+			}
+			else {
+				$newTotal = $leItem[0] * $leItem[3];
+				$cartTotal = $newTotal + $cartTotal;
+			}
+			push(@multipliers,"$leItem[3]");
+			push(@numeros,"$leItem[1]-----$leItem[2]");
+			## only if count is higher than 1 which makes for dupe
+			if ($leItem[3] > 1) { push(@multiples,"$leItem[0]-----$leItem[1]-----$leItem[2]-----$leItem[3]-----$CMultiples"); $CMultiples++; }
+			else { push(@singulares,"$leItem[0]-----$leItem[1]-----$leItem[2]-----$leItem[3]-----$CSingulars"); $CSingulars++; }
+			$counter++;
+		
+			if($counter eq "0") { $realCount = $muaMultiplier * $items; }
+			else { $newCount = $muaMultiplier * $items; $realCount = $realCount + $newCount; }
+
+		}
+		##FIRST GRAB FULL COUNT FOR EACH DROP
+		foreach $Numero (@numeros) {
+			@thyItem = split(/-----/,$Numero);
+			$esteCosita=0;
+			foreach $SavedItem (@thyItem) {
+				if ($SavedItem =~ ",") {
+					@splitN = split(/,/,$Numero);
+					$muaCNT=0;
+					foreach $splited (@splitN) { 
+						$esteCosita++;
+					}
+				}
+				elsif ($SavedItem ne "NONE") { $esteCosita++; }
+			}
+			push(@itemsPerSet,$esteCosita);
+		}
+
+		$countie=0;
+		## THEN MULTIPLY USING THE MULTIPLIERS RETRIEVED IN FIRST METHOD
+		foreach $itps (@itemsPerSet) {
+			$leCountie = $multipliers[$countie];
+			$muaC = $itps * $leCountie;
+			push(@allCs,$muaC);
+			$countie++;
+		}
+		## FINALLY ADD ALL PIECES TOGETHER FOR FINAL
+		foreach $meC (@allCs) {
+			if ($ccnt eq "0") { $leFC = $meC; }
+			else { $leFC = $leFC + $meC; }
+		}
+
+		
+		sprintf("%.2d", $cartTotal);
+		sprintf("%.2d", $leFC);
+1;
+}
+
+sub runSTEP3 {
+
+	if ($muaIncoming) { $todosLosProductos = "<img src=\"images/spacer.gif\" width=\"1\" height=\"1\">"; }
+	else { print "<img src=\"images/spacer.gif\" width=\"1\" height=\"1\">"; }
+
+		############################################# DUPES
+		$countPosted = 0;
+		if (@multiples) {
+			$CMulti=0;
+			foreach $mul (@multiples) {
+			@muaAccess = 0;
+			@splitN = 0;
+			@esteAcc = 0;
+			@muaSplit = 0;
+			@muaPrices = 0;
+			$totalistico = 0;
+			$esteTotals = 0;
+			$newPrice = 0;
+			$totalWeight = "0.0";
+				@splitMul = split(/-----/,$mul);
+				$count1=0;
+				my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$splitMul[1]'");
+				$sth->execute or die "Unable to execute query\n"; 
+				my @row;
+				while(@row = $sth->fetchrow_array) { 
+					$MainItemName = $row[5];
+					$MainEmailPhoto = $row[8];
+					$MainWeight = $row[11];
+					$totalWeight = $MainWeight * $splitMul[3];
+					push(@allWeights,$totalWeight);
+				}
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+
+					if ($FORM{'CT'} eq "MasterDist") { $MainPrice = $row[12]; }
+					elsif ($FORM{'CT'} eq "Distributor") { $MainPrice = $row[13]; }
+					elsif ($FORM{'CT'} eq "Dealer") { $MainPrice = $row[14]; }
+					elsif ($FORM{'CT'} eq "LawEnforce") { $MainPrice = $row[15]; }
+					else { $MainPrice = $row[16]; }
+					$count1++;
+
+					my $sth = $dbh->prepare("SELECT * FROM Images WHERE ImageID='$MainEmailPhoto';");
+					$sth->execute or die "Unable to execute query\n"; 
+					my @row;
+						while(@row = $sth->fetchrow_array) { 
+							$FileName = $row[2];
+							$count++;
+						}
+					$sth->execute or die "Unable to execute query\n"; 
+					$sth->finish;
+	
+					if ($MainEmailPhoto ne "" && $MainEmailPhoto ne " ") { $SavedInnerURL = "images/products/$FileName"; }
+					else { $SavedInnerURL = "images/spacer.gif"; }
+					$picture = "<img src=\"$SavedInnerURL\" width=\"125\" height=\"90\" border=\"0\" vspace=\"5\" hspace=\"20\">";
+					
+					$MainPrice = sprintf("%.2f", $MainPrice);
+					##single price
+					push(@muaPrices,"$MainPrice-----$CMulti");
+					## if no accessories we need qty price
+					$totalistico1 = $MainPrice * $splitMul[3];
+					$totalistico1 = sprintf("%.2f", $totalistico1);
+
+
+				##### START ACCESSORY DROP IF NECESSARY
+				if ($splitMul[2] =~ "00") {
+					if ($splitMul[2] =~ "," && $CMulti == $splitMul[4]) {
+						@splitN = split(/,/,$splitMul[2]);
+						foreach $splited (@splitN) { push(@muaAccess,$splited); }
+					}
+					elsif ($splitMul[2] ne "NONE" && $CMulti == $splitMul[4]) { push(@muaAccess,$splitMul[2]); }
+
+					$counter2=1;
+					foreach $muaA (@muaAccess) {
+						my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$muaA'");
+						$sth->execute or die "Unable to execute query\n"; 
+						my @row;
+						while(@row = $sth->fetchrow_array) { 
+							$AccItemName = $row[5];
+							$AccSmallPhoto = $row[8];
+							$AccWeight = $row[11];
+							$totalWeight = $AccWeight * $splitMul[3];
+							push(@allWeights,$totalWeight);
+							if ($FORM{'CT'} eq "MasterDist") { $AccPrice = $row[12]; }
+							elsif ($FORM{'CT'} eq "Distributor") { $AccPrice = $row[13]; }
+							elsif ($FORM{'CT'} eq "Dealer") { $AccPrice = $row[14]; }
+							elsif ($FORM{'CT'} eq "LawEnforce") { $AccPrice = $row[15]; }
+							else { $AccPrice = $row[16]; }
+							push(@esteAcc,"$AccWeight-----$AccPrice-----&nbsp;&nbsp;&nbsp;&nbsp;- <a href=\"http://www.usnightvision.com/products.cgi?PID=$muaA\" class=\"commonSmall\" style=\"margin-left:10px;\">$AccItemName</a>-----$CMulti");
+							push(@muaPrices,"$AccPrice-----$CMulti");
+						}
+						$sth->execute or die "Unable to execute query\n"; 
+						$sth->finish;
+						$counter2++;				
+					}
+			
+					$esteTotal = $estePrice * $splitMul[3];
+				
+					$CountPrice=0;
+					foreach $muaPrecio (@muaPrices) {
+						@muaSplit = split(/-----/,$muaPrecio);
+						if ($muaSplit[1] == $CMulti) { 
+							$lePrice = sprintf("%.2f", $muaSplit[0]);
+							if ($CountPrice > 0) { $esteTotals = $lePrice * $splitMul[3]; }
+							else { $newPrice = $lePrice * $splitMul[3]; $esteTotals = $newPrice + $esteTotals; }
+						}
+					}
+
+					
+					$totalistico = sprintf("%.2f", $esteTotals);
+
+					## for getting price for just one QUANTITY item					
+					$oldPrice = $totalistico / $splitMul[3];
+					
+					$countPosted++;
+					$myQuantity = "Qty" . $countPosted;
+					$myOldCookieName = "Cookie" . $countPosted;
+					$myOldCookie = "\$$oldPrice-----$splitMul[1]-----$splitMul[2]-----$splitMul[3]";
+					if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td width=\"150\" align=\"center\" valign=\"top\">$picture</td><td width=\"100%\" valign=\"top\"><font face=\"verdana\" size=\"1\" color=\"#000000\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitMul[1]\">$MainItemName</a></b> - <u>$splitMul[3] Units</u><br>&nbsp;&nbsp;<i>Accessories Selected for this NV System</i></span>"; }
+					elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<li type=\"circle\"><font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b> - <font class=\"commonSmall\" style=\"text-decoration:underline;\">$splitMul[3] Units</a><br><div style=\"position:relative; top:10px;left:35px;\"><i>Accessories Selected for this NV System</i></div></font>"; }
+					else { print "<li type=\"circle\"><font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b> - <a href=\"javascript:void(0);\" class=\"commonSmall\" onMouseOver=\"overlib('<center class=\\'overlibCart\\'>Each unit consists of a Product and all its selected Accessories.</center>');\" onMouseOut=\"return nd();\">$splitMul[3] Units</a><br><div style=\"position:relative; top:10px;left:35px;\"><i>Accessories Selected for this NV System</i></div></font>"; }
+					
+					$CountThisD=1;
+					foreach $cnfg (@esteAcc) {
+						$CountThisD++;
+						##spacing image under last accessory (3 = 1 Accessory and 4 = 2 and so on and so forth)
+						## for last items only
+						if ($CountThisD eq "$counter2") { 
+							## if last item between 3-5 make specific size space
+							if ($counter2 eq "3") { $muaHeight= "36"; }
+							elsif ($counter2 eq "4") { $muaHeight= "23"; }
+							elsif ($counter2 eq "5") { $muaHeight= "18"; }
+							## otherwise parse common last space
+							else { $muaHeight= "15"; }
+							$extraBreak = "<br>"; 
+							$extraSpacer = "<img src=\"images/spacer.gif\" width=\"50\" height=\"$muaHeight\">";
+						}
+						else { $extraBreak = ""; $extraSpacer = ""; }
+
+						if ($cnfg ne "0") {
+							@splitCnfg = split(/-----/,$cnfg);
+							$muaPrice = $splitCnfg[1];
+							$muaPrice =~ s/\$//g;
+							$muaTotal = $muaPrice * $splitMul[3];
+							sprintf("%.2d", $muaTotal);
+							if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "&nbsp;&nbsp;&nbsp;&nbsp;$splitCnfg[2] $extraSpacer<br>"; }
+							elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\"><div style=\"margin-left:15px;\">$splitCnfg[2]</div> $extraSpacer</font>"; }
+							else { print "<font class=\"commonSmall\"><div style=\"margin-left:15px;\">$splitCnfg[2]</div> $extraSpacer</font>"; }
+						}
+						##spacing TR
+						else { 							
+							if ($muaIncoming) { $todosLosProductos = $todosLosProductos . "<br>"; } 
+							else { print "<br>"; } 
+						}
+					}
+					$CMulti++;
+					## for total tally
+					push(@precioTotal,"$totalistico");
+				}
+				###### END ACCESSORIES DROP
+
+				else {
+					$countPosted++;
+					$myQuantity = "Qty" . $countPosted;
+					$myOldCookieName = "Cookie" . $countPosted;
+					$myOldCookie = "\$$MainPrice-----$splitMul[1]-----$splitMul[2]-----$splitMul[3]";
+					if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td width=\"150\" align=\"center\" valign=\"top\">$picture</td><td width=\"100%\" valign=\"top\"><font face=\"verdana\" size=\"1\" color=\"#000000\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitMul[1]\">$MainItemName</a></b><br>&nbsp;&nbsp;<i>No Accessories Selected</i>"; } 
+					elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>No Accessories Selected</i></font>"; } 
+					else { print "<font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitMul[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$MainItemName</a></b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>No Accessories Selected</i></font>"; }
+
+					## for total tally
+					push(@precioTotal,"$totalistico1");
+				}
+			if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "</font></td></tr></table><br><br>"; }
+			}
+
+		}
+		############################################# SINGULARES
+		if (@singulares) {
+			foreach $singular (@singulares) {
+			@muaAccess = 0;
+			@splitN = 0;
+			@esteAcc = 0;
+			@muaSplit = 0;
+			@muaPrices = 0;
+			$totalistico = 0;
+			$esteTotals = 0;
+			$newPrice = 0;
+			$totalWeight = "0.0";
+				@splitSing = split(/-----/,$singular);
+				$count1=0;
+				my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$splitSing[1]'");
+				$sth->execute or die "Unable to execute query\n"; 
+				my @row;
+				while(@row = $sth->fetchrow_array) { 
+					$SingItemName = $row[5];
+					$SingEmailPhoto = $row[8];
+					$SingWeight = $row[11];
+					$totalWeight = $SingWeight * $splitSing[3];
+					push(@allWeights,$totalWeight);
+					if ($FORM{'CT'} eq "MasterDist") { $SingPrice = $row[12]; }
+					elsif ($FORM{'CT'} eq "Distributor") { $SingPrice = $row[13]; }
+					elsif ($FORM{'CT'} eq "Dealer") { $SingPrice = $row[14]; }
+					elsif ($FORM{'CT'} eq "LawEnforce") { $SingPrice = $row[15]; }
+					else { $SingPrice = $row[16]; }
+					push(@muaPrices,"$SingPrice");
+					$count1++;
+				}
+				$sth->execute or die "Unable to execute query\n"; 
+				$sth->finish;
+
+
+					my $sth = $dbh->prepare("SELECT * FROM Images WHERE ImageID='$SingEmailPhoto';");
+					$sth->execute or die "Unable to execute query\n"; 
+					my @row;
+						while(@row = $sth->fetchrow_array) { 
+							$FileName = $row[2];
+							$count++;
+						}
+					$sth->execute or die "Unable to execute query\n"; 
+					$sth->finish;
+	
+					if ($SingEmailPhoto ne "" && $SingEmailPhoto ne " ") { $SavedInnerURL = "images/products/$FileName"; }
+					else { $SavedInnerURL = "images/spacer.gif"; }
+					$picture = "<img src=\"$SavedInnerURL\" width=\"125\" height=\"90\" border=\"0\" vspace=\"5\" hspace=\"20\">";
+				
+
+				$SingPrice = sprintf("%.2f", $SingPrice);
+				$Stotalistico1 = $splitSing[3] * $SingPrice;
+				$Stotalistico1 = sprintf("%.2f", $Stotalistico1);
+				
+				##### START ACCESSORY DROP IF NECESSARY
+				if ($splitSing[2] =~ "00") {
+					if ($splitSing[2] =~ "," && $CMulti2 == $splitSing[4]) {
+						@splitN = split(/,/,$splitSing[2]);
+						foreach $splited (@splitN) { push(@muaAccess,$splited); }
+					}
+					elsif ($splitSing[2] ne "NONE" && $CMulti2 == $splitSing[4]) { push(@muaAccess,$splitSing[2]); }
+
+					$counteie=1;
+					foreach $muaA (@muaAccess) {
+						my $sth = $dbh->prepare("SELECT * FROM Products WHERE ProductID='$muaA'");
+						$sth->execute or die "Unable to execute query\n"; 
+						my @row;
+						while(@row = $sth->fetchrow_array) { 
+							$AccItemName = $row[5];
+							$AccSmallPhoto = $row[8];
+							$AccWeight = $row[11];
+							$totalWeight = $AccWeight * $splitSing[3];
+							push(@allWeights,$totalWeight);
+							if ($FORM{'CT'} eq "MasterDist") { $AccPrice = $row[12]; }
+							elsif ($FORM{'CT'} eq "Distributor") { $AccPrice = $row[13]; }
+							elsif ($FORM{'CT'} eq "Dealer") { $AccPrice = $row[14]; }
+							elsif ($FORM{'CT'} eq "LawEnforce") { $AccPrice = $row[15]; }
+							else { $AccPrice = $row[16]; }
+							push(@esteAcc,"$AccWeight-----$AccPrice-----&nbsp;&nbsp;&nbsp;&nbsp;- <a href=\"http://www.usnightvision.com/products.cgi?PID=$muaA\" class=\"commonSmall\" style=\"margin-left:10px;\">$AccItemName</a>-----$CMulti2");
+							push(@muaPrices,"$AccPrice");
+						}
+						$sth->execute or die "Unable to execute query\n"; 
+						$sth->finish;
+						$counteie++;				
+					}
+			
+					$esteTotal = $estePrice * $splitSing[3];
+				
+					$CountPrice=0;
+					foreach $muaPrecio (@muaPrices) {
+						$lePrice = sprintf("%.2f", $muaPrecio);
+						if ($CountPrice > 0) { $esteTotals = $lePrice * $splitSing[3]; }
+						else { $newPrice = $lePrice * $splitSing[3]; $esteTotals = $newPrice + $esteTotals; }
+					}
+
+					$Stotalistico = sprintf("%.2f", $esteTotals);
+
+				## for getting price for just one QUANTITY item					
+				$oldPrice = $Stotalistico / $splitSing[3];
+
+				$countPosted++;
+				$myQuantity = "Qty" . $countPosted;
+				$myOldCookieName = "Cookie" . $countPosted;
+				$myOldCookie = "\$$oldPrice-----$splitSing[1]-----$splitSing[2]-----$splitSing[3]";
+				if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td width=\"150\" align=\"center\" valign=\"top\">$picture</td><td width=\"100%\" valign=\"top\"><font face=\"verdana\" size=\"1\" color=\"#000000\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitSing[1]\">$SingItemName</a></b> - <u>$splitSing[3] Unit</u><br>&nbsp;&nbsp;<i>Accessories Selected for this NV System</i>"; } 
+				elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<li type=\"circle\"><font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b> - <font class=\"commonSmall\" style=\"text-decoration:underline;\">$splitSing[3] Unit</font><br><div style=\"position:relative; top:10px;left:35px;\"><i>Accessories Selected for this NV System</i></div></font>"; } 
+				else { print "<li type=\"circle\"><font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b> - <a href=\"javascript:void(0);\" class=\"commonSmall\" onMouseOver=\"overlib('<center class=\\'overlibCart\\'>Each unit consists of a Product and all its selected Accessories.</center>');\" onMouseOut=\"return nd();\">$splitSing[3] Unit</a><br><div style=\"position:relative; top:10px;left:35px;\"><i>Accessories Selected for this NV System</i></div></font>"; }
+
+					$CountThisS = 1;
+					foreach $cnfg (@esteAcc) {
+						$CountThisS++;
+						##spacing image under last accessory (3 = 1 Accessory and 4 = 2 and so on and so forth)
+						## for last items only
+						if ($CountThisS eq "$counteie") { 
+							## if last item between 3-5 make specific size space
+							if ($counteie eq "3") { $muaHeight= "36"; }
+							elsif ($counteie eq "4") { $muaHeight= "23"; }
+							elsif ($counteie eq "5") { $muaHeight= "18"; }
+							## otherwise parse common last space
+							else { $muaHeight= "15"; }
+							$extraBreak = "<br>"; 
+							$extraSpacer = "<img src=\"images/spacer.gif\" width=\"50\" height=\"$muaHeight\">";
+						}
+						else { $extraBreak = ""; $extraSpacer = ""; }
+						
+						if ($cnfg ne "0") {
+							@splitCnfg = split(/-----/,$cnfg);
+							$muaPrice = $splitCnfg[1];
+							$muaPrice =~ s/\$//g;
+							$muaTotal = $muaPrice * $splitSing[3];
+							sprintf("%.2d", $muaTotal);
+							if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "&nbsp;&nbsp;&nbsp;&nbsp;$splitCnfg[2] $extraSpacer<br>"; } 
+							elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<font class=\"commonSmall\" valign=\"top\"><div style=\"margin-left:15px;\">$splitCnfg[2]</div> $extraSpacer</font>"; } 
+							else { print "<font class=\"commonSmall\" valign=\"top\"><div style=\"margin-left:15px;\">$splitCnfg[2]</div> $extraSpacer</font>"; }
+						}
+						##spacing TR
+						else { 
+							if ($muaIncoming) { $todosLosProductos = $todosLosProductos . "<br>"; } 
+							else { print "<br>"; } 
+						 }
+					}
+					$CMulti2++;
+
+					## for total tally
+					push(@precioTotal,"$Stotalistico");
+				}
+				###### END ACCESSORIES DROP
+				
+				else {
+					$countPosted++;
+					$myQuantity = "Qty" . $countPosted;		
+					$myOldCookieName = "Cookie" . $countPosted;
+					$myOldCookie = "$splitSing[0]-----$splitSing[1]-----$splitSing[2]-----$splitSing[3]";
+					if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td width=\"150\" align=\"center\" valign=\"top\">$picture</td><td width=\"100%\" valign=\"top\"><font face=\"verdana\" size=\"1\" color=\"#000000\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitSing[1]\">$SingItemName</a></b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>No Accessories Selected</i>"; }
+					elsif ($muaIncoming eq "1") { $todosLosProductos = $todosLosProductos . "<li type=\"circle\"><font class=\"commonSmall\"><b><a href=\"http://www.usnightvision.com/products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>No Accessories Selected</i></font>"; }
+					else { print "<li type=\"circle\"><font class=\"commonSmall\"><b><a href=\"products.cgi?PID=$splitSing[1]\" class=\"commonSmall\" style=\"margin-left:10px;\">$SingItemName</a></b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>No Accessories Selected</i></font>"; }
+
+					## for total tally
+					push(@precioTotal,"$Stotalistico1");
+
+				}
+
+			if ($muaIncoming eq "Last") { $todosLosProductos = $todosLosProductos . "</font></td></tr></table><br><br>"; }
+				
+
+			}
+		}
+
+1;
+}
+
+
+exit;

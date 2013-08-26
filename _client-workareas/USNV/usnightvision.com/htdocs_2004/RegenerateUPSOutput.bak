@@ -1,0 +1,152 @@
+#!/usr/bin/perl5 -s
+
+use LWP::Simple;
+use CGI;
+use CGI::Carp qw(fatalsToBrowser);
+my $url = "http://wwwapps.ups.com/WebTracking/processInputRequest?HTMLVersion=5.0&sort_by=status&term_warn=yes&tracknums_displayed=5&TypeOfInquiryNumber=T&loc=en_US&InquiryNumber1=$FORM{'Package'}&InquiryNumber2=$FORM{'Package2'}&InquiryNumber3=$FORM{'Package3'}&InquiryNumber4=$FORM{'Package4'}&InquiryNumber5=$FORM{'Package5'}&AgreeToTermsAndConditions=yes";
+my $page = get ($url);
+$page =~ s/CCCC99/9EC4ED/gi;
+
+
+#### GOOD CALL
+if ($page =~ "TRACKING" && $page =~ "STATUS" && $page =~ "detailed" && $page =~ "report") {
+	$leOne = "<TABLE BORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\" WIDTH=\"600\">";
+	@splitted = split(/$leOne/,$page);
+	$elImagen = "";
+	$elImagenReal = "";
+	$splitted[4] =~ s/\/tracking\/images\/engua_detail.gif/images\/spacer.gif/gi;
+	$splitted[4] =~ s/<TD/<TD CLASS=commonSmall STYLE=\"color:#4D4D4D\"/gi;
+	print "<center>";
+	print "<TABLE BORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"10\" WIDTH=\"100%\">";
+	print "<tr align=\"center\" bgcolor=\"#673301\" height=\"30\" class=\"commonSmall\" style=\"color:#FFFFFF\"><td>Package ID(s)</td><td>Status</td><td colspan=\"2\">Package Information</td></tr>";
+	print "$splitted[4]";
+	print "</center>";
+}
+
+if ($page =~ "Delivered" && $page =~ "Status" && $page =~ "Signed") {
+	$pieza1 = "<div class=\"modulepad\"><div class=\"modpadbullet\">";
+	$pieza2 = "<td valign=\"bottom\" width=\"155\">";
+	$pieza3 = "<td valign=\"top\" width=\"155\">";
+	$pieza4 = "Signed by:";
+	$pieza5 = "Service Type:";
+	$pieza6 = "Tracking results provided by UPS:";
+	$tede = "</td>";
+	@splittedLines = split(/\n/,$page);
+	foreach $unaLinea (@splittedLines) {
+
+	 	if ($unaLinea =~ "$pieza1") { 
+			@splitLine = split(/$pieza1/,$unaLinea);
+	 		push(@TrackNums,$splitLine[1]);
+		}
+		elsif ($unaLinea =~ "A.M." || $unaLinea =~ "P.M.") { 
+			$unaLinea =~ s/\t//g;
+			if ($unaLinea ne "$lastFoundT") { 
+				push(@Times,$unaLinea);
+				$lastFoundT = "$unaLinea";
+			}
+		}
+		elsif ($unaLinea =~ "$pieza2") {
+			$foundDT1 = int($counta + 1);
+			$lastFoundD = "$unaLinea";
+		}
+		elsif ($unaLinea =~ "$pieza3") {
+				$foundPZ31 = int($counta + 2);
+				$foundPZ32 = int($counta + 5);
+				$lastFoundPZ31 = "$unaLinea";
+				$lastFoundPZ32 = "$unaLinea";
+		}
+		
+		elsif ($unaLinea =~ "$pieza4") {
+			$foundSignedB = int($counta + 3);
+			$lastFoundSignedB = "$unaLinea";
+		}
+		
+		elsif ($unaLinea =~ "$pieza5") {
+			$foundServT = int($counta + 3);
+			$lastFoundServT = "$unaLinea";
+		}
+		elsif ($unaLinea =~ "$pieza6") {
+			$unaLinea =~ s/\t//g;
+			$ThanksUPS = "$unaLinea"; 
+		}
+
+		if ($foundDT1 eq "$counta" && $unaLinea ne "$lastFoundD") {
+			$unaLinea =~ s/\t//g;
+			push(@Dates,$unaLinea); 
+		}
+
+		elsif ($foundPZ31 eq "$counta" && $unaLinea ne "$lastFoundPZ31" && $unaLinea =~ ",&nbsp;") {
+			$unaLinea =~ s/\t//g;
+			@splitLine = split(/,&nbsp;/,$unaLinea);
+	 		push(@Citys,$splitLine[0]);
+		}
+		
+		elsif ($foundPZ32 eq "$counta" && $unaLinea ne "$lastFoundPZ32" && $unaLinea =~ ",&nbsp;") {
+			$unaLinea =~ s/\t//g;
+			@splitLine = split(/,&nbsp;/,$unaLinea);
+	 		push(@States,$splitLine[0]);
+		}		
+		
+		elsif ($foundSignedB eq "$counta" && $unaLinea ne "$lastFoundSignedB" && $unaLinea =~ "$tede") {
+			@splitLine = split(/$pieza3/,$unaLinea);
+			
+			my $orale =  $splitLine[1]; 
+			$orale =~ s/$tede//g;
+	 		push(@SignedBys,$orale);
+		}		
+		
+		elsif ($foundServT eq "$counta" && $unaLinea ne "$lastFoundServT" && $unaLinea =~ "$tede") {
+			@splitLine = split(/$pieza3/,$unaLinea);
+			
+			my $orale2 =  $splitLine[1]; 
+			$orale2 =~ s/$tede//g;
+	 		push(@ServiceTypes,$orale2);
+		}		
+		
+
+		$counta++;
+	}
+	$CountTracks=0;
+
+	foreach $TN (@TrackNums) { 
+		#print "Track#: $TN<br>"; 
+		$CountTracks++; 
+	}
+#	foreach $DATE (@Dates) { print "Date: $DATE<br>"; }
+#	foreach $TIME (@Times) { print "Time: $TIME<br>"; }
+#	foreach $Cit (@Citys) { print "City: $Cit<br>"; }
+#	foreach $Stado (@States) { print "State: $Stado<br>"; }
+#	foreach $SB (@SignedBys) { print "Signed By: $SB<br>"; }
+#	foreach $ST (@ServiceTypes) { print "Service Type By: $ST<br>"; }
+#	print "$ThanksUPS<br>";
+	
+#	print $page;
+
+	print "<center>";
+	print "<TABLE BORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"10\" WIDTH=\"100%\">";
+	print "<tr align=\"center\" bgcolor=\"#673301\" height=\"30\" class=\"commonSmall\" style=\"color:#FFFFFF\"><td>Package ID(s)</td><td>Status</td><td colspan=\"2\">Package Information</td></tr>";
+	$RunTrack=0;
+	foreach (1 .. $CountTracks) {
+		print "<tr valign=\"top\" align=\"center\" height=\"30\" class=\"commonSmall\"><td>$TrackNums[$RunTrack]</td><td>Delivered</td><td colspan=\"2\" align=\"left\">Delivered On ( $Dates[$RunTrack] at $Times[$RunTrack] )<br>Delivered To ( $Citys[$RunTrack], $States[$RunTrack] )<br>Signed By ( $SignedBys[$RunTrack] )<br>Package Type ( $ServiceTypes[$RunTrack] )</td></tr>";
+		$RunTrack++;
+	}
+	print "<tr align=\"center\" bgcolor=\"#673301\" height=\"30\" class=\"commonSmall\" style=\"color:#FFFFFF\"><td colspan=\"4\">$ThanksUPS</td></tr>";
+	print "</table>";
+	print "</center>";
+}
+
+#### BAD CALL
+elsif ($page =~ "invalid") {
+	print "<font class=\"commonSmall\" style=\"color:#FFFFFF\"><b>Bad User Input</b><br><br>One or more of the numbers you entered are not valid UPS Tracking Numbers. These UPS Tracking Number(s) are not valid. Please try again...</font>";
+}
+
+#### BAD CALL
+elsif ($page =~ "Unable" && $page =~ "track" && $page =~ "shipment") {
+	print "<font class=\"commonSmall\" style=\"color:#FFFFFF\"><b>Unable to Track Package</b><br><br>We were unable to track the package for the number you entered. Please try again...</font>";
+}
+
+else {
+	print "<font class=\"commonSmall\" style=\"color:#FFFFFF\"><b>Unable to Track Package</b><br><br>We were unable to track the package for the number you entered. Please try again...</font>";
+}
+
+1;

@@ -1,0 +1,563 @@
+#!/usr/bin/perl5 -s
+
+if (&GetCookies('MyProcessType')) {
+	&GetCookies('MyProcessType');
+	if ($Cookies{'MyProcessType'} =~ "EQuote") {
+		$cualPurchType = "<script language=\"Javascript\">makeQuote();</script>";
+	}
+	##purchase	
+	else {
+		$cualPurchType = "<script language=\"Javascript\">makePurchase();</script>";	
+	}
+}
+
+print qq~
+
+<script language="Javascript">
+function toggleFieldsetOn(numero,field,table) {
+	document.getElementById("Fieldset"+numero+"").style.border = '1px solid #'+field;
+//	document.getElementById("Table"+numero+"").style.background = '1px solid #'+table;
+}
+function toggleFieldsetOff(numero,field) {
+	document.getElementById("Fieldset"+numero+"").style.border = '1px solid #'+field;
+//	document.getElementById("Table"+numero+"").style.background = '1px solid #A0A0A0';
+}
+
+
+// IMAGE PRELOADER
+check0 = new Image();
+check0.src = "images/Bcheckbox0.gif";
+check1 = new Image();
+check1.src = "images/Bcheckbox1.gif";
+
+function toggleCheckbox(incoming) {
+	var leNombre = incoming;
+	var muaField = document.checkout1[leNombre];
+	if (muaField.checked == true) {
+		muaField.checked = 0;
+		document.images[leNombre].src = check0.src;
+		document.getElementById(""+leNombre+"").style.color = "000000";
+	}
+	else {
+		muaField.checked = 1;
+		document.images[leNombre].src = check1.src;
+		document.getElementById(""+leNombre+"").style.color = "4C6279";
+	}
+}
+
+function checkOut() {
+var missingdrop = "";
+var thefirst = "";
+
+if (document.checkout1.FName.value == "" || document.checkout1.FName.value == " ") {
+    missingdrop += "\\n     - First Name";
+	if (thefirst == "") { thefirst = "FName"; }
+}
+
+if (document.checkout1.LName.value == "" || document.checkout1.LName.value == " ") {
+    missingdrop += "\\n     - Last Name";
+	if (thefirst == "") { thefirst = "LName"; }
+}
+
+if (document.checkout1.Address1.value == "" || document.checkout1.Address1.value == " ") {
+    missingdrop += "\\n     - Address Line 1";
+	if (thefirst == "") { thefirst = "Address1"; }
+}
+
+if (document.checkout1.City.value == "" || document.checkout1.City.value == " ") {
+    missingdrop += "\\n     - City";
+	if (thefirst == "") { thefirst = "City"; }
+}
+
+if (isNaN(document.checkout1.Zip.value) || (document.checkout1.Zip.value == "") || (document.checkout1.Zip.value == " ") || (document.checkout1.Zip.value.length != 5)) {
+    missingdrop += "\\n     - Zip Code must be a 5 or 9 digit number (*no hyphens)";
+	if (thefirst == "") { thefirst = "Zip"; }
+}
+
+if (document.checkout1.State.value.length < 1) {
+    missingdrop += "\\n     - State";
+	if (thefirst == "") { thefirst = "State"; }
+}
+
+// Check Phone number and format if it is there get the area code and num and feed the Phone field
+if (isNaN(document.checkout1.TArea.value) || (document.checkout1.TArea.value == "") || (document.checkout1.TArea.value == " ") || (document.checkout1.TArea.value.length != 3)) {
+    missingdrop += "\\n     - Phone's Area Code must be a 3 digit number";
+	if (thefirst == "") { thefirst = "TArea"; }
+}
+else if (isNaN(document.checkout1.TNum.value) || (document.checkout1.TNum.value == "") || (document.checkout1.TNum.value == " ") || (document.checkout1.TNum.value.indexOf('-') != -1) || (document.checkout1.TNum.value.length != 7)) {
+    missingdrop += "\\n     - Phone Number must be a 7 digit number\\n        *No hyphen (-) necessary";
+	if (thefirst == "") { thefirst = "TNum"; }
+}
+else {
+	PhoneValues = document.checkout1.TArea.value + document.checkout1.TNum.value;
+	document.checkout1.Phone.value = PhoneValues;
+}
+
+// Check Fax number and format if it is there get the area code and num and feed the Fax field
+
+	FaxValues = document.checkout1.FArea.value + document.checkout1.FNum.value;
+	document.checkout1.Fax.value = FaxValues;
+
+
+// CHECK EMAIL
+  if (document.checkout1.Email.value == "")	{
+    missingdrop += "\\n     - Email";
+	if (thefirst == "") { thefirst = "Email"; }
+  } else if ((document.checkout1.Email.value.indexOf('\@') == -1) || 
+        (document.checkout1.Email.value.indexOf('.') == -1)) {
+    missingdrop += "\\n     - Email Format should be: username\@mycompany.com";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.checkout1.Email.value.indexOf(',') != -1)) {
+    missingdrop += "\\n     - Commas are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.checkout1.Email.value.indexOf(';') != -1)) {
+    missingdrop += "\\n     - Semicolons are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.checkout1.Email.value.indexOf(':') != -1)) {
+    missingdrop += "\\n     - Colons are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.checkout1.Email.value.indexOf('&') != -1)) {
+    missingdrop += "\\n     - Ampersands are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.checkout1.Email.value.indexOf(' ') != -1)) {
+    missingdrop += "\\n     - Spaces are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+~;
+
+  
+  
+if (!$Cookies{'SaShUs'}) {
+print qq~
+
+	if (document.checkout1.UNamePassed.value != "YES" && thefirst == "") {
+			return runUCheck();
+	}
+	// this step for new users only
+	else {
+		document.checkout1.Username.value = document.checkout1.Email.value; 	
+		document.checkout1.action = 'products.cgi';
+	}
+
+~;
+}
+	
+	
+
+print qq~
+// pass stuff for new users only
+if (document.checkout1.Pass1) {
+	if ((document.checkout1.Pass1.value == "") || (document.checkout1.Pass1.value == " ") || (document.checkout1.Pass1.value.length < 8)) {
+    	missingdrop += "\\n     - Pass Code must be at least 8 characters, Numbers and/or Letters (*no hyphens)";
+		if (thefirst == "") { thefirst = "Pass1"; }
+	}	
+	else if (document.checkout1.Pass1.value != document.checkout1.Pass2.value) {
+		missingdrop += "\\n     - Your two passwords do not match. Please try again.";
+		if (thefirst == "") { thefirst = "Pass1"; }
+		document.checkout1.Pass1.value = "";
+		document.checkout1.Pass2.value = "";
+	}
+}
+
+
+// ONLY IF BUYING DO WE TEST CC INFO
+if (document.checkout1.cualMove.value == "Purchase" || document.checkout1.cualMove.value == "") {
+	var leindex = document.checkout1.PayType.selectedIndex;
+	var thisPT = document.checkout1.PayType.options[leindex].value;
+	if (thisPT == "CHOOSEONE") { 
+	    missingdrop += "\\n     - Please select a proper Method of Payment";
+		if (thefirst == "") { thefirst = "PayType"; }	
+	}
+	else if (thisPT == "CC::CC1" || thisPT == "CC::CC2" || thisPT == "CC::CC3") {
+		if (document.checkout1.CCPassed.value != "YES" && thefirst == "") {
+			return runCCCheck();
+		}
+	}
+}	
+
+	
+
+// If anything comes back wrong alert and detain form, else submit info
+if (missingdrop != "") {
+    missingdrop ="___________________________________________                   \\n\\n" + "  Sorry, I cannot process your request because the\\n  following fields are either blank or filled incorrectly:\\n" + "___________________________________________                   \\n\\n" +
+    missingdrop + "\\n\\n___________________________________________                   " + "\\n\\n   To continue, check fields and submit form again!" + "\\n___________________________________________";
+    alert(missingdrop);
+	document.checkout1[thefirst].focus();
+    return false;
+} 
+else {
+	return true;
+}
+}
+
+function runCCCheck() {
+
+	// NAME OF THE REQUESTED NEW WINDOW
+	var name = "CCCheck";
+	var SweSweT = document.checkout1.SeaSeaT.value;
+	var SweSweN = document.checkout1.SeaSeaN.value;
+	var SweSweEX = document.checkout1.SeaSeaEX.value;
+	var url = "https://www.usnightvision.com/cc_ver.cgi?SeaSeaT="+SweSweT+"&SeaSeaN="+SweSweN+"&SeaSeaEX="+SweSweEX+"";
+	
+	if (document.checkout1.CCPassed.value != "YES") {
+		parent.lower.location.href=url;
+		return false;
+	}
+	else {
+		return true;
+	}
+
+}
+
+function runUCheck() {
+
+	// NAME OF THE REQUESTED NEW WINDOW
+	var name = "UCheck";
+	var leEmail = document.checkout1.Email.value;
+	var url = "https://www.usnightvision.com/user_ver.cgi?leEmail="+leEmail+"";
+	
+	if (document.checkout1.UNamePassed.value != "YES") {
+		parent.lower.location.href=url;
+		return false;
+	}
+	else {
+		return true;
+	}
+
+}
+
+function makeQuote() {
+	var cualMoveValue = document.checkout1.cualMove.value;
+	document.getElementById("HowWould").style.visibility = 'hidden';
+	if (cualMoveValue == "") {
+		document.checkout1.cualMove.value = 'Quote';
+		document.getElementById("Fieldset1").style.visibility = 'visible';
+		document.getElementById("Fieldset2").style.visibility = 'hidden';
+		document.getElementById("YTSlayer").style.visibility = 'hidden';
+		document.checkout1.triggerPurchase.disabled = 'true';
+		document.checkout1.triggerQuote.readonly = 'true';
+		document.location.href = '#first';
+		document.checkout1.CName.focus();
+	}
+}
+function makePurchase() {
+	var cualMoveValue = document.checkout1.cualMove.value;
+	document.getElementById("HowWould").style.visibility = 'hidden';
+	if (cualMoveValue == "") {
+		document.checkout1.cualMove.value = 'Purchase';
+		document.getElementById("Fieldset1").style.visibility = 'visible';
+		document.getElementById("Fieldset2").style.visibility = 'visible';
+		document.getElementById("YTSlayer").style.visibility = 'visible';
+		document.checkout1.triggerQuote.disabled = 'true';
+		document.checkout1.triggerPurchase.readonly = 'true';
+		document.location.href = '#first';
+		document.checkout1.CName.focus();
+	}
+}
+	
+</script>
+<style type="text/css">
+.commonInput { border:#4C6279 1px solid; }
+</style>
+<form method="post" action="products.cgi" name="checkout1" onSubmit="return checkOut();" target="upper">
+<font class="commonMediumB"><div id="HowWould">How would you like to proceed?</div><br><br></font>
+<input type="button" name="triggerQuote" value="Quote Items" onClick="makeQuote();" class="commonInput" style="font-size:12px;font-weight:bold;height:25px;" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" OnMouseOver="focusOnMe(this);" OnMouseOut="blurMe(this);">
+<input type="button" name="triggerPurchase" value="Purchase Items" onClick="makePurchase();" class="commonInput" style="font-size:12px;font-weight:bold;height:25px;" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" OnMouseOver="focusOnMe(this);" OnMouseOut="blurMe(this);">
+<input type="hidden" name="cualMove" value="">
+<br><br>
+<FIELDSET id="Fieldset1" style="border:1px solid #4C6279;padding:5px;visibility:hidden;" onFocus="toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="toggleFieldsetOff('1','4C6279');"> 
+<LEGEND class="commonMediumB" style="margin-bottom:20px;">&nbsp;Billing Information (as it appears on your credit card statement)&nbsp;&nbsp;</LEGEND> 
+
+<table width="95%" id="Table1" cellpadding="1" cellspacing="0" border="0">
+
+	<input type="hidden" name="leAction" value="CHECKOUT">
+	<input type="hidden" name="NextLocation" value="Step2">
+	<input type="hidden" name="TotalCartWeight" value="$daTWeight">
+    <tr> 
+      <td width="115" align="center" height="1"><img src="images/spacer.gif" width="115" height="1"></td>
+      <td width="50%" align="center" height="1"><img src="images/spacer.gif" width="100" height="1"></td>
+      <td width="115" align="center" height="1"><img src="images/spacer.gif" width="115" height="1"></td>
+      <td width="50%" align="center" height="1"><img src="images/spacer.gif" width="100" height="1"></td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right"><a name="first"></a><nobr><font class="commonSmallest"><b>Company Name&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left"><nobr>
+        <input type="text" name="CName" value="$thyCName" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" size="20" tabIndex="1">
+        </nobr></td>
+      <td width="115" align="right"><nobr><font class="commonSmallest"><b><font style="color:#ffffff">*</font> 
+        (Area) Phone</b>&nbsp;&nbsp;&nbsp;</font></nobr></td>
+      <td width="50%" align="left"><nobr> 
+        <input type="hidden" name="Phone" value="">
+		<input type="text" name="TArea" value="$thyTArea" class="commonInput" size="5" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" tabIndex="9">
+        <font class="commonSmallest">&nbsp;&nbsp;</font> 
+        <input type="text" name="TNum" value="$thyTNum" class="commonInput" size="15" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" tabIndex="10">
+        </nobr></td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b><font style="color:#ffffff">* 
+        </font>First Name 
+        &nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left" > 
+        <input type="text" name="FName" value="$thyFName" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" size="20" tabIndex="2">
+      </td>
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b>(Area) Fax</b>&nbsp;&nbsp;&nbsp;</font></nobr></td>
+      <td width="50%" align="left" ><nobr> 
+        <input type="hidden" name="Fax" value="">
+		<input type="text" name="FArea" value="$thyFArea" class="commonInput" size="5" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" tabIndex="11">
+        <font class="commonSmallest">&nbsp;</font> 
+        <input type="text" name="FNum" value="$thyFNum" class="commonInput" size="15" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" tabIndex="12">
+        </nobr></td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b><font style="color:#ffffff">* 
+        </font>Last Name 
+        &nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left" > 
+        <input type="text" name="LName" value="$thyLName" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" size="20" tabIndex="3">
+      </td>
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b><font style="color:#ffffff">*</font> 
+        Email Address &nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left" > 
+        <input type="text" name="Email" value="$thyEmail" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" size="20" tabIndex="13" $readOnly1>
+      </td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b><font style="color:#ffffff">* 
+        </font>Address&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left" > 
+        <input type="text" name="Address1" value="$thyAddress1" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" size="20" tabIndex="4">
+      </td>
+      <td width="115" align="right" >&nbsp;</td>
+      <td width="50%" align="left" >&nbsp;</td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right"><font class="commonSmallest"><b><font style="color:#ffffff">§</font></b></font></td>
+      <td width="50%" align="left" > 
+        <input type="text" name="Address2" value="$thyAddress2" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" size="20" tabIndex="5">
+      </td>
+      <td width="115" align="right" >&nbsp;</td>
+      <td width="50%" align="left" >&nbsp;</td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b><font style="color:#ffffff">*</font> 
+        City&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left" > 
+        <input type="text" name="City" value="$thyCity" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" size="20" tabIndex="6">
+      </td>
+      <td width="115" align="right"><nobr><font class="commonSmallest"><b>Username&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left"><nobr><font class="commonSmallest">$MuaUsername</font></nobr></td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right"><nobr><font class="commonSmallest"><b><font style="color:#ffffff">*</font> State&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left"> 
+
+<select name="State" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" tabIndex="7">
+~;
+
+## WHICH ProductType IS CHOSEN?
+$count=0;
+@EstadosUnidos = ("AL,Alabama","AK,Alaska","AZ,Arizona","AR,Arkansas","CA,California","CO,Colorado","CT,Connecticut","DE,Delaware","DC,DC","FL,Florida","GA,Georgia","HI,Hawaii","ID,Idaho","IL,Illinois","IN,Indiana","IA,Iowa","KS,Kansas","KY,Kentucky","LA,Louisiana","ME,Maine","MD,Maryland","MA,Massachusetts","MI,Michigan","MN,Minnesota","MS,Mississippi","MO,Missouri","MT,Montana","NE,Nebraska","NV,Nevada","NH,New Hampshire","NJ,New Jersey","NM,New Mexico","NY,New York","NC,North Carolina","ND,North Dakota","OH,Ohio","OK,Oklahoma","OR,Oregon","PA,Pennsylvania","RI,Rhode Island","SC,South Carolina","SD,South Dakota","TN,Tennessee","TX,Texas","UT,Utah","VT,Vermont","VA,Virginia","WA,Washington","WV,West Virginia","WI,Wisconsin","WY,Wyoming");
+foreach $Estado (@EstadosUnidos) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $Estado);
+	if ($thyState eq "$value") {
+		print "<option value=\"$value\" SELECTED>$name</option>"; 
+	}
+	else {
+		print "<option value=\"$value\">$name</option>"; 
+	}
+}
+
+print qq~
+</select>
+	  
+      </td>
+~;
+
+if ($Cookies{'Logged'} eq "SI") { 
+	print "<td width=\"150\" align=\"right\"><nobr><font class=\"commonSmallest\"><b> Password&nbsp;&nbsp;&nbsp;</b></font></nobr></td>";
+	print "<td width=\"50%\" align=\"left\"><nobr><font class=\"commonSmallest\">Hidden from your protection</font></nobr></td>";
+}
+else {
+	print "<td width=\"150\" align=\"right\"><nobr><font class=\"commonSmallest\"><b><font style=\"color:#ffffff\">*</font> Password&nbsp;&nbsp;&nbsp;</b></font></nobr></td>";
+	print "<td width=\"50%\" align=\"left\"><input type=\"password\" name=\"Pass1\" class=\"commonInput\" size=\"15\" onFocus=\"focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');\" onBlur=\"blurMe(this);toggleFieldsetOff('1','4C6279');\" tabIndex=\"14\"></td>";
+}	  
+
+print qq~
+    </tr>
+    <tr  valign="middle"> 
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b><font style="color:#ffffff">*</font> Zip / Postal Code&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td width="50%" align="left" ><input type="text" name="Zip" value="$thyZip" class="commonInput" size="15" onFocus="focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('1','4C6279');" tabIndex="8"></td>
+~;
+
+if ($Cookies{'Logged'} eq "SI") {
+	print "<td width=\"150\" align=\"right\"><font class=\"commonSmallest\">&nbsp;</font></td>";
+	print "<td width=\"50%\" align=\"left\"><font class=\"commonSmallest\">&nbsp;</font></td>";
+}
+else {
+	print "<td width=\"150\" align=\"right\"><nobr><font class=\"commonSmallest\"><b><font style=\"color:#ffffff\">*</font> Re-Type Password&nbsp;&nbsp;&nbsp;</b></font></nobr></td>";
+	print "<td width=\"50%\" align=\"left\"><input type=\"password\" name=\"Pass2\" class=\"commonInput\" size=\"15\" onFocus=\"focusOnMe(this);toggleFieldsetOn('1','CCCCCC','CCCCCC');\" onBlur=\"blurMe(this);toggleFieldsetOff('1','4C6279');\" tabIndex=\"15\"></td>";
+}
+
+print qq~
+    </tr>
+    <tr  valign="middle" align="center"> 
+      <td colspan="4" height="35"><div id="YTSlayer"><a href="javascript:void(0);" class="commonSmallest" style="text-decoration:none;" onClick="toggleCheckbox('YesToSame');" id="YesToSame" onFocus="toggleFieldsetOn('1','CCCCCC','CCCCCC');" onBlur="toggleFieldsetOff('1','4C6279');" tabIndex="16"><img src="images/Bcheckbox0.gif" border="0" width="10" height="12" name="YesToSame"><img src="images/spacer.gif" border="0" width="5" height="12"><b>Ship my order to this address</b></a><input type="checkbox" name="YesToSame" style="visibility:hidden"></div></td>
+    </tr>
+</table>
+<center><font class="commonSmallest" style=\"line-height:25px;\">(<font style="color:#ffffff">*</font>)Asterisks Mark Required Fields   -   (<font style="color:#ffffff">§</font>) Military can use AP, AE or AA in "2nd Address Field"</font></center>
+</FIELDSET>
+<FIELDSET id="Fieldset2" style="border:1px solid #4C6279;padding:5px;visibility:hidden;" onFocus="toggleFieldsetOn('2','CCCCCC','CCCCCC');" onBlur="toggleFieldsetOff('2','4C6279');"> 
+<LEGEND class="commonMediumB" style="margin-bottom:20px;">&nbsp;Payment Information&nbsp;&nbsp;</LEGEND> 
+<table id="Table2" cellpadding="1" cellspacing="0" border="0" width="95%">
+
+    <tr> 
+      <td width="50%" align="center" height="1"><img src="images/spacer.gif" width="115" height="1"></td>
+      <td width="115" align="center" height="1"><img src="images/spacer.gif" width="115" height="1"></td>
+      <td align="center" height="1"><img src="images/spacer.gif" width="10" height="1"></td>
+      <td width="50%" align="center" height="1"><img src="images/spacer.gif" width="115" height="1"></td>
+    </tr>
+    <tr> 
+      <td width="50%" align="center" height="1"><img src="images/spacer.gif" width="115" height="1"></td>
+      <td width="115" align="right" height="1"><nobr><font class="commonSmallest"><b>Purchase Order #&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td align="center" height="1"><input type="text" name="PurchOrd" value="" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('2','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('2','4C6279');" size="30" tabindex="17"></td>
+      <td width="50%" align="center" height="1"><img src="images/spacer.gif" width="115" height="1"></td>
+    </tr>
+    <tr valign="middle"> 
+      <td width="50%" align="right" >&nbsp;</td>
+      <td width="115" align="right" ><nobr><font class="commonSmallest"><b>Select Your Payment Method&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td align="left">
+	<script language="Javascript">
+		function togglePTs() {
+			var formindex = document.checkout1.PayType.selectedIndex;
+			var thisone = document.checkout1.PayType.options[formindex].value;
+			if (thisone.indexOf("CC") != -1) {
+				document.checkout1.CCPassed.value = "NO";			
+				document.getElementById("SeaSeaT").style.visibility = 'visible';
+				document.getElementById("SeaSeaN").style.visibility = 'visible';
+				document.getElementById("SeaSeaEX").style.visibility = 'visible';
+				document.getElementById("SeaSeaTT").style.visibility = 'visible';
+				document.getElementById("SeaSeaNT").style.visibility = 'visible';
+				document.getElementById("SeaSeaEXT").style.visibility = 'visible';
+				if (thisone == "CC::CC1") { 
+					document.checkout1.SeaSeaT.value = '$thySeaSeaT';
+					document.checkout1.SeaSeaN.value = '$thySeaSeaN';
+					document.checkout1.SeaSeaEX.value = '$thySeaSeaEX';
+				}
+				if (thisone == "CC::CC2") {
+					document.checkout1.SeaSeaT.value = '$thySeaSeaT2';
+					document.checkout1.SeaSeaN.value = '$thySeaSeaN2';
+					document.checkout1.SeaSeaEX.value = '$thySeaSeaEX2';				
+				}
+				if (thisone == "CC::CC3") {
+					document.checkout1.SeaSeaT.value = '$thySeaSeaT3';
+					document.checkout1.SeaSeaN.value = '$thySeaSeaN3';
+					document.checkout1.SeaSeaEX.value = '$thySeaSeaEX3';				
+				}
+			}
+			else {
+				document.checkout1.CCPassed.value = "YES";
+				document.getElementById("SeaSeaT").style.visibility = 'hidden';
+				document.getElementById("SeaSeaN").style.visibility = 'hidden';
+				document.getElementById("SeaSeaEX").style.visibility = 'hidden';
+				document.getElementById("SeaSeaTT").style.visibility = 'hidden';
+				document.getElementById("SeaSeaNT").style.visibility = 'hidden';
+				document.getElementById("SeaSeaEXT").style.visibility = 'hidden';
+			}
+		}
+	</script>
+<select name="PayType" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('2','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('2','4C6279');" tabindex="18" onChange="togglePTs();">
+<option value="CHOOSEONE"> -- Choose One -- </option>
+~;
+
+## WHICH ProductType IS CHOSEN?
+$count=0;
+@PTypes = ("CC::CC1,1st Credit Card","CC::CC2,2nd Credit Card","CC::CC3,3rd Credit Card","OTHER::net5,Net5","OTHER::net10,Net10","OTHER::net25,Net25","OTHER::check,Check/Money Order","OTHER::cod,C.O.D.");
+foreach $PType (@PTypes) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $PType);
+	if ($thyPT =~ "$value") {
+		print "<option value=\"$value\">$name</option>";
+	}
+	## DEFAULT PAYTYPES ALWAYS PRINTED
+	elsif ("$value" =~ "CC1") {
+		print "<option value=\"$value\">Credit Card</option>";
+	}
+}
+
+print qq~
+</select>
+	  </td>
+      <td width="50%" align="right" >&nbsp;</td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="50%" align="right">&nbsp;</td>
+      <td width="115" align="right"><nobr><font class="commonSmallest" id="SeaSeaTT" style="visibility:hidden;"><b>Credit Card Type&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td align="left"><nobr>
+
+<input type="hidden" name="CCPassed" value="">
+<select name="SeaSeaT" id="SeaSeaT" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('2','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('2','4C6279');" tabindex="19" style="visibility:hidden;">
+~;
+
+## WHICH CCType IS CHOSEN?
+$count=0;
+@CCTypes = ("amex,American Express","novus,Discover / Novus","mastercard,MasterCard","visa,Visa");
+foreach $CCType (@CCTypes) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $CCType);
+	if ($thySeaSeaT =~ "$value") {
+		print "<option value=\"$value\" SELECTED>$name</option>"; 
+	}
+	else {
+		print "<option value=\"$value\">$name</option>"; 
+	}
+}
+
+print qq~
+</select>
+
+</nobr></td>
+      <td width="50%" align="right">&nbsp;</td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="50%" align="right" >&nbsp;</td>
+      <td width="115" align="right" ><nobr><font class="commonSmallest" id="SeaSeaNT" style="visibility:hidden;"><b><font style="color:#ffffff">* </font>Credit Card #</b></font></nobr><nobr></nobr><nobr><font class="commonSmallest"><b>&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td align="left"><input type="text" name="SeaSeaN" id="SeaSeaN" value="$thySeaSeaN" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('2','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('2','4C6279');" size="30" tabindex="20" style="visibility:hidden;"></td>
+      <td width="50%" align="right" >&nbsp;</td>
+    </tr>
+    <tr  valign="middle"> 
+      <td width="50%" align="right" >&nbsp;</td>
+      <td width="115" align="right" ><nobr><font class="commonSmallest" id="SeaSeaEXT" style="visibility:hidden;"><b><font style="color:#ffffff">* </font>Expiration Date</b></font></nobr><nobr></nobr><nobr></nobr><nobr><font class="commonSmallest"><b>&nbsp;&nbsp;&nbsp;</b></font></nobr></td>
+      <td align="left"><input type="text" name="SeaSeaEX" id="SeaSeaEX" value="$thySeaSeaEX" class="commonInput" onFocus="focusOnMe(this);toggleFieldsetOn('2','CCCCCC','CCCCCC');" onBlur="blurMe(this);toggleFieldsetOff('2','4C6279');" size="10" tabindex="21" style="visibility:hidden;"></td>
+      <td width="50%" align="right" >&nbsp;</td>
+    </tr>
+</table>
+<br>
+</FIELDSET>
+
+<span id="Step1Tip1" class="commonInput" style="text-align:center; background-color:#FFFFFF; layer-background-color:#FFFFFF;">Sorry, you cannot alter this field</span>
+
+$cualPurchType
+
+~;
+
+
+
+print qq~
+
+<br>
+<br>
+~;
+
+
+&secureLeftBot;
+
+1;

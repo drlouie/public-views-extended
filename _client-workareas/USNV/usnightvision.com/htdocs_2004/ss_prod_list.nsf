@@ -1,0 +1,51 @@
+<tr>
+<td width="100%" valign="top" colspan="3">
+
+
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+	<tr>
+	<td>
+
+	
+	
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr> 
+    <td align="center" width="160" valign="top"><font class="commonSmall" style="font-size:12px;">!!IMAGEN!!<br><nobr><b>Price</b> !!PRICE!!</nobr></font></td>
+    <td><font class="commonSmall" style="line-height:16px;"><b style="text-decoration:underline;font-size:12px;">!!Title_With_Link!!</b>!!GENERATION!!<br>!!ProdDescSmall!!</font> 
+
+      <table width="100%" border="0" cellspacing="7" cellpadding="0">
+        <tr> 
+          <td><font class="commonSmall" style="line-height:normal;">!!DESCRIPTION!!</font></td>
+        </tr>
+      </table>
+ 
+!!BULLETS!!
+	  
+    </td>
+    <td width="180" align="center" valign="top">
+	
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">!!MPINFO!!</td>
+        </tr>
+        <tr>
+          <td align="center">!!SFCQ!!</td>
+        </tr>
+      </table>
+	  
+    </td>
+  </tr>
+</table>
+
+
+
+	</td>
+</tr>
+</table>
+
+</td>
+</tr>
+<tr>
+<td width="100%" height="20" colspan="3" align="center"><table width="85%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#cccccc" width="100%" height="1"><img src="images/spacer.gif" width="10" height="1"></td></tr></table></td>
+</tr>

@@ -1,0 +1,1984 @@
+#!/usr/bin/perl5 -s
+
+	use DBI;
+	my $dbh = DBI->connect("DBI:mysql:unvWeb","root","chinga2") or die "Unable to connect to database...\n"; 
+	$dbh->{RaiseError} = 1; 
+
+## If SAVING
+if ($FORM{'DROPIN'} && $FORM{'Email'} =~ "@") {
+
+	## Crumble Form Input to Variables
+		my $CustNum = "$FORM{'CustNum'}";
+		my $CompanyName = "$FORM{'CompanyName'}";
+		my $CompanyType = "$FORM{'CompanyType'}";
+		my $Phone = "$FORM{'Phone'}";
+		my $Ext = "$FORM{'Extension'}";
+		my $Fax = "$FORM{'Fax'}";
+		my $MailAdd = "$FORM{'MailAdd'}";
+		my $MailAdd2 = "$FORM{'MailAdd2'}";
+		my $MailCity = "$FORM{'MailCity'}";
+		my $MailState = "$FORM{'MailState'}";
+		my $MailZip = "$FORM{'MailZip'}";
+		my $RepFName = "$FORM{'FirstName'}";
+		my $RepLName = "$FORM{'LastName'}";
+		my $RepTitle = "$FORM{'Position'}";
+		my $RepEmail = "$FORM{'Email'}";
+		my $Password = "$FORM{'Password'}";
+		my $PT = "$FORM{'PT'}";
+		my $UT = "$FORM{'UT'}";
+		my $AdminID = "$FORM{'AdminID'}";
+		if ($UT eq "Internet" || $UT eq "Home") {
+			$NewUser = "$RepEmail";
+			$Username = "$RepEmail";
+		}
+		else {
+			$NewUser = "$FORM{'Username'}";
+			$Username = "$FORM{'Username'}";
+		}
+		
+	my $sth = $dbh->prepare("INSERT INTO Customers (CustomerID, CustNum, CompanyName, CompanyType, Phone, 
+													Ext, Fax, MailAdd, MailAdd2, MailCity, MailState, MailZip, 
+													RepFName, RepLName, RepTitle, RepEmail, Username, Password, 
+													AddedOn, LastLog, LastOrder, ShipFName, ShipLName, ShipAdd, 
+													ShipAdd2, ShipCity, ShipState, ShipZip, PT, SiSiTi, 
+													SiSiNo, SiSiEx, UT, SiSiTi2, SiSiNo2, SiSiEx2, SiSiTi3, 
+													SiSiNo3, SiSiEx3, RepUID)
+
+						 	 VALUES (Null, '$CustNum', '$CompanyName', '$CompanyType', '$Phone', '$Ext', 
+								'$Fax', '$MailAdd', '$MailAdd2', '$MailCity', '$MailState', '$MailZip', 
+								'$RepFName', '$RepLName', '$RepTitle', '$RepEmail', '$NewUser', '$Password', 
+								Null, '', '', '', '', '', '', '', '', '', '$PT', '$FORM{'SeaSeaT'}', '$FORM{'SeaSeaN'}', 
+								'$FORM{'SeaSeaEx'}', '$UT', '$FORM{'SeaSeaT2'}', '$FORM{'SeaSeaN2'}', '$FORM{'SeaSeaEx2'}', 
+								'$FORM{'SeaSeaT3'}', '$FORM{'SeaSeaN3'}', '$FORM{'SeaSeaEx3'}', '$AdminID')");
+	$sth->execute or die "Unable to execute query\n";
+	$sth->finish;
+
+#########################################################
+############ CALL DYNAMIC HTML EMAILER MODULE ###########
+require "email_template.nsp";
+
+###########################################################
+############ SEND USER'S 'ACCOUNT ADDED' EMAIL ############
+
+if ($UT eq "TopAdmin" || $UT eq "MidAdmin" || $UT eq "MinAdmin") {
+	$EBodyText = "<b>$RepFName $RepLName</b>,<br><br>A new user account has been created for you on the Web-Based Administration System. If you have any problems using accessing the system or any of its functions and/or features please contact your supervisor/manager for help.<br><br>";
+}
+else { 
+	$EBodyText = "<b>$RepFName $RepLName</b>,<br><br>A new user account has been created for you on our Online E-Commerce System. The following are the parameters of the new account for use as a shopping/browsing tool for your future night vision needs. Also, <b>$USNVRepFName $USNVRepLName</b>, has been designated by the system to assist you with your online purchases and quotes. Please feel free to email, call or utilize our site, and <b>$USNVRepFName $USNVRepLName</b>, to get an instant and knowledgable quote for any product you see offered. We thank you for taking interest in our innovative night vision, thermal, digital and infrared products.<br><br>"; 
+}
+
+if ($AdminID =~ "@") {
+
+	$sth = $dbh->prepare("SELECT * FROM Customers WHERE RepEmail='$AdminID'");
+	$sth->execute or die "Unable to execute query\n"; 
+	my @row;
+	while(@row = $sth->fetchrow_array) { 
+		$USNVRepFName = $row[12];
+		$USNVRepLName = $row[13];
+		$USNVRepTitle = $row[14];
+		$USNVRepEmail = $row[15];
+	}
+	$sth->finish;
+	
+	$repInfo = "<br><br><br><b>Your Representative's Information</b><br><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>First & Last Name</b> - $USNVRepFName $USNVRepLName<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Position</b> - $USNVRepTitle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Email Address</b> - $USNVRepEmail</i>";
+}
+
+
+my $RecipientIn = "$RepEmail ($RepFName $RepLName)";
+use lib "/usr/local/lib/";
+use MIME::Lite;
+my $msg = MIME::Lite->new(
+				From    =>"webadmin\@usnightvision.com ( USNightVision.com Administrator )",
+                To      =>"$RecipientIn",
+                Subject =>'US Night Vision Website - New Account Created',
+                Type    =>'multipart/related'
+                );
+   $msg->attach(Type => 'text/html',
+   Data => qq{
+$wrapTop
+
+<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+<tr><td width='100%' align='left'><font class='commonSmall'>$EBodyText</font></td></tr>
+<tr><td width='100%' align='left'>
+
+<font class='commonSmall'>
+<b>Your Username</b> - $NewUser<br>
+<b>Your Password</b> - $Password
+$repInfo
+<br><br>Thank You,<br>US Night Vision Staff<br><br>
+<br><br>
+<center>
+<div style="text-align:left">
+<ul>
+<li><b>US NightVision E-Com System</b><br><a href=\"http://www.USNightVision.com/\">http://www.USNightVision.com/</a></li>
+<li><b>US NightVision Product Catalog (FREE)</b><br><a href=\"http://www.USNightVision.com/freecatalog/\">http://www.USNightVision.com/FreeCatalog/</a></li>
+<li><b>Night Vision Online Forum (FREE)</b><br><a href=\"http://www.USNightVision.com/nvforum/\">http://www.USNightVision.com/NVForum/</a></li>
+</ul>
+</center>
+</font>
+
+</td></tr>
+</table>
+
+$wrapBot
+});
+
+$msg->send();
+		
+
+
+##############################################################################
+############ IF REP IS SPECIFIED SEND REP'S 'ACCOUNT ADDED' EMAIL ############
+if ($AdminID =~ "@") {
+
+
+if ($CompanyName ne "" && $CompanyName ne " ") { $thyCompanyName = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Company Name</b> - $CompanyName<br>"; }
+if ($Fax ne "" && $Fax ne " ") { $thyFaxNum = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Fax Number</b> - ($myFaxArea) $myFaxNum<br>"; }
+if ($Ext ne "" && $Ext ne " ") { $thyExt = "x$Ext"; }
+	## Re-Structure data as necessary
+	my $myTelArea = substr($Phone, 0, 3);
+	my $myTelNum = substr($Phone, 3, 7);
+	my $myFaxArea = substr($Fax, 0, 3);
+	my $myFaxNum = substr($Fax, 3, 7);
+
+$RecipientIn2 = "$USNVRepEmail ($USNVRepFName $USNVRepLName)";
+use lib "/usr/local/lib/";
+use MIME::Lite;
+my $msg = MIME::Lite->new(
+				From    =>"ecom\@usnightvision.com ( USNightVision.com E-Commerce System )",
+                To      =>"$RecipientIn2",
+                Subject =>'US Night Vision Website - Meet Your New Customer/Account',
+                Type    =>'multipart/related'
+                );
+   $msg->attach(Type => 'text/html',
+   Data => qq{
+$wrapTop
+
+<table width='90%' align='center' cellpadding='5' cellspacing='0' border='0'>
+<tr><td width='100%' align='left'><img src='http://www.usnightvision.com/images/spacer.gif' width='100' height='100' border='0'></td></tr>
+<tr><td width='100%' align='left'><font class='commonSmall'><b>$USNVRepFName $USNVRepLName</b>,<br><br>A new user account has been created for <b>$RepFName $RepLName</b> on our Online E-Commerce System. The following are the parameters of this customer's new online account. This message is for your records only, there is no need to reply to this message.<br><br></font></td></tr>
+<tr><td width='100%' align='left'>
+
+<font class='commonSmall'>
+<b>Your New Customer's Account Profile</b><br>
+<i>
+$thyCompanyName
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>First & Last Name</b> - $RepFName $RepLName<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Position</b> - $RepTitle<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Username</b> - $NewUser<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Password</b> - $Password<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Email Address</b> - $RepEmail<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Phone Number</b> - ($myTelArea) $myTelNum $thyExt<br>
+$thyFaxNumber
+<br><br>
+</i>
+</font>
+
+</td></tr>
+</table>
+
+$wrapBot
+});
+
+$msg->send();
+
+
+}
+
+
+{
+print <<EOF
+
+<table width="95%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="50%"><font face="verdana,arial,helvetica" size="2" color="#4d4d4d"><b>Add User/Customer Account</b></font></td>
+          <td align="right" width="50%">&nbsp;</td>
+        </tr>
+        <tr> 
+          <td colspan="2"> 
+            <table width="100%" border="1" cellspacing="0" cellpadding="0" bordercolor="E6A306">
+              <tr bordercolor="#4d4d4d"> 
+                <td width="50%" align="center" valign="top" height="250"> 
+                  <table width="100%" border="0" cellspacing="0" cellpadding="5">
+                    <tr> 
+                      <td width="100%"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d">
+					  
+<center><br><b>Add User/Customer Account</b><br><br>An account for <b>$RepFName $RepLName</b> has been created and an HTML formatted email has been sent via <b>$RepEmail</b> to let him/her know of this addition.<br><br><form><input type="button" value="Back to $RepFName $RepLName\'s Profile" onClick="javascript:location.href='aboutusnv.cgi?leAdmin=addU&CID=$FORM{'CID'}'" class="commonInput"><br><br><input type="button" value="Add More User Accounts" onClick="javascript:location.href='aboutusnv.cgi?leAdmin=addU'" class="commonInput"><br></center>
+<br><br></font>
+
+	
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+<script language="Javascript"> 
+	function feedUsers() { end=1; } 
+	function checkSelects() { end=1; } 
+</script>
+
+EOF
+}
+	
+$dbh->disconnect;
+
+
+1;
+}
+
+
+else {
+
+{
+print <<EOF
+
+<script language="Javascript">
+function checkForm() {
+var missingdrop = "";
+var thefirst = "";
+
+if (document.add.FirstName.value == "" || document.add.FirstName.value == " ") {
+    missingdrop += "\\n     - First Name";
+	if (thefirst == "") { thefirst = "FirstName"; }
+}
+
+if (document.add.LastName.value == "" || document.add.LastName.value == " ") {
+    missingdrop += "\\n     - Last Name";
+	if (thefirst == "") { thefirst = "LastName"; }
+}
+
+
+// CHECK EMAIL
+  if (document.add.Email.value == "")	{
+    missingdrop += "\\n     - Email";
+	if (thefirst == "") { thefirst = "Email"; }
+  } else if ((document.add.Email.value.indexOf('\@') == -1) || 
+        (document.add.Email.value.indexOf('.') == -1)) {
+    missingdrop += "\\n     - Email Format should be: username\@mycompany.com";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.add.Email.value.indexOf(',') != -1)) {
+    missingdrop += "\\n     - Commas are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.add.Email.value.indexOf(';') != -1)) {
+    missingdrop += "\\n     - Semicolons are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.add.Email.value.indexOf(':') != -1)) {
+    missingdrop += "\\n     - Colons are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.add.Email.value.indexOf('&') != -1)) {
+    missingdrop += "\\n     - Ampersands are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+  if ((document.add.Email.value.indexOf(' ') != -1)) {
+    missingdrop += "\\n     - Spaces are not allowed in email addresses";
+	if (thefirst == "") { thefirst = "Email"; }
+  }
+
+
+	var formindex = document.add.UT.selectedIndex;
+	var cualUT = document.add.UT.options[formindex].value;
+
+  
+if (cualUT == "Internet" || cualUT == "Home")  {
+	if (document.add.MailAdd.value == "" || document.add.MailAdd.value == " ") {
+    	missingdrop += "\\n     - Mailing Address";
+		if (thefirst == "") { thefirst = "MailAdd"; }
+	}
+
+	if (document.add.MailCity.value == "" || document.add.MailCity.value == " ") {
+    	missingdrop += "\\n     - City";
+		if (thefirst == "") { thefirst = "MailCity"; }
+	}
+
+	var STindex = document.add.MailState.selectedIndex;
+	var STthisone = document.add.MailState.options[STindex].value;
+	if (STthisone == "--") {
+    	missingdrop += "\\n     - State";
+		if (thefirst == "") { thefirst = "MailState"; }
+	}
+
+	if (isNaN(document.add.MailZip.value) || (document.add.MailZip.value == "") || (document.add.MailZip.value == " ") || (document.add.MailZip.value.length != 5)) {
+    	missingdrop += "\\n     - Zip Code must be a 5 or 9 digit number (*no hyphens)";
+		if (thefirst == "") { thefirst = "MailZip"; }
+	}
+}
+	
+// Check Phone number and format if it is there get the area code and num and feed the Phone field
+if (isNaN(document.add.TelArea.value) || (document.add.TelArea.value == "") || (document.add.TelArea.value == " ") || (document.add.TelArea.value.length != 3)) {
+    missingdrop += "\\n     - Phone's Area Code must be a 3 digit number";
+	if (thefirst == "") { thefirst = "TelArea"; }
+}
+else if (isNaN(document.add.TelNum.value) || (document.add.TelNum.value == "") || (document.add.TelNum.value == " ") || (document.add.TelNum.value.indexOf('-') != -1) || (document.add.TelNum.value.length != 7)) {
+    missingdrop += "\\n     - Phone Number must be a 7 digit number\\n        *No hyphen (-) necessary";
+	if (thefirst == "") { thefirst = "TelNum"; }
+}
+else {
+	PhoneValues = document.add.TelArea.value + document.add.TelNum.value;
+	document.add.Phone.value = PhoneValues;
+}
+
+
+// Check extension character
+if (isNaN(document.add.Extension.value)) {
+    missingdrop += "\\n     - Extension must be a number";
+	if (thefirst == "") { thefirst = "Extension"; }
+}
+
+// Check Fax number and format if it is there get the area code and num and feed the Fax field
+
+	FaxValues = document.add.FaxArea.value + document.add.FaxNum.value;
+	document.add.Fax.value = FaxValues;
+
+
+var selectedPayM = document.add.PT.selectedIndex;
+if (cualUT == "Internet" || cualUT == "Home") {
+	if (selectedPayM == "-1")	{
+		missingdrop += "\\n     - You must select at least one Payment Method for Customer Accounts.";
+		if (thefirst == "") { thefirst = "PT"; }
+	}
+}
+
+
+if (missingdrop != "") {	
+	
+
+	if (document.add.UNamePassed.value != "YES" && thefirst == "") {
+		return runUCheck();
+	}
+	else if ((cualUT == "Internet" || cualUT == "Home") || document.add.Username.value.indexOf("\@") == 1) {
+		document.add.Username.value = document.add.Email.value;
+	}
+
+
+	if ((document.add.Password.value == "") || (document.add.Password.value == " ") || (document.add.Password.value.length < 8)) {
+		missingdrop += "\\n     - Pass Code must be at least 8 characters, Numbers and/or Letters (*no hyphens)";
+		if (thefirst == "") { thefirst = "Password"; }
+	}	
+	else if (document.add.Password.value != document.add.Password2.value) {
+		missingdrop += "\\n     - Your two passwords do not match. Please try again.";
+		if (thefirst == "") { thefirst = "Password"; }
+		document.add.Password.value = "";
+		document.add.Password2.value = "";
+	}
+}
+	
+	
+if (cualUT == "Internet" || cualUT == "Home")  {
+	if (document.add.CCPassed.value != "YES" && thefirst == "" && document.add.SeaSeaN.value != "$SeaSeaN" && document.add.SeaSeaN.value.length >= 1) {
+		return runCCCheck('uno');
+	}
+
+	if (document.add.CCPassed2.value != "YES" && thefirst == "" && document.add.SeaSeaN2.value != "$SeaSeaN2" && document.add.SeaSeaN2.value.length >= 1) {
+		return runCCCheck('dos');
+	}
+
+	if (document.add.CCPassed3.value != "YES" && thefirst == "" && document.add.SeaSeaN3.value != "$SeaSeaN3" && document.add.SeaSeaN3.value.length >= 1) {
+		return runCCCheck('tres');
+	}
+}
+	
+// If anything comes back wrong alert and detain form, else submit info
+if (missingdrop != "") {
+    missingdrop ="___________________________________________                   \\n\\n" + "  Sorry, I cannot process your request because the\\n  following fields are either blank or filled incorrectly:\\n" + "___________________________________________                   \\n\\n" +
+    missingdrop + "\\n\\n___________________________________________                   " + "\\n\\n   To continue, check fields and submit form again!" + "\\n___________________________________________";
+    alert(missingdrop);
+	document.add[thefirst].focus();
+    return false;
+} 
+else {
+return true;
+}
+}
+
+
+function runUCheck() {
+
+	// NAME OF THE REQUESTED NEW WINDOW
+	var name = "UCheck";
+	var leEmail = document.add.Email.value;
+
+	var formindex = document.add.UT.selectedIndex;
+	var cualUT = document.add.UT.options[formindex].value;
+
+	var cualPT = document.add.PT.selectedIndex;
+	var url = "";
+	
+	if (cualPT == "5" && (cualUT == "Internet" || cualUT == "Home")) { url = "user_ver.cgi?myFORM=add&withCC=1&leEmail="+leEmail+""; }
+	else { url = "user_ver.cgi?myFORM=add&leEmail="+leEmail+""; }
+	
+	if (document.add.UNamePassed.value != "YES") {
+		//GET SIZE OF WINDOW/SCREEN FOR NEW WINDOW PLACEMENT UNTO CENTER OF SCREEN
+		parent.lower.location.href=url;
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+
+
+
+
+function runCCCheck(cual) {
+
+	if (cual == "uno" && document.add.CCPassed.value != "YES") {
+		var SweSweT = document.add.SeaSeaT.value;
+		var SweSweN = document.add.SeaSeaN.value;
+		var SweSweEX = document.add.SeaSeaEx.value;
+		var url1 = "cc_ver.cgi?myFORM=add&SeaSeaT="+SweSweT+"&SeaSeaN="+SweSweN+"&SeaSeaEX="+SweSweEX+"";
+		parent.lower.location.href=url1;
+		return false;
+	}
+	else if (cual == "dos" && document.add.CCPassed2.value != "YES") {
+		var SweSweT2 = document.add.SeaSeaT2.value;
+		var SweSweN2 = document.add.SeaSeaN2.value;
+		var SweSweEX2 = document.add.SeaSeaEx2.value;
+		var url2 = "cc_ver.cgi?myFORM=add&CualSweSwe=2&SeaSeaT="+SweSweT2+"&SeaSeaN="+SweSweN2+"&SeaSeaEX="+SweSweEX2+"";
+		parent.lower.location.href=url2;
+		return false;
+	}
+	else if (cual == "tres" && document.add.CCPassed3.value != "YES") {
+		var SweSweT3 = document.add.SeaSeaT3.value;
+		var SweSweN3 = document.add.SeaSeaN3.value;
+		var SweSweEX3 = document.add.SeaSeaEx3.value;
+		var url3 = "cc_ver.cgi?myFORM=add&CualSweSwe=3&SeaSeaT="+SweSweT3+"&SeaSeaN="+SweSweN3+"&SeaSeaEX="+SweSweEX3+"";
+		parent.lower.location.href=url3;
+		return false;
+	}
+	else {
+		return true;
+	}
+
+}
+
+</script>
+
+<form method="post" action="aboutusnv.cgi" name="add" onSubmit="return checkForm();">
+<input type="hidden" name="leAdmin" value="addU">
+<input type="hidden" name="myFORM" value="add">
+<input type="hidden" name="DROPIN" value="1">
+<table width="100%" border="0" height="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top"> 
+      <td align="center" width="100%"> 
+        <table width="95%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+            <td width="50%"> <font face="verdana,arial,helvetica" size="2" color="#4d4d4d"><b>Add User/Customer Account</b></font></td>
+            <td align="right" width="50%">&nbsp;</td>
+        </tr>
+        <tr> 
+          <td colspan="2"> 
+              <table width="100%" border="1" cellspacing="0" cellpadding="0" class="tableBORDER" bordercolor="#4d4d4d">
+                <tr bordercolor="#4d4d4d" valign="middle"> 
+                  <td width="100%" align="center" height="50"><font face="verdana,arial,helvetica" size="1" color="#FFFFFF">*If you have any questions please ask your Supervisor or Manager for help using the system or updating it's information.</font> <font face="verdana,arial,helvetica" size="1" color="#4d4d4d"></font><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"></font></td>
+              </tr>
+              <tr bordercolor="#4d4d4d"> 
+                  <td width="50%" align="center" valign="top" bordercolor="#4d4d4d"> 
+                    <table width="100%" border="0" cellspacing="0" cellpadding="5">
+                      <tr> 
+                        <td width="100%" align="center" height="25"  bgcolor="#E6A306" class="tableBG" colspan="2"><font face="verdana,arial,helvetica" size="2" color="#4d4d4d"><b>User's Personal Information</b></font></td>
+                      </tr>
+                      <tr> 
+                        <td align="center" valign="top"><br>
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Account Type</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="105"  bgcolor="#E6A306" align="left" valign="middle"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><center>
+                                        <font face="verdana,arial,helvetica" size="1" color="#4d4d4d">Selected is the type of user this person is. Each user type consists of a set of system access rights. For more access rights layout information for a specific user type select an option then click:<br>
+                                        <br>
+                                        <center>
+                                          <a href="javascript:void(0)" onClick="javascript:showRights();"><font color="#EB0000">Access Rights Layout</font></a> 
+                                        </center>
+                                        </font>
+</center>
+                                      </font></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"><nobr> 
+<script language="Javascript">
+function showRights() {
+var formindex = document.add.UT.selectedIndex;
+var thisone2 = document.add.UT.options[formindex].value;
+var myAlert = "";
+var alertDrop = "";
+	if (thisone2 == "Internet") { myAlert = "This customer was added when he/she first ordered a product online"; }
+	else if (thisone2 == "Home") { myAlert = "This customer was added by a US NightVision Employee/Rep"; }
+	else if (thisone2 == "TopAdmin") { myAlert = "               . : :   US Night Vision Top-Level Administrative User   : : .\\n\\nProducts (View / Add / Import / Update / Delete / Archive / Publish)\\nCustomers (View / Add / Update / Delete)\\nOrders (View / Add / Update / Delete)\\nWebsite (Web Traffic Reports / Forum Admin / Poll Admin / Banner Admin)"; }
+	else if (thisone2 == "MidAdmin") { myAlert = "               . : :   US Night Vision Mid-Level Administrative User   : : .\\n\\nProducts (View / Update / Archive / Publish)\\nCustomers (View / Update)\\nOrders (View / Add / Update 'Only ship date[s] and Tracking ID[s]')\\nWebsite (Web Traffic Reports / Poll Admin / Banner Admin)"; }
+	else { myAlert = "               . : :   US Night Vision Low-Level Administrative User   : : .\\n\\nProducts (View / Update 'Only Pricing')\\nCustomers (View)\\nOrders (View / Update 'Only ship date[s] and Tracking ID[s]')\\nWebsite (Web Traffic Reports)"; }
+
+   	alertDrop ="___________________________________________________________                   \\n\\n" + "                                         ACCESS RIGHTS LAYOUT  \\n" + "___________________________________________________________                   \\n\\n\\n\\n\\n" +
+    myAlert + "\\n\\n\\n\\n___________________________________________________________                   " + "\\n\\n                                   Click OK to close this screen  " + "\\n___________________________________________________________";
+	alert (alertDrop);
+}
+
+function toggleUsername() {
+var formindex = document.add.UT.selectedIndex;
+var thisone3 = document.add.UT.options[formindex].value;
+	if (thisone3 == "Internet" || thisone3 == "Home") {
+		document.add.Username.disabled = true; 
+		document.getElementById("CompanyNameTable").style.visibility = 'visible';
+		document.getElementById("CustNumTable").style.visibility = 'visible';
+		document.getElementById("MailAddLayer").style.visibility = 'visible';
+		document.getElementById("PaymentInfoTable").style.visibility = 'visible';
+		document.getElementById("RepsPanel").style.visibility = 'visible';
+	}
+	else { 
+		document.add.Username.disabled = false; 
+		document.getElementById("CompanyNameTable").style.visibility = 'hidden';
+		document.getElementById("CustNumTable").style.visibility = 'hidden';
+		document.getElementById("MailAddLayer").style.visibility = 'hidden';
+		document.getElementById("PaymentInfoTable").style.visibility = 'hidden';
+		document.getElementById("RepsPanel").style.visibility = 'hidden';
+	}
+	
+}
+</script>
+                                      <select name="UT" class="commonInput" onClick="toggleUsername();" onChange="toggleUsername();" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" style="width:225px;">
+EOF
+}
+
+
+## WHICH UserAccess IS CHOSEN?
+@Types = ("Internet","Home","TopAdmin","MidAdmin","MinAdmin");
+foreach $Type (@Types) {
+	if ($Type eq "TopAdmin" || $Type eq "MidAdmin" || $Type eq "MinAdmin") {
+		## only topadmin can assign admin rights to system
+		if ($thyUT eq "TopAdmin") {
+			print "<option value=\"$Type\">$Type</option>";
+		}
+	}
+	else {
+		if ($type eq "Home") {
+			print "<option value=\"$Type\" selected>$Type</option>";	
+		}
+		else {
+			print "<option value=\"$Type\">$Type</option>";	
+		}
+	}
+}
+
+
+{
+print <<EOF
+                                      </select>
+<!--THREE-->
+                                      </nobr><nobr></nobr></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+<br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Account Type</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="105"  bgcolor="#E6A306" align="left" valign="middle"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><center>
+                                        <font face="verdana,arial,helvetica" size="1" color="#4d4d4d">Selected is the type of user this person is. Each user type consists of a set of system access rights. For more access rights layout information for a specific user type select an option then click:<br>
+                                        <br>
+                                        <center>
+                                          <a href="javascript:void(0)" onClick="javascript:showRights();"><font color="#EB0000">Access Rights Layout</font></a> 
+                                        </center>
+                                        </font>
+</center>
+                                      </font></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"><nobr> 
+<script language="Javascript">
+function showRights() {
+var formindex = document.change.UT.selectedIndex;
+var thisone = document.change.UT.options[formindex].value;
+var myAlert = "";
+var alertDrop = "";
+	if (thisone == "Internet") { myAlert = "This customer was added when he/she first ordered a product online"; }
+	else if (thisone == "Home") { myAlert = "This customer was added by a US NightVision Employee/Rep"; }
+	else if (thisone == "TopAdmin") { myAlert = "               . : :   US Night Vision Top-Level Administrative User   : : .\\n\\nProducts (View / Add / Import / Update / Delete / Archive / Publish)\\nCustomers (View / Add / Update / Delete)\\nOrders (View / Add / Update / Delete)\\nWebsite (Web Traffic Reports / Forum Admin / Poll Admin / Banner Admin)"; }
+	else if (thisone == "MidAdmin") { myAlert = "               . : :   US Night Vision Mid-Level Administrative User   : : .\\n\\nProducts (View / Update / Archive / Publish)\\nCustomers (View / Update)\\nOrders (View / Add / Update 'Only ship date[s] and Tracking ID[s]')\\nWebsite (Web Traffic Reports / Poll Admin / Banner Admin)"; }
+	else { myAlert = "               . : :   US Night Vision Low-Level Administrative User   : : .\\n\\nProducts (View / Update 'Only Pricing')\\nCustomers (View)\\nOrders (View / Update 'Only ship date[s] and Tracking ID[s]')\\nWebsite (Web Traffic Reports)"; }
+
+   	alertDrop ="___________________________________________________________                   \\n\\n" + "                                         ACCESS RIGHTS LAYOUT  \\n" + "___________________________________________________________                   \\n\\n\\n\\n\\n" +
+    myAlert + "\\n\\n\\n\\n___________________________________________________________                   " + "\\n\\n                                   Click OK to close this screen  " + "\\n___________________________________________________________";
+	alert (alertDrop);
+}
+
+function toggleUsername() {
+var formindex = document.change.UT.selectedIndex;
+var thisone = document.change.UT.options[formindex].value;
+	if (thisone == "Internet" || thisone == "Home") {
+		document.change.Username.disabled = true; 
+		document.getElementById("CompanyNameTable").style.visibility = 'visible';
+		document.getElementById("CustNumTable").style.visibility = 'visible';
+		document.getElementById("LastOrderTable").style.visibility = 'visible';
+		document.getElementById("MailAddLayer").style.visibility = 'visible';
+		document.getElementById("PaymentInfoTable").style.visibility = 'visible';
+		document.getElementById("RepsPanel").style.visibility = 'visible';
+		
+	}
+	else { 
+		document.change.Username.disabled = false; 
+		document.getElementById("CompanyNameTable").style.visibility = 'hidden';
+		document.getElementById("CustNumTable").style.visibility = 'hidden';
+		document.getElementById("LastOrderTable").style.visibility = 'hidden';
+		document.getElementById("MailAddLayer").style.visibility = 'hidden';
+		document.getElementById("PaymentInfoTable").style.visibility = 'hidden';
+		document.getElementById("RepsPanel").style.visibility = 'hidden';
+	}
+	
+}
+</script>
+
+<select name="UT" class="commonInput" onClick="toggleUsername();" onChange="toggleUsername();" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" style="width:225px;" $ROUT>
+EOF
+}
+
+
+## WHICH UserAccess IS CHOSEN?
+@Types = ("Internet","Home","TopAdmin","MidAdmin","MinAdmin");
+foreach $Type (@Types) {
+	if ($Type eq "$SavedUT") { print "<option value=\"$Type\" SELECTED>$Type</option>"; }
+	else { print "<option value=\"$Type\">$Type</option>"; }
+}
+
+
+{
+print <<EOF
+                                      </select>
+<!--THREE-->
+                                      </nobr><nobr></nobr></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+<br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">First Name </font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"> 
+                                      <input type="text" name="FirstName" size="30" class="commonInput" value="$SavedRepFName" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROFName>
+                                    </td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+                          <br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Last 
+                                      Name </font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"> 
+                                      <input type="text" name="LastName" size="30" class="commonInput" value="$SavedRepLName" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROLName>
+                                    </td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+                          <br>
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">User's Title / Position</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"> 
+                                      <input type="text" name="Position" size="30" class="commonInput" value="$SavedRepTitle" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROPosi>
+                                    </td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+						  
+                          <br>
+                        </td>
+                        <td align="center" valign="top"> <br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Email Address</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"> 
+<script language="Javascript">
+function checkUsername() {
+var formindex = document.change.UT.selectedIndex;
+var thisone = document.change.UT.options[formindex].value;
+if (thisone == "Internet" || thisone == "Home") {
+	document.change.Username.value = document.change.Email.value;
+}
+else {
+	return true;
+}
+
+}
+</script>
+                                      <input type="text" name="Email" size="50" class="commonInput" value="$SavedRepEmail" onFocus="focusOnMe(this);" OnBlur="checkUsername();blurMe(this);" $ROEmail>
+									  <input type="hidden" name="OGEmail" value="$SavedRepEmail">
+                                    </td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+
+                          <br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Username</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"><input type="text" name="Username" value="$SavedUsername" size="50" class="commonInput" onFocus="checkUsername();" onBlur="checkUsername();" $UsernameAccess><input type="hidden" name="UsernameIN" value="$SavedUsername"><input type="hidden" name="UNamePassed" value="YES"></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+                          <br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">User's Password</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="105"  bgcolor="#E6A306" align="left" valign="middle"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d">Both 
+                                      these fields contain the password as saved 
+                                      in the system. To retrieve a password for 
+                                      a user please ask the user to utilize the 
+                                      'Get Pass' function within the site. To 
+                                      change the password type the new password 
+                                      in both the password and confirm password 
+                                      fields.<br>
+                                      <br>
+                                      <center>
+                                        <font color="#EB0000">Minimum 8 characters</font> 
+                                      </center>
+                                      </font></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="65" align="center"><nobr>
+                                      <table width="150" border="0" cellspacing="0" cellpadding="0">
+                                        <tr> 
+                                          <td width="125" height="20" align="center"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b>Password</b></font></td>
+                                        </tr>
+                                        <tr> 
+                                          <td width="125" height="35" valign="top" align="center"> 
+                                            <input type="password" name="Password" size="15" class="commonInput" value="$SavedPassword" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROPass>
+                                          </td>
+                                        </tr>
+                                        <tr> 
+                                          <td width="125" height="20" align="center"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b>Confirm Password </b></font></td>
+                                        </tr>
+                                        <tr> 
+                                          <td width="125" height="35" valign="top" align="center"> 
+                                            <input type="password" name="Password2" size="15" class="commonInput" value="$SavedPassword" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROPass>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                      </nobr><nobr></nobr></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+<br>
+                        </td>
+                      </tr>
+                      <tr> 
+                        <td width="100%" align="center" height="27"  bgcolor="#E6A306" class="tableBG" colspan="2"><font face="verdana,arial,helvetica" size="2" color="#4d4d4d"><b>Company / Profile Information</b></font></td>
+                      </tr>
+                      <tr> 
+                        <td width="50%" align="center" height="25" valign="top" class="tableBG">
+
+<br>
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Last Website Login On</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="32" align="center"> <font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b>$SavedLastLog</b></font></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+
+
+<br>
+
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center" id="ComapnyTypeTable" style="visibility:$CTTableSH;">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Account Buying Power</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center">
+
+<select name="CompanyType" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCT>
+
+EOF
+}
+
+## WHICH STATE IS CHOSEN?
+@CTs = ("MasterDist","Distributor","Dealer","LawEnforce","Retail","International");
+foreach $CT (@CTs) {
+	if ($CT eq "$SavedCompanyType") { print "
+                                        <option value=\"$CT\" SELECTED>$CT</option>"; }
+	else { print "
+                                        <option value=\"$CT\">$CT</option>"; }
+}
+
+{
+print <<EOF									
+
+</select>
+									
+									</td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+
+
+
+<br>
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center" id="CompanyNameTable" style="visibility:$CNTableSH;">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">USNV Internal Company ID</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"><input type="text" name="CustNum" value="$SavedCustNum" size="30" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCID></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table> 
+						  
+<br>
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Account Created On</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="15" bgcolor="#E6A306">&nbsp;</td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="32" align="center"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b>$AddMonth/$AddDay/$AddYear</b></font></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+
+<br>
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center" id="CustNumTable" style="visibility:$CNumTableSH;">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Company Name</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15"  bgcolor="#E6A306" align="center"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="35" align="center"><input type="text" name="CompanyName" size="30" class="commonInput" value="$SavedCompanyName" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCON></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+
+
+<br>
+
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center" id="LastOrderTable" style="visibility:$LOTableSH;">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Last Ordered On</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="32" align="center"> <font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b>$SavedLastOrder</b></font></td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+<br>
+						</td>
+                        <td width="50%" align="center" height="25" valign="top" class="tableBG">
+<br>
+EOF
+}
+
+
+
+##----------->>> IF TOP ADMIN SHOW ADMIN USERS FOR CUSTOMERS
+if ($thyUT eq "TopAdmin" && ($SavedUT eq "Home" || $SavedUT eq "Internet")) {
+{
+print <<EOF
+<div id="RepsPanel" style="visibility:visible;">
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#333366"><b><font color="#FFFFFF">Account Administrator</font></b><font color="#FFFFFF"> 
+                                      (Company User)</font></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15" bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="315" bgcolor="#E6A306" align="left" valign="middle"><font face="verdana,arial,helvetica" size="1" color="#333366">Only 
+                                      one user can be a company's main administrator 
+                                      at a time. This user will have access to 
+                                      the company's full profile and configuration. 
+                                      This means this user can add, delete change 
+                                      any of the company's users, data or profiles 
+                                      as necessary. This user will also get a 
+                                      copy of all messages sent to any and all 
+                                      other users in the system. That option can 
+                                      be changed if necessary.<br>
+                                      <br>
+                                      There will always be an administrator showing 
+                                      in the <b>Administrator</b> field. To change 
+                                      the administrator choose a user from the 
+                                      List of Sales Reps and click 'Make Admin'<br>
+                                      <br>
+                                      To edit a user's profile select the user 
+                                      you would like to update from the <b>List 
+                                      of Sales Reps</b> list then click 'Edit 
+                                      Selected'<br>
+                                      <br>
+                                      To edit the current administrator's user 
+                                      profile select a different user to be the 
+                                      administrator, then when the user that was 
+                                      the administrator shows up in the <b>List 
+                                      of Sales Reps</b> list, choose that user 
+                                      and click 'Edit Selected'<br></font></td>
+                                    <td width="15" bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15" bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="45" align="center">
+                                      <table width="280" border="0" cellspacing="0" cellpadding="0" bgcolor="#A0A0A0" align="center">
+                                        <tr> 
+                                          <td align="center" width="130" height="20"><font face="verdana,arial,helvetica" size="1" color="#333366"><b>Administrator</b></font></td>
+                                          <td width="10" rowspan="6"><img src="images/spacer.gif" width="10" height="1"></td>
+                                          <td bgcolor="#E6A306" width="1" rowspan="6"><img src="images/spacer.gif" width="1" height="25"></td>
+                                          <td width="10" rowspan="6"><img src="images/spacer.gif" width="10" height="1"></td>
+                                          <td align="center" width="129"><font face="verdana,arial,helvetica" size="1" color="#333366"><b>List of Sales Reps</b></font></td>
+                                        </tr>
+                                        <tr> 
+                                          <td width="130" valign="top" align="center" height="30">
+										  	<input type="hidden" name="OGAdminID" value="$AdminID">
+                                            <select name="AdminID" multiselect size="1" class="commonInput" onFocus="focusOnMe(this);" onBlur="blurMe(this);">
+                                              <option value="BIGNULL">0000000000000000</option>
+                                            </select>
+                                          </td>
+                                          <td width="129" valign="bottom" align="center" rowspan="3"> 
+                                            <select name="UserIDs" size="8" multiple class="commonInput" style="height:150px;" onFocus="focusOnMe(this);" onBlur="blurMe(this);">
+                                              <option value="BIGNULL">0000000000000000</option>
+                                            </select>
+                                          </td>
+                                        </tr>
+                                        <tr> 
+                                          <td valign="top" align="center" width="130"> 
+                                            <input type="Button" value="Make Admin" onClick="javascript:jumpUser();" class="commonInput" name="Button2">
+                                          </td>
+                                        </tr>
+                                        <tr> 
+                                          <td valign="top" align="center" width="130"> 
+                                            <input type="Button" value="Clear Admin" onClick="javascript:clearAdmin();" class="commonInput" name="Button2">
+                                          </td>
+                                        </tr>
+                                        <tr> 
+                                          <td valign="top" align="center" width="130">&nbsp;</td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                    <td width="15" bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15" bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top" bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15" bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+</div>
+EOF
+}
+##end if
+}
+
+
+else {
+	print '<div id="RepsPanel" style="visibility:visible;"></div><input type="hidden" name="AdminID" value="$AdminID">';
+}
+
+{
+print <<EOF
+<br>				
+						</td>
+						
+                      </tr>
+                      <tr> 
+                        <td width="100%" align="center" height="27"  bgcolor="#E6A306" class="tableBG" colspan="2"><font face="verdana,arial,helvetica" size="2" color="#4d4d4d"><b>Contact Information</b></font></td>
+                      </tr>
+						<tr> 
+							<td width="50%" align="center" height="25" valign="top" class="tableBG">
+
+
+                          <br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Phone 
+                                      Number</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="45"  bgcolor="#E6A306" align="center" valign="middle"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><font color="#EB0000">Area 
+                                      Code - 3 digits<br>
+                                      Phone Number - 7 digits</font> </font></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="55" align="center"> <nobr> 
+                                      <input type="text" name="TelArea" size="3" maxlength="3" value="$TelArea" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROPH>
+                                      <input type="text" name="TelNum" size="10" maxlength="7" value="$TelNum" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROPH>
+                                      </nobr> <font face="verdana,arial,helvetica" size="1" color="#4d4d4d"></font><nobr> 
+                                      <input type="text" name="Extension" size="3" maxlength="7" class="commonInput" value="$SavedExtension" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROPH>
+                                      <input type="hidden" name="Phone">
+                                      </nobr> <font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><br>
+                                      <nobr>Area&nbsp;&nbsp;&nbsp; Number &nbsp;&nbsp;&nbsp;&nbsp;Ext.<nobr></font> 
+                                    </td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+
+
+
+<div id="MailAddLayer" style="visibility:$MALayerSH;"><br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Mailing Address</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="105" align="center">
+<input type="text" name="MailAdd" size="40" class="commonInput" value="$SavedMailAdd" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROMAIL>
+<br>
+<input type="text" name="MailAdd2" size="40" class="commonInput" value="$SavedMailAdd2" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROMAIL>
+<br>
+<nobr>
+<input type="text" name="MailCity" size="19" class="commonInput" value="$SavedMailCity" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROMAIL>
+<select name="MailState" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROMAILSTATE>
+
+EOF
+}
+
+## WHICH STATE IS CHOSEN?
+@States = ("--","AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY");
+foreach $State (@States) {
+	if ($State eq "$SavedMailState") { print "
+                                        <option value=\"$State\" SELECTED>$State</option>"; }
+	else { print "
+                                        <option value=\"$State\">$State</option>"; }
+}
+
+{
+print <<EOF									
+
+</select>
+<input type="text" name="MailZip" size="7" class="commonInput" value="$SavedMailZip" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROMAIL>
+</nobr>
+									</td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+</div>
+						  
+						  
+							</td>
+							<td width="50%" align="center" height="25" valign="top" class="tableBG">
+
+
+                          <br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Fax Number</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="45"  bgcolor="#E6A306" align="center" valign="middle"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><font color="#EB0000">Area Code - 3 digits<br>
+                                      Fax Number - 7 digits</font> </font></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="55" align="center"><nobr> 
+                                      <input type="text" name="FaxArea" size="3" maxlength="3" value="$FaxArea" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);">
+                                      <input type="text" name="FaxNum" size="10" maxlength="7" value="$FaxNum" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);">
+                                      <input type="hidden" name="Fax"></nobr><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><br>
+                                      <nobr>Area&nbsp;&nbsp;&nbsp; Number<nobr></font></font>
+                                    </td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+<br>
+							
+							</td>
+						</tr>
+					</table>
+
+                    <table width="100%" border="0" cellspacing="0" cellpadding="5" id="PaymentInfoTable" style="visibility:$PITableSH;">
+                      <tr> 
+                        <td width="100%" align="center" height="27"  bgcolor="#E6A306" class="tableBG" colspan="2"><font face="verdana,arial,helvetica" size="2" color="#4d4d4d"><b>Payment Options</b></font></td>
+                      </tr>
+                      <tr> 
+                        <td width="50%" align="center" height="25" valign="top" class="tableBG">
+
+                          <br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Payment Method(s)</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="15" bgcolor="#E6A306">&nbsp;</td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="55" align="center">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr valign="middle"> 
+      <td align="right"><font class="commonSmallest"><b><nobr>Payment Type(s)</nobr></b><br>(Multiple)</font></td>
+      <td align="left"><nobr>
+	  
+EOF
+}
+
+print '<select name="PT" class="commonInput" onFocus="focusOnMe(this);" onBlur="blurMe(this);" $ROPT multiple style="height:80px;">';
+
+## WHICH ProductType IS CHOSEN?
+$count=0;
+@CCTypes = ("OTHER::net5,Net5","OTHER::net10,Net10","OTHER::net25,Net25","OTHER::check,Check/Money Order","OTHER::cod,C.O.D.","CC,Credit Card");
+foreach $CCType (@CCTypes) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $CCType);
+	if ($SavedPT =~ "$value") {
+		print "<option value=\"$value\" SELECTED>$name</option>";
+	}
+	else {
+		print "<option value=\"$value\">$name</option>";
+	}
+}
+
+print '</select>';
+
+{
+print <<EOF
+	  
+	  </nobr></td>
+    </tr>
+
+</table>
+									
+									</td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+<br>
+						
+						</td>
+                        <td width="50%" align="center" height="25" valign="top" class="tableBG">
+
+<br>
+                          <table width="300" border="0" cellspacing="0" cellpadding="0" align="center">
+                            <tr> 
+                              <td width="348" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                            <tr> 
+                              <td bgcolor="#919191" width="1" height="80"><img src="images/spacer.gif" width="1" height="25"></td>
+                              <td width="348" valign="top"> 
+                                <table width="300" border="0" cellspacing="0" cellpadding="0">
+                                  <tr> 
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                    <td height="20" bgcolor="#919191"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><b><font color="#FFFFFF">Credit Card(s) on File</font></b></font></td>
+                                    <td width="15" height="15" bgcolor="#919191">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td colspan="3" height="1"><img src="images/spacer.gif" width="15" height="1"></td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                    <td height="45"  bgcolor="#E6A306" align="center" valign="middle"><font face="verdana,arial,helvetica" size="1" color="#4d4d4d"><font color="#EB0000">CC Type - CC Number - CC Expiration</font> </font></td>
+                                    <td width="15"  bgcolor="#E6A306" height="15">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                    <td height="55" align="left"><font class="commonSmallest">&nbsp;&nbsp;<b>1st Credit Card</b><br>
+<center>
+<nobr>
+<input type="hidden" name="CCPassed" value="">
+<select name="SeaSeaT" id="SeaSeaT" class="commonInput" onFocus="focusOnMe(this);" onBlur="blurMe(this);" tabindex="18" $ROCCSel>
+EOF
+}
+
+## WHICH CCType IS CHOSEN?
+$count=0;
+@CCTypes = ("amex,Amex","novus,Discover","mastercard,Master","visa,Visa");
+foreach $CCType (@CCTypes) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $CCType);
+	if ($SeaSeaT =~ "$value") {
+		print "<option value=\"$value\" SELECTED>$name</option>"; 
+	}
+	else {
+		print "<option value=\"$value\">$name</option>"; 
+	}
+}
+
+{
+print <<EOF
+</select>
+<input type="text" name="SeaSeaN" size="26" value="$SeaSeaN" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCC>
+<input type="text" name="SeaSeaEx" size="5" class="commonInput" value="$SeaSeaEx" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCC>
+<nobr>
+</center>
+<br><br>
+
+
+&nbsp;&nbsp;<b>2nd Credit Card</b><br>
+<center>
+<nobr>
+<input type="hidden" name="CCPassed2" value="">
+<select name="SeaSeaT2" id="SeaSeaT2" class="commonInput" onFocus="focusOnMe(this);" onBlur="blurMe(this);" tabindex="18" $ROCCSel>
+EOF
+}
+
+## WHICH CCType IS CHOSEN?
+$count=0;
+@CCTypes = ("amex,Amex","novus,Discover","mastercard,Master","visa,Visa");
+foreach $CCType (@CCTypes) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $CCType);
+	if ($SeaSeaT2 =~ "$value") {
+		print "<option value=\"$value\" SELECTED>$name</option>"; 
+	}
+	else {
+		print "<option value=\"$value\">$name</option>"; 
+	}
+}
+
+{
+print <<EOF
+</select>
+<input type="text" name="SeaSeaN2" size="26" value="$SeaSeaN2" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCC>
+<input type="text" name="SeaSeaEx2" size="5" class="commonInput" value="$SeaSeaEx2" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCC>
+<nobr>
+</center>
+<br><br>
+
+
+&nbsp;&nbsp;<b>3rd Credit Card</b><br>
+<center>
+<nobr>
+<input type="hidden" name="CCPassed3" value="">
+<select name="SeaSeaT3" id="SeaSeaT3" class="commonInput" onFocus="focusOnMe(this);" onBlur="blurMe(this);" tabindex="18" $ROCCSel>
+EOF
+}
+
+## WHICH CCType IS CHOSEN?
+$count=0;
+@CCTypes = ("amex,Amex","novus,Discover","mastercard,Master","visa,Visa");
+foreach $CCType (@CCTypes) {
+	$count++;
+   	# Split the pair up into individual variables.
+   	local($value, $name) = split(/,/, $CCType);
+	if ($SeaSeaT3 =~ "$value") {
+		print "<option value=\"$value\" SELECTED>$name</option>"; 
+	}
+	else {
+		print "<option value=\"$value\">$name</option>"; 
+	}
+}
+
+{
+print <<EOF
+</select>
+<input type="text" name="SeaSeaN3" size="26" value="$SeaSeaN3" class="commonInput" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCC>
+<input type="text" name="SeaSeaEx3" size="5" class="commonInput" value="$SeaSeaEx3" onFocus="focusOnMe(this);" OnBlur="blurMe(this);" $ROCC>
+<nobr>
+</center>
+</font> 
+                                    </td>
+                                    <td width="15"  bgcolor="#E6A306">&nbsp;</td>
+                                  </tr>
+                                  <tr> 
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td height="15" align="center" width="318" valign="top"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                    <td width="15"  bgcolor="#E6A306"><img src="images/spacer.gif" width="15" height="15"></td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td bgcolor="#919191" width="1" height="70"><img src="images/spacer.gif" width="1" height="25"></td>
+                            </tr>
+                            <tr> 
+                              <td width="100%" colspan="3" bgcolor="#919191"><img src="images/spacer.gif" width="25" height="1"></td>
+                            </tr>
+                          </table>
+						
+						</td>
+                    </table>
+                </td>
+              </tr>
+              <tr bordercolor="#4d4d4d"  bgcolor="#E6A306">
+                  <td align="center" valign="middle" height="45" width="100%" bordercolor="#4d4d4d"  bgcolor="#E6A306"> 
+                    <input type="submit" value="Save User Profile" name="submitter" class="commonInput">
+                    <input type="hidden" name="submitterToo" style="width:1px;height:1px;" onFocus="document.change.submit();">
+                    <input type="reset" value="Reset Form" name="reset" class="commonInput">
+                    &nbsp;</td>
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+      </table>
+        <br>
+    </td>
+  </tr>
+</table>
+EOF
+}
+
+
+
+
+##----------->>> IF TOP ADMIN SHOW ADMIN USERS FOR CUSTOMERS
+if ($thyUT eq "TopAdmin" && ($SavedUT eq "Home" || $SavedUT eq "Internet")) {
+print "
+
+<script language=\"Javascript\">
+
+
+function jumpUser() {
+	if (document.change.AdminID) {
+		AdminID = document.change.AdminID;
+		UserIDs = document.change.UserIDs; 
+		var sizer = AdminID.length;
+		for(var i = 0; i < UserIDs.length; i++) {
+			if ((UserIDs.options[i] != null) && (UserIDs.options[i].selected)) {
+				var there = false;
+				for(var count = 0; count < sizer; count++) {
+					if (AdminID.options[count] != null) {
+						AdminID.options[count] = null;
+					}
+				}
+				if (there != true) {
+					var sizer = AdminID.length;
+					AdminID.options[sizer] = new Option(UserIDs.options[i].text); 
+					AdminID.options[sizer].value = UserIDs.options[i].value;
+					sizer++;
+         		}
+      		}
+   		}
+  	}
+}
+
+
+function clearAdmin() {
+	AdminIDs = document.change.AdminID;
+	AdminIDs.options[0] = null;
+}
+
+function checkSelects() {
+	UserIDs = document.change.UserIDs;
+	// CLEARS DEFAULT DATA FOR ALL SELECTS
+	UserIDs.options[0] = null;
+	clearAdmin();
+	
+// IF ADDING NEW CUSTOMERS NO NEED TO SEARCH/LOAD ALL THIS CUSTOMER'S USERS
+//	if (document.change.AdminID && document.change.UserIDs) {
+//		UserIDs = document.change.UserIDs; 
+//		UserIDs.options[0] = null;
+//	}
+
+}
+
+function feedUsers() {
+	UserIDs = document.change.UserIDs;
+	AdminIDs = document.change.AdminID;
+	var sizer = UserIDs.length;
+	var sizer2 = AdminIDs.length;
+	// GETTING READY TO FEED INFO
+";
+
+## Get list of ALL USNV users who are SALESREPS
+my $sth = $dbh->prepare("SELECT * FROM Customers WHERE UT='MidAdmin' ORDER BY RepLName ASC");
+$sth->execute or die "Unable to execute query\n"; 
+my @row;
+while(@row = $sth->fetchrow_array) { 
+	my $FirstName = $row[12];
+	my $LastName = $row[13];
+	my $Email = $row[15];
+	my $Username = $row[16];
+	print "UserIDs.options[sizer] = new Option('$LastName, $FirstName');";
+	print "UserIDs.options[sizer].value = '$Email';";
+	print "sizer++;";
+
+	if ($Email eq "$AdminID") {
+		print "AdminIDs.options[sizer2] = new Option('$LastName, $FirstName');";
+		print "AdminIDs.options[sizer2].value = '$Email';";
+	}
+
+}
+$sth->finish;
+	print "}\n</script>";
+}
+
+else {
+	print "<script language=\"Javascript\"> function feedUsers() { end=1; } \n function checkSelects() { end=1; } </script>";
+}
+
+
+
+{
+print <<EOF
+
+<input type="hidden" name="DROPIN" value="1">
+</form>
+
+
+EOF
+}
+
+
+
+
+
+
+
+}
+$dbh->disconnect;
+1;
+}
