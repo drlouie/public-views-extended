@@ -1,0 +1,41 @@
+#!/usr/bin/perl -s
+
+#######################################################################################################
+# Company: NetMedia Solutions                                                                         #
+# Date: Sunday, June 6, 2004                                                                          #
+# Location: Los Angeles, California, United States of America                                         #
+# Made By: Luis Rodriguez (drlouie)                                                                   #
+#######################################################################################################
+
+require("parse_query.nsp");
+
+print "Content-type: text/html\n\n";
+
+
+## ADMIN EMAIL
+use lib "/usr/local/lib/";
+use MIME::Lite;
+my $msg = MIME::Lite->new(
+				From    =>"$Wemail ($Wfname $Wlname)",
+                To      =>"$u_email ($u_fname)",
+                Subject =>'TEST MESSAGE',
+                Type    =>'text/html', 
+Data => qq{
+
+TEST
+
+});
+
+$msg->send();
+print qq~
+
+<html>
+<head>
+<title></title>
+</head>
+<body onLoad="parent.document.location.href = 'index2.php?act=link&url=goodform';">
+</body>
+</html>
+
+~;
+1;

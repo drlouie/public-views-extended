@@ -1,0 +1,54 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="100%" align="left" valign=top><br>
+	<!--Start Content Table Wrapper--> 
+<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr> 
+          <td width="35%"><font class="commonMediumB"><b>!!SResults!!</b></font></td>
+          <td align="right" width="65%"><!-- !!SAGAIN1!!<a href="products.cgi?Search=1"><img src="images/sagain.gif" width="100" height="20" name="sagain" border="0"></a>!!SAGAIN2!! --></td>
+        </tr>
+        <tr bgcolor="#4d4d4d"> 
+          <td colspan="2" height="1"><img src="images/spacer.gif" width="1" height="1"></td>
+        </tr>
+        <tr> 
+          <td width="35%" height="20"><font class="commonSmall"><b><font color="#4d4d4d">!!Matches!! !!SearchedIn!!</font></b> found !!WhileWhat!!</font></td>
+          <td width="65%" align="right"><font class="commonSmall">!!Prev_Pages!! &nbsp; !!Pages!! &nbsp; !!Next_Pages!!</font></td>
+		</tr>
+        <tr> 
+          <td colspan="2" height="15"><img src="images/spacer.gif" width="1" height="15"></td>
+        </tr>
+        <tr> 
+          <td colspan="2" align="left" width="100%">
+!!LETBTR!!
+<table width="100%" border="0" cellspacing="0" cellpadding="2" align="center">!!SearchResults!!</table>
+		</td>
+        </tr>
+        <tr> 
+          <td colspan="2" height="15"><img src="images/spacer.gif" width="1" height="15"></td>
+        </tr>
+        <tr> 
+          <td width="35%" height="20"><font class="commonSmall"><b><font color="#4d4d4d">!!Matches!! !!SearchedIn!!</font></b> found !!WhileWhat!!</font></td>
+          <td width="65%" align="right"><font class="commonSmall">!!Prev_Pages!! &nbsp; !!Pages!! &nbsp; !!Next_Pages!!</font></td>
+		</tr>		
+        <tr bgcolor="#4d4d4d"> 
+          <td colspan="2" height="1"><img src="images/spacer.gif" width="1" height="1"></td>
+        </tr>
+        <tr> 
+          <td width="35%"><font class="commonSmallbig"><b>&nbsp;</b></font></td>
+          <td align="right" width="65%"><!-- !!SAGAIN1!!<a href="products.cgi?Search=1"><img src="images/sagain.gif" width="100" height="20" name="sagain" border="0"></a>!!SAGAIN2!! --></td>
+        </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+      <!--End Content Table Wrapper-->
+</td>
+  </tr>
+</table>
