@@ -1,5 +1,0 @@
-#-	use Crypt::Tea;
-#-	$plaintext = 'mesohony';
-#-	$key = 'CRAP';
-#-	$ascii_cyphertext = &encrypt ($plaintext, $key);
-#-	$dec = &decrypt ($ascii_cyphertext, $key);
